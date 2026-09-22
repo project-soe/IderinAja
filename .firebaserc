@@ -1,6 +1,21 @@
 {
   "projects": {
-    "default": ""
+    "default": "absensitamu"
   },
-  "targets": {}
+  "targets": {
+    "absensitamu": {
+      "hosting": {
+        "vendor": [
+          "absensitamu"
+        ],
+        "customer": [
+          "absensitamu-customer"
+        ],
+        "auth": [
+          "iderinaja-auth"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }

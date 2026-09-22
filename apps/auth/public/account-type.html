@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  >
+
+  <meta
+    name="description"
+    content="Pilih jenis akun IderinAja"
+  >
+
+  <title>IderinAja — Pilih Akun</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  >
+
+  <link rel="stylesheet" href="account-type.css">
+</head>
+
+<body>
+
+  <main class="account-screen">
+
+    <div class="ambient ambient-one"></div>
+    <div class="ambient ambient-two"></div>
+
+    <header class="topbar">
+
+      <a class="brand" href="index.html" aria-label="Kembali ke IderinAja">
+
+        <span class="brand-mark">
+          <svg viewBox="0 0 64 72" aria-hidden="true">
+            <path
+              d="M32 2C17.1 2 5 14.1 5 29c0 20.1 27 41 27 41s27-20.9 27-41C59 14.1 46.9 2 32 2Z"
+              fill="#FFC21A"
+            />
+
+            <path
+              d="M17 27h30v16H17z"
+              fill="none"
+              stroke="#081A24"
+              stroke-width="3"
+              rx="2"
+            />
+
+            <path
+              d="M14 27h36M20 22h28"
+              stroke="#081A24"
+              stroke-width="3"
+              stroke-linecap="round"
+            />
+
+            <circle
+              cx="22"
+              cy="47"
+              r="3"
+              fill="#081A24"
+            />
+
+            <circle
+              cx="42"
+              cy="47"
+              r="3"
+              fill="#081A24"
+            />
+          </svg>
+        </span>
+
+        <span class="brand-name">
+          Iderin<span>Aja</span>
+        </span>
+
+      </a>
+
+      <button
+        class="back-button"
+        type="button"
+        onclick="history.back()"
+        aria-label="Kembali"
+      >
+        ←
+      </button>
+
+    </header>
+
+
+    <section class="account-content">
+
+      <div class="intro">
+
+        <span class="eyebrow">
+          SELAMAT DATANG
+        </span>
+
+        <h1>
+          Kamu menggunakan<br>
+          IderinAja sebagai?
+        </h1>
+
+        <p>
+          Pilih akun yang sesuai dengan aktivitasmu.
+        </p>
+
+      </div>
+
+
+      <div class="account-options">
+
+        <!-- MITRA -->
+
+        <button
+          class="account-card vendor-card"
+          type="button"
+          data-account="vendor"
+        >
+
+          <span class="card-icon">
+
+            <svg viewBox="0 0 64 64" aria-hidden="true">
+              <path
+                d="M10 27h44v24H10z"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="3"
+              />
+
+              <path
+                d="M7 27l5-13h40l5 13"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="3"
+                stroke-linejoin="round"
+              />
+
+              <path
+                d="M7 27c0 5 4 8 9 8s8-3 8-8c0 5 4 8 8 8s8-3 8-8c0 5 4 8 8 8s9-3 9-8"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="3"
+              />
+
+              <circle
+                cx="21"
+                cy="51"
+                r="3"
+                fill="currentColor"
+              />
+
+              <circle
+                cx="44"
+                cy="51"
+                r="3"
+                fill="currentColor"
+              />
+            </svg>
+
+          </span>
+
+          <span class="card-content">
+
+            <span class="card-label">
+              MITRA PEDAGANG
+            </span>
+
+            <strong>
+              Jualan & kelola usaha
+            </strong>
+
+            <span>
+              Kelola menu, stok, lokasi,
+              pesanan, dan pelanggan.
+            </span>
+
+          </span>
+
+          <span class="card-arrow">
+            →
+          </span>
+
+        </button>
+
+
+        <!-- CUSTOMER -->
+
+        <button
+          class="account-card customer-card"
+          type="button"
+          data-account="customer"
+        >
+
+          <span class="card-icon">
+
+            <svg viewBox="0 0 64 64" aria-hidden="true">
+
+              <path
+                d="M32 58S13 40.5 13 25
+                   C13 15.6 20.6 8 30 8
+                   c5.8 0 10.8 3 13.6 7.6
+                   C46.4 11 51.4 8 57 8"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="3"
+                stroke-linecap="round"
+              />
+
+              <path
+                d="M57 8c3 4.5 3 10.5 0 15"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="3"
+                stroke-linecap="round"
+              />
+
+              <circle
+                cx="32"
+                cy="27"
+                r="8"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="3"
+              />
+
+            </svg>
+
+          </span>
+
+          <span class="card-content">
+
+            <span class="card-label">
+              KONSUMEN
+            </span>
+
+            <strong>
+              Temukan & pesan
+            </strong>
+
+            <span>
+              Temukan pedagang di sekitar,
+              pesan menu, dan ikuti favoritmu.
+            </span>
+
+          </span>
+
+          <span class="card-arrow">
+            →
+          </span>
+
+        </button>
+
+      </div>
+
+
+      <div class="login-link">
+
+        <span>Sudah punya akun?</span>
+
+        <button
+          type="button"
+          id="loginButton"
+        >
+          Masuk
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <footer class="footer">
+      <span>© IderinAja</span>
+      <span>Pedagang Keliling Lebih Mudah, Lebih Dekat</span>
+    </footer>
+
+  </main>
+
+  <script src="account-type.js"></script>
+
+</body>
+</html>

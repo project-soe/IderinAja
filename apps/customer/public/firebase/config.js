@@ -1,11 +1,11 @@
-// Konfigurasi Firebase akan didefinisikan di sini.
-// IderinAja - Firebase Configuration
-// Project: absensitamu
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
 
+import {
+  initializeFirestore,
+} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+
 const firebaseConfig = {
-  apiKey: "AIzaSyCo2mE2do07rZq4B8Q8w5mux9oO7cc2lj3I",
+  apiKey: "AIzaSyCo2mE2do07rZq4B8Qw5mux9oO7cc2lj3I",
   authDomain: "absensitamu.firebaseapp.com",
   projectId: "absensitamu",
   storageBucket: "absensitamu.firebasestorage.app",
@@ -15,4 +15,9 @@ const firebaseConfig = {
 };
 
 export const firebaseApp = initializeApp(firebaseConfig);
-export { firebaseConfig };
+
+export const firestoreDb = initializeFirestore(
+  firebaseApp,
+  {},
+  "default"
+);

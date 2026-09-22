@@ -1,0 +1,1649 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+
+  <title>IderinAja — Pedagang Terdekat</title>
+
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
+
+  <style>
+    :root {
+      --yellow: #ffc21a;
+      --yellow-dark: #f5a900;
+
+      --dark: #081a24;
+      --dark-2: #06131b;
+      --dark-3: #0c2531;
+
+      --white: #ffffff;
+      --muted: #91a0a8;
+
+      --green: #28c76f;
+      --red: #ff5c5c;
+      --blue: #168cff;
+
+      --border: rgba(255, 255, 255, 0.08);
+      --border-soft: rgba(255, 255, 255, 0.05);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+
+      font-family: Arial, sans-serif;
+
+      background:
+        radial-gradient(
+          circle at top right,
+          rgba(255, 194, 26, 0.12),
+          transparent 35%
+        ),
+        radial-gradient(
+          circle at bottom left,
+          rgba(22, 140, 255, 0.06),
+          transparent 35%
+        ),
+        var(--dark-2);
+
+      color: var(--white);
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    button:disabled {
+      cursor: wait;
+    }
+
+    /* =========================================
+       DASHBOARD
+    ========================================= */
+
+    .dashboard {
+      width: min(100%, 800px);
+      margin: auto;
+      padding: 20px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* =========================================
+       HEADER
+    ========================================= */
+
+    .header {
+      margin-bottom: 18px;
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand {
+      color: var(--yellow);
+      font-size: 25px;
+      font-weight: 800;
+      letter-spacing: -0.4px;
+    }
+
+    .role {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .logout-button {
+      border: 1px solid rgba(255, 92, 92, 0.35);
+      border-radius: 12px;
+      padding: 9px 13px;
+
+      background: rgba(255, 92, 92, 0.08);
+      color: var(--red);
+
+      font-size: 12px;
+      font-weight: 700;
+
+      transition:
+        transform 0.15s ease,
+        background 0.15s ease;
+    }
+
+    .logout-button:hover {
+      background: rgba(255, 92, 92, 0.13);
+    }
+
+    .logout-button:active {
+      transform: scale(0.97);
+    }
+
+    .logout-button:disabled {
+      opacity: 0.6;
+    }
+
+    .status {
+      margin-top: 16px;
+      padding: 12px 14px;
+
+      border-radius: 14px;
+      border: 1px solid var(--border);
+
+      background: rgba(255, 255, 255, 0.025);
+
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .status.online {
+      color: var(--green);
+      border-color: rgba(40, 199, 111, 0.18);
+      background: rgba(40, 199, 111, 0.05);
+    }
+
+    /* =========================================
+       CARD
+    ========================================= */
+
+    .card {
+      margin-bottom: 16px;
+      padding: 16px;
+
+      border-radius: 20px;
+
+      background: rgba(255, 255, 255, 0.04);
+
+      border: 1px solid var(--border);
+
+      box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.08);
+    }
+
+    .card h2 {
+      margin: 0 0 14px;
+
+      font-size: 19px;
+      letter-spacing: -0.2px;
+    }
+
+    /* =========================================
+       SEARCH
+    ========================================= */
+
+    .search-box {
+      display: grid;
+      gap: 10px;
+    }
+
+    .search-input {
+      width: 100%;
+
+      padding: 14px 15px;
+
+      border: 1px solid var(--border);
+      border-radius: 14px;
+
+      outline: none;
+
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--white);
+
+      font-size: 15px;
+
+      transition:
+        border-color 0.2s ease,
+        background 0.2s ease;
+    }
+
+    .search-input::placeholder {
+      color: var(--muted);
+    }
+
+    .search-input:focus {
+      border-color: rgba(255, 194, 26, 0.55);
+      background: rgba(255, 255, 255, 0.07);
+    }
+
+    .category-filter {
+      display: flex;
+      gap: 8px;
+
+      overflow-x: auto;
+
+      padding-bottom: 2px;
+
+      scrollbar-width: none;
+    }
+
+    .category-filter::-webkit-scrollbar {
+      display: none;
+    }
+
+    .category-button {
+      flex: 0 0 auto;
+
+      padding: 9px 13px;
+
+      border: 1px solid var(--border);
+      border-radius: 999px;
+
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--muted);
+
+      font-size: 13px;
+
+      transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.15s ease;
+    }
+
+    .category-button:hover {
+      background: rgba(255, 255, 255, 0.07);
+    }
+
+    .category-button:active {
+      transform: scale(0.97);
+    }
+
+    .category-button.active {
+      background: var(--yellow);
+      color: var(--dark);
+
+      border-color: var(--yellow);
+
+      font-weight: 700;
+    }
+
+    .search-result-count {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    /* =========================================
+       VENDOR CARD
+    ========================================= */
+
+    .vendor {
+      padding: 15px;
+      margin-bottom: 10px;
+
+      border-radius: 16px;
+
+      background: rgba(255, 255, 255, 0.035);
+
+      border: 1px solid var(--border);
+
+      transition:
+        transform 0.2s ease,
+        background 0.2s ease,
+        border-color 0.2s ease;
+    }
+
+    .vendor:last-child {
+      margin-bottom: 0;
+    }
+
+    .vendor:hover {
+      background: rgba(255, 255, 255, 0.045);
+      border-color: rgba(255, 194, 26, 0.12);
+      transform: translateY(-1px);
+    }
+
+    .vendor-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .vendor-name {
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    .vendor-username {
+      margin-top: 4px;
+
+      color: var(--muted);
+
+      font-size: 12px;
+    }
+
+    .distance {
+      color: var(--yellow);
+
+      font-weight: 700;
+      font-size: 13px;
+
+      white-space: nowrap;
+    }
+
+    .vendor-category {
+      display: inline-flex;
+      width: fit-content;
+
+      margin-top: 9px;
+      padding: 5px 9px;
+
+      border-radius: 999px;
+
+      background: rgba(255, 194, 26, 0.1);
+      color: var(--yellow);
+
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .vendor-info {
+      display: grid;
+      gap: 5px;
+
+      margin-top: 10px;
+
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .vendor-actions {
+      display: flex;
+      gap: 8px;
+
+      margin-top: 13px;
+    }
+
+    .vendor-button {
+      flex: 1;
+
+      padding: 11px 12px;
+
+      border: 1px solid var(--border);
+      border-radius: 12px;
+
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--white);
+
+      font-size: 13px;
+      font-weight: 700;
+
+      transition:
+        transform 0.15s ease,
+        background 0.2s ease,
+        border-color 0.2s ease;
+    }
+
+    .vendor-button:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .vendor-button:active {
+      transform: scale(0.98);
+    }
+
+    .vendor-button.primary {
+      background: var(--yellow);
+      border-color: var(--yellow);
+      color: var(--dark);
+    }
+
+    .vendor-button.primary:hover {
+      background: var(--yellow-dark);
+      border-color: var(--yellow-dark);
+    }
+
+    .vendor-button.subscribed {
+      background: rgba(40, 199, 111, 0.12);
+      border-color: rgba(40, 199, 111, 0.3);
+      color: var(--green);
+    }
+
+    /* =========================================
+       MAP
+    ========================================= */
+
+    #map {
+      width: 100%;
+      height: 430px;
+
+      border-radius: 16px;
+
+      overflow: hidden;
+    }
+
+    .leaflet-popup-content {
+      font-family: Arial, sans-serif;
+    }
+
+    /* =========================================
+       EMPTY / ERROR
+    ========================================= */
+
+    .empty {
+      padding: 24px 10px;
+
+      text-align: center;
+
+      color: var(--muted);
+
+      font-size: 13px;
+    }
+
+    .error {
+      color: var(--red);
+    }
+
+    /* =========================================
+       PROFILE MODAL
+    ========================================= */
+
+    .modal {
+      position: fixed;
+      inset: 0;
+
+      z-index: 9999;
+
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+
+      padding: 15px;
+
+      background: rgba(0, 0, 0, 0.68);
+
+      backdrop-filter: blur(5px);
+    }
+
+    .modal.hidden {
+      display: none;
+    }
+
+    .modal-card {
+      width: min(100%, 520px);
+      max-height: min(90vh, 760px);
+
+      padding: 20px;
+
+      overflow-y: auto;
+
+      border-radius: 22px;
+
+      background:
+        linear-gradient(
+          180deg,
+          rgba(12, 37, 49, 0.98),
+          rgba(8, 26, 36, 0.98)
+        );
+
+      border: 1px solid var(--border);
+
+      box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.45);
+
+      scrollbar-width: thin;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      gap: 15px;
+    }
+
+    .modal-title {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+    }
+
+    .modal-close {
+      flex: 0 0 auto;
+
+      width: 38px;
+      height: 38px;
+
+      border: 0;
+      border-radius: 50%;
+
+      background: rgba(255, 255, 255, 0.07);
+      color: var(--white);
+
+      font-size: 20px;
+
+      transition:
+        background 0.2s ease,
+        transform 0.15s ease;
+    }
+
+    .modal-close:hover {
+      background: rgba(255, 255, 255, 0.11);
+    }
+
+    .modal-close:active {
+      transform: scale(0.94);
+    }
+
+    .modal-username {
+      margin-top: 5px;
+
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .modal-category {
+      display: inline-block;
+
+      margin-top: 14px;
+      padding: 6px 10px;
+
+      border-radius: 999px;
+
+      background: rgba(255, 194, 26, 0.1);
+      color: var(--yellow);
+
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    /* =========================================
+       VENDOR MENU
+    ========================================= */
+
+    .vendor-menu-section {
+      margin-top: 20px;
+    }
+
+    .vendor-menu-title {
+      margin-bottom: 12px;
+
+      color: var(--white);
+
+      font-size: 17px;
+      font-weight: 800;
+    }
+
+    .vendor-menu-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .vendor-menu-item {
+      position: relative;
+
+      padding: 15px;
+
+      border-radius: 16px;
+
+      background:
+        linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.055),
+          rgba(255, 255, 255, 0.025)
+        );
+
+      border: 1px solid var(--border);
+
+      box-shadow:
+        0 7px 20px rgba(0, 0, 0, 0.08);
+
+      transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        background 0.2s ease;
+    }
+
+    .vendor-menu-item:hover {
+      transform: translateY(-1px);
+
+      border-color:
+        rgba(255, 194, 26, 0.18);
+
+      background:
+        linear-gradient(
+          135deg,
+          rgba(255, 194, 26, 0.07),
+          rgba(255, 255, 255, 0.025)
+        );
+    }
+
+    .vendor-menu-item.unavailable {
+      opacity: 0.52;
+    }
+
+    .vendor-menu-main {
+      min-width: 0;
+    }
+
+    .vendor-menu-name {
+      color: var(--white);
+
+      font-size: 15px;
+      font-weight: 800;
+
+      line-height: 1.3;
+    }
+
+    .vendor-menu-description {
+      margin-top: 6px;
+
+      color: var(--muted);
+
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .vendor-menu-bottom {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+
+      gap: 12px;
+
+      margin-top: 14px;
+    }
+
+    .vendor-menu-meta {
+      min-width: 0;
+    }
+
+    .vendor-menu-price {
+      color: var(--yellow);
+
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .vendor-menu-stock {
+      margin-top: 4px;
+
+      color: var(--muted);
+
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .vendor-menu-status {
+      flex: 0 0 auto;
+
+      display: inline-flex;
+      align-items: center;
+
+      min-height: 26px;
+
+      padding: 5px 9px;
+
+      border-radius: 999px;
+
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .vendor-menu-status.available {
+      background: rgba(40, 199, 111, 0.12);
+      color: var(--green);
+    }
+
+    .vendor-menu-status.unavailable {
+      background: rgba(255, 92, 92, 0.1);
+      color: var(--red);
+    }
+
+    .vendor-menu-loading,
+    .vendor-menu-empty,
+    .vendor-menu-error {
+      padding: 14px;
+
+      border-radius: 14px;
+
+      background: rgba(255, 255, 255, 0.04);
+
+      border: 1px solid var(--border-soft);
+
+      color: var(--muted);
+
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    /* =========================================
+       LOCATION / SUBSCRIBE
+    ========================================= */
+
+    .location-locked {
+      margin-top: 18px;
+      padding: 14px;
+
+      border-radius: 14px;
+
+      background: rgba(255, 255, 255, 0.035);
+
+      border: 1px solid var(--border-soft);
+
+      color: var(--muted);
+
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .subscribe-button {
+      width: 100%;
+
+      margin-top: 0;
+      padding: 14px;
+
+      border: 0;
+      border-radius: 14px;
+
+      background: var(--yellow);
+      color: var(--dark);
+
+      font-weight: 800;
+
+      transition:
+        transform 0.15s ease,
+        background 0.2s ease,
+        opacity 0.2s ease;
+    }
+
+    .subscribe-button:hover {
+      background: var(--yellow-dark);
+    }
+
+    .subscribe-button:active {
+      transform: scale(0.985);
+    }
+
+    .subscribe-button:disabled {
+      opacity: 0.6;
+    }
+
+    .subscribe-button.subscribed {
+      background: rgba(40, 199, 111, 0.12);
+      color: var(--green);
+
+      border: 1px solid rgba(40, 199, 111, 0.3);
+    }
+
+    .subscribe-button.subscribed:hover {
+      background: rgba(40, 199, 111, 0.17);
+    }
+
+
+    /* =========================================
+       CART
+    ========================================= */
+
+    .vendor-menu-cart-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .vendor-menu-quantity {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .quantity-button {
+      width: 32px;
+      height: 32px;
+
+      border: 1px solid var(--border);
+      border-radius: 10px;
+
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--white);
+
+      font-size: 16px;
+      font-weight: 800;
+
+      transition:
+        background 0.15s ease,
+        transform 0.15s ease;
+    }
+
+    .quantity-button:hover {
+      background: rgba(255, 194, 26, 0.12);
+    }
+
+    .quantity-button:active {
+      transform: scale(0.94);
+    }
+
+    .quantity-button:disabled {
+      opacity: 0.35;
+    }
+
+    .quantity-value {
+      min-width: 24px;
+      text-align: center;
+
+      color: var(--white);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .add-cart-button {
+      flex: 1;
+
+      min-height: 38px;
+      padding: 9px 12px;
+
+      border: 0;
+      border-radius: 11px;
+
+      background: var(--yellow);
+      color: var(--dark);
+
+      font-size: 12px;
+      font-weight: 800;
+
+      transition:
+        transform 0.15s ease,
+        background 0.2s ease,
+        opacity 0.2s ease;
+    }
+
+    .add-cart-button:hover {
+      background: var(--yellow-dark);
+    }
+
+    .add-cart-button:active {
+      transform: scale(0.97);
+    }
+
+    .add-cart-button:disabled {
+      opacity: 0.45;
+    }
+
+    .vendor-menu-item.unavailable .add-cart-button {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--muted);
+    }
+
+    .cart-bar {
+      position: fixed;
+      left: 50%;
+      bottom: 16px;
+      z-index: 900;
+
+      width: min(
+        calc(100% - 30px),
+        760px
+      );
+
+      transform: translateX(-50%);
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+
+      padding: 13px 14px;
+
+      border: 1px solid rgba(255, 194, 26, 0.22);
+      border-radius: 18px;
+
+      background:
+        linear-gradient(
+          135deg,
+          rgba(12, 37, 49, 0.97),
+          rgba(6, 19, 27, 0.97)
+        );
+
+      box-shadow:
+        0 14px 40px rgba(0, 0, 0, 0.35);
+
+      backdrop-filter: blur(14px);
+    }
+
+    .cart-bar-info {
+      min-width: 0;
+    }
+
+    .cart-bar-title {
+      color: var(--white);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .cart-bar-summary {
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .cart-bar-button {
+      flex: 0 0 auto;
+
+      padding: 11px 15px;
+
+      border: 0;
+      border-radius: 12px;
+
+      background: var(--yellow);
+      color: var(--dark);
+
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .cart-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1200;
+
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+
+      padding: 12px;
+
+      background: rgba(0, 0, 0, 0.68);
+    }
+
+    .cart-modal.hidden {
+      display: none;
+    }
+
+    .cart-card {
+      width: min(100%, 620px);
+      max-height: min(82vh, 720px);
+
+      overflow-y: auto;
+
+      padding: 18px;
+
+      border-radius: 22px 22px 18px 18px;
+
+      background: var(--dark-3);
+      border: 1px solid var(--border);
+
+      box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.45);
+    }
+
+    .cart-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .cart-title {
+      color: var(--white);
+      font-size: 19px;
+      font-weight: 800;
+    }
+
+    .cart-close {
+      width: 34px;
+      height: 34px;
+
+      border: 1px solid var(--border);
+      border-radius: 10px;
+
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--white);
+
+      font-size: 20px;
+    }
+
+    .cart-vendor {
+      margin-top: 6px;
+
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .cart-items {
+      display: grid;
+      gap: 10px;
+
+      margin-top: 18px;
+    }
+
+    .cart-item {
+      padding: 13px;
+
+      border-radius: 15px;
+      border: 1px solid var(--border-soft);
+
+      background: rgba(255, 255, 255, 0.035);
+    }
+
+    .cart-item-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .cart-item-name {
+      color: var(--white);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .cart-item-price {
+      color: var(--yellow);
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .cart-item-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+
+      margin-top: 11px;
+    }
+
+    .cart-item-total {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .cart-remove {
+      border: 0;
+      background: transparent;
+      color: var(--red);
+
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .cart-summary {
+      margin-top: 18px;
+      padding-top: 14px;
+
+      border-top: 1px solid var(--border);
+    }
+
+    .cart-summary-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .cart-summary-label {
+      color: var(--muted);
+      font-size: 12px;
+    }
+      .cart-item-total {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .cart-remove {
+      border: 0;
+      background: transparent;
+      color: var(--red);
+
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .cart-summary {
+      margin-top: 18px;
+      padding-top: 14px;
+
+      border-top: 1px solid var(--border);
+    }
+
+    .cart-summary-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .cart-summary-label {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .cart-summary-total {
+      color: var(--yellow);
+      font-size: 19px;
+      font-weight: 900;
+    }
+
+    .cart-checkout-button {
+      width: 100%;
+
+      margin-top: 14px;
+      padding: 14px;
+
+      border: 0;
+      border-radius: 14px;
+
+      background: var(--yellow);
+      color: var(--dark);
+
+      font-weight: 900;
+    }
+
+    .cart-empty {
+      padding: 22px 14px;
+
+      border-radius: 15px;
+
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid var(--border-soft);
+
+      color: var(--muted);
+      text-align: center;
+      font-size: 12px;
+    }
+
+
+    /* =========================================
+       RESPONSIVE
+    ========================================= */
+
+    @media (max-width: 480px) {
+      .dashboard {
+        padding: 15px;
+      }
+
+      .card {
+        padding: 14px;
+        border-radius: 18px;
+      }
+
+      .vendor-actions {
+        flex-direction: column;
+      }
+
+      .vendor-button {
+        width: 100%;
+      }
+
+      #map {
+        height: 380px;
+      }
+
+      .modal {
+        padding: 10px;
+      }
+
+      .modal-card {
+        padding: 17px;
+
+        border-radius: 20px;
+      }
+    }
+
+    @media (min-width: 700px) {
+      .modal {
+        align-items: center;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- =========================================
+       CUSTOMER DASHBOARD
+  ========================================== -->
+
+  <main
+    id="dashboard"
+    class="dashboard hidden"
+  >
+
+    <!-- =======================================
+         HEADER
+    ======================================== -->
+
+    <header class="header">
+
+      <div class="header-top">
+
+        <div>
+
+          <div class="brand">
+            IderinAja
+          </div>
+
+          <div class="role">
+            Konsumen
+          </div>
+
+        </div>
+
+        <button
+          id="logoutButton"
+          class="logout-button"
+          type="button"
+        >
+          Keluar
+        </button>
+
+      </div>
+
+      <div
+        id="connectionStatus"
+        class="status"
+      >
+        Menghubungkan...
+      </div>
+
+    </header>
+
+    <!-- =========================================
+         SEARCH PEDAGANG
+    ========================================== -->
+
+    <section class="card">
+
+      <h2>
+        🔎 Cari Pedagang
+      </h2>
+
+      <div class="search-box">
+
+        <input
+          id="vendorSearch"
+          class="search-input"
+          type="search"
+          autocomplete="off"
+          placeholder="Cari nama pedagang atau @username..."
+        />
+
+        <div
+          id="categoryFilter"
+          class="category-filter"
+        >
+
+          <button
+            type="button"
+            class="category-button active"
+            data-category="all"
+          >
+            Semua
+          </button>
+
+          <button
+            type="button"
+            class="category-button"
+            data-category="makanan"
+          >
+            Makanan
+          </button>
+
+          <button
+            type="button"
+            class="category-button"
+            data-category="minuman"
+          >
+            Minuman
+          </button>
+
+          <button
+            type="button"
+            class="category-button"
+            data-category="lainnya"
+          >
+            Lainnya
+          </button>
+
+        </div>
+
+        <div
+          id="searchResultCount"
+          class="search-result-count"
+        >
+          Menampilkan pedagang...
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- =========================================
+         PEDAGANG
+    ========================================== -->
+
+    <section class="card">
+
+      <h2>
+        Mitra
+      </h2>
+
+      <div id="vendorList">
+
+        <div class="empty">
+          Mencari mitra...
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- =========================================
+         MAP
+    ========================================== -->
+
+    <section class="card">
+
+      <h2>
+        📍 Pedagang di Sekitar Anda
+      </h2>
+
+      <div id="map"></div>
+
+    </section>
+
+  </main>
+
+  <!-- =========================================
+       LOADING
+  ========================================== -->
+
+  <div
+    id="loading"
+    class="dashboard"
+  >
+
+    <div class="card">
+
+      <div class="empty">
+        Memverifikasi akun...
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- =========================================
+       ERROR
+  ========================================== -->
+
+  <div
+    id="error"
+    class="dashboard hidden"
+  >
+
+    <div class="card">
+
+      <h2>
+        Akses ditolak
+      </h2>
+
+      <p
+        id="errorMessage"
+        class="error"
+      ></p>
+
+    </div>
+
+  </div>
+
+
+  <!-- =========================================
+       CART BAR
+  ========================================== -->
+
+  <div
+    id="cartBar"
+    class="cart-bar hidden"
+  >
+
+    <div class="cart-bar-info">
+
+      <div
+        id="cartBarTitle"
+        class="cart-bar-title"
+      >
+        🛒 Keranjang
+      </div>
+
+      <div
+        id="cartBarSummary"
+        class="cart-bar-summary"
+      >
+        0 item
+      </div>
+
+    </div>
+
+    <button
+      id="openCartButton"
+      class="cart-bar-button"
+      type="button"
+    >
+      Lihat Keranjang
+    </button>
+
+  </div>
+
+  <!-- =========================================
+       CART MODAL
+  ========================================== -->
+
+  <div
+    id="cartModal"
+    class="cart-modal hidden"
+  >
+
+    <div class="cart-card">
+
+      <div class="cart-header">
+
+        <div>
+          <div class="cart-title">
+            🛒 Keranjang
+          </div>
+
+          <div
+            id="cartVendorName"
+            class="cart-vendor"
+          >
+            Mitra
+          </div>
+        </div>
+
+        <button
+          id="closeCartButton"
+          class="cart-close"
+          type="button"
+          aria-label="Tutup keranjang"
+        >
+          ×
+        </button>
+
+      </div>
+
+      <div
+        id="cartItems"
+        class="cart-items"
+      ></div>
+
+      <div class="cart-summary">
+
+        <div class="cart-summary-row">
+
+          <div class="cart-summary-label">
+            Total sementara
+          </div>
+
+          <div
+            id="cartTotal"
+            class="cart-summary-total"
+          >
+            Rp0
+          </div>
+
+        </div>
+
+        <button
+          id="cartCheckoutButton"
+          class="cart-checkout-button"
+          type="button"
+        >
+          Lanjut ke Checkout
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =========================================
+       VENDOR PROFILE MODAL
+  ========================================== -->
+
+  <div
+    id="vendorModal"
+    class="modal hidden"
+  >
+
+    <div class="modal-card">
+
+      <!-- Modal header -->
+
+      <div class="modal-header">
+
+        <div>
+
+          <div
+            id="modalVendorName"
+            class="modal-title"
+          >
+            Pedagang
+          </div>
+
+          <div
+            id="modalVendorUsername"
+            class="modal-username"
+          >
+            @username
+          </div>
+
+        </div>
+
+        <button
+          id="closeVendorModal"
+          class="modal-close"
+          type="button"
+          aria-label="Tutup"
+        >
+          ×
+        </button>
+
+      </div>
+
+      <!-- Category -->
+
+      <div
+        id="modalVendorCategory"
+        class="modal-category"
+      >
+        Kategori
+      </div>
+
+      <!-- Vendor menu -->
+
+      <div
+        id="modalVendorMenu"
+        class="vendor-menu-section"
+      >
+
+        <div class="vendor-menu-title">
+          Menu Pedagang
+        </div>
+
+        <div class="vendor-menu-loading">
+          Memuat menu...
+        </div>
+
+      </div>
+
+      <!-- Subscription area -->
+
+      <div class="location-locked">
+
+        <button
+          id="subscribeButton"
+          class="subscribe-button"
+          type="button"
+        >
+          ⭐ Berlangganan
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- =========================================
+       LEAFLET
+  ========================================== -->
+
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  ></script>
+
+  <!-- =========================================
+       DEBUG — ERUDA
+  ========================================== -->
+
+  <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+
+  <script>
+    eruda.init();
+
+    console.log(
+      "[ERUDA] Eruda aktif"
+    );
+  </script>
+
+  <!-- =========================================
+       CUSTOMER DASHBOARD JAVASCRIPT
+  ========================================== -->
+
+  <script
+    type="module"
+    src="customer-dashboard.js"
+  ></script>
+
+</body>
+</html>

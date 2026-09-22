@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  />
+
+  <title>Verifikasi Nomor HP — IderinAja</title>
+
+  <link rel="stylesheet" href="login.css" />
+
+  <style>
+    .phone-auth {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background:
+        radial-gradient(circle at top right, rgba(255, 194, 26, 0.16), transparent 35%),
+        #06131b;
+    }
+
+    .phone-card {
+      width: min(100%, 430px);
+      padding: 32px 24px;
+      border-radius: 24px;
+      background: rgba(8, 26, 36, 0.94);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
+      color: #fff;
+    }
+
+    .brand {
+      margin-bottom: 28px;
+      color: #ffc21a;
+      font-weight: 800;
+      font-size: 24px;
+      letter-spacing: -0.04em;
+    }
+
+    .phone-card h1 {
+      margin: 0 0 10px;
+      font-size: 28px;
+      line-height: 1.15;
+    }
+
+    .subtitle {
+      margin: 0 0 28px;
+      color: rgba(255, 255, 255, 0.68);
+      line-height: 1.6;
+    }
+
+    .field-label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.75);
+    }
+
+    .phone-input,
+    .otp-input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 15px 16px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 14px;
+      outline: none;
+      background: rgba(255, 255, 255, 0.06);
+      color: #fff;
+      font: inherit;
+    }
+
+    .phone-input:focus,
+    .otp-input:focus {
+      border-color: #ffc21a;
+    }
+
+    .action-button {
+      width: 100%;
+      margin-top: 16px;
+      padding: 15px;
+      border: 0;
+      border-radius: 14px;
+      background: #ffc21a;
+      color: #06131b;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .action-button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    #recaptcha-container {
+      margin-top: 18px;
+      min-height: 78px;
+    }
+
+    .otp-section {
+      display: none;
+      margin-top: 28px;
+    }
+
+    .otp-section.active {
+      display: block;
+    }
+
+    .status {
+      min-height: 24px;
+      margin-top: 18px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .status.success {
+      color: #8be28b;
+    }
+
+    .status.error {
+      color: #ff8d8d;
+    }
+
+    .role-badge {
+      display: inline-block;
+      margin-bottom: 18px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255, 194, 26, 0.12);
+      color: #ffc21a;
+      font-size: 12px;
+      font-weight: 700;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="phone-auth">
+    <section class="phone-card">
+
+      <div class="brand">IderinAja</div>
+
+      <span id="roleBadge" class="role-badge">Memuat...</span>
+
+      <h1>Verifikasi nomor HP</h1>
+
+      <p class="subtitle">
+        Masukkan nomor HP kamu untuk menerima kode OTP.
+      </p>
+
+      <form id="phoneForm">
+        <label class="field-label" for="phoneNumber">
+          Nomor HP
+        </label>
+
+        <input
+          id="phoneNumber"
+          class="phone-input"
+          type="tel"
+          inputmode="tel"
+          autocomplete="tel"
+          placeholder="0812xxxxxxxx"
+          required
+        />
+
+        <div id="recaptcha-container"></div>
+
+        <button
+          id="sendOtpButton"
+          class="action-button"
+          type="submit"
+        >
+          Kirim OTP
+        </button>
+      </form>
+
+      <section id="otpSection" class="otp-section">
+        <label class="field-label" for="otpCode">
+          Kode OTP
+        </label>
+
+        <input
+          id="otpCode"
+          class="otp-input"
+          type="text"
+          inputmode="numeric"
+          autocomplete="one-time-code"
+          maxlength="6"
+          placeholder="Masukkan 6 digit OTP"
+        />
+
+        <button
+          id="verifyOtpButton"
+          class="action-button"
+          type="button"
+        >
+          Verifikasi OTP
+        </button>
+      </section>
+      <pre
+  id="debugLog"
+  style="
+    margin-top: 18px;
+    padding: 12px;
+    border-radius: 12px;
+    background: rgba(0,0,0,0.35);
+    color: #8be28b;
+    font-size: 11px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    max-height: 260px;
+    overflow-y: auto;
+  "
+></pre>
+
+      <div id="status" class="status"></div>
+
+    </section>
+  </main>
+<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+<script>
+  eruda.init();
+</script>
+
+<script type="module" src="phone-auth.js"></script>
+<script type="module" src="phone-auth.js"></script>
+</body>
+</html>

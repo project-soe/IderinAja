@@ -1,0 +1,381 @@
+/* ==================================================
+   IDERINAJA — VENDOR DASHBOARD
+   Design System
+================================================== */
+
+:root {
+  --color-primary: #ffc21a;
+  --color-primary-dark: #f5a900;
+
+  --color-background: #06131b;
+  --color-surface: rgba(255, 255, 255, 0.04);
+  --color-surface-hover: rgba(255, 255, 255, 0.06);
+
+  --color-text: #ffffff;
+  --color-muted: #91a0a8;
+
+  --color-success: #28c76f;
+  --color-danger: #ff5c5c;
+
+  --color-border: rgba(255, 255, 255, 0.08);
+
+  --radius-card: 20px;
+  --radius-control: 14px;
+}
+
+/* ==================================================
+   RESET
+================================================== */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+
+  min-height: 100vh;
+
+  font-family:
+    Inter,
+    Arial,
+    Helvetica,
+    sans-serif;
+
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(255, 194, 26, 0.12),
+      transparent 35%
+    ),
+    var(--color-background);
+
+  color: var(--color-text);
+}
+
+/* ==================================================
+   LAYOUT
+================================================== */
+
+.dashboard {
+  width: min(100%, 700px);
+
+  margin: 0 auto;
+
+  padding: 20px;
+}
+
+/* ==================================================
+   HEADER
+================================================== */
+
+.header {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 24px;
+}
+
+.brand {
+  font-size: 24px;
+
+  font-weight: 800;
+
+  color: var(--color-primary);
+}
+
+.role {
+  margin-top: 4px;
+
+  color: var(--color-muted);
+
+  font-size: 13px;
+}
+
+/* ==================================================
+   CARD
+================================================== */
+
+.card {
+  margin-bottom: 16px;
+
+  padding: 20px;
+
+  background: var(--color-surface);
+
+  border: 1px solid var(--color-border);
+
+  border-radius: var(--radius-card);
+
+  backdrop-filter: blur(12px);
+}
+
+.card h2 {
+  margin-top: 0;
+  margin-bottom: 8px;
+
+  font-size: 19px;
+}
+
+.section-heading p {
+  margin-top: 0;
+
+  color: var(--color-muted);
+
+  font-size: 13px;
+}
+
+/* ==================================================
+   FORM
+================================================== */
+
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-group label {
+  display: block;
+
+  margin-bottom: 8px;
+
+  font-size: 14px;
+
+  font-weight: 700;
+}
+
+input,
+select {
+  width: 100%;
+
+  min-height: 48px;
+
+  padding: 12px 14px;
+
+  border: 1px solid var(--color-border);
+
+  border-radius: var(--radius-control);
+
+  outline: none;
+
+  background: rgba(255, 255, 255, 0.05);
+
+  color: var(--color-text);
+
+  font-size: 15px;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+input:focus,
+select:focus {
+  border-color: var(--color-primary);
+
+  background: rgba(255, 255, 255, 0.07);
+}
+
+select option {
+  background: #081a24;
+
+  color: #ffffff;
+}
+
+.username-input {
+  display: flex;
+
+  align-items: center;
+
+  border: 1px solid var(--color-border);
+
+  border-radius: var(--radius-control);
+
+  background: rgba(255, 255, 255, 0.05);
+
+  overflow: hidden;
+}
+
+.username-input span {
+  padding-left: 14px;
+
+  color: var(--color-primary);
+
+  font-weight: 700;
+}
+
+.username-input input {
+  border: 0;
+
+  background: transparent;
+}
+
+.field-help {
+  display: block;
+
+  margin-top: 7px;
+
+  color: var(--color-muted);
+
+  font-size: 12px;
+
+  line-height: 1.5;
+}
+
+/* ==================================================
+   BUTTONS
+================================================== */
+
+button {
+  width: 100%;
+
+  min-height: 48px;
+
+  border: 0;
+
+  border-radius: var(--radius-control);
+
+  padding: 14px 16px;
+
+  font-size: 15px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.15s ease,
+    opacity 0.15s ease;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+button:disabled {
+  opacity: 0.55;
+
+  cursor: not-allowed;
+}
+
+.primary-button {
+  background: var(--color-primary);
+
+  color: var(--color-background);
+}
+
+.primary-button:hover {
+  background: var(--color-primary-dark);
+}
+
+.secondary-button {
+  display: none;
+
+  margin-top: 10px;
+
+  background: #222e35;
+
+  color: var(--color-text);
+}
+
+/* ==================================================
+   LOCATION STATUS
+================================================== */
+
+.location-status {
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  margin-bottom: 18px;
+}
+
+.status-dot {
+  width: 12px;
+  height: 12px;
+
+  flex: 0 0 auto;
+
+  border-radius: 50%;
+
+  background: #777;
+}
+
+.status-dot.online {
+  background: var(--color-success);
+
+  box-shadow:
+    0 0 14px
+    rgba(40, 199, 111, 0.8);
+}
+
+.status-dot.error {
+  background: var(--color-danger);
+}
+
+/* ==================================================
+   GPS INFORMATION
+================================================== */
+
+.info {
+  display: grid;
+
+  gap: 10px;
+
+  color: var(--color-muted);
+
+  font-size: 14px;
+}
+
+.info strong {
+  color: var(--color-text);
+}
+
+/* ==================================================
+   MESSAGE
+================================================== */
+
+.message {
+  min-height: 22px;
+
+  margin-top: 14px;
+
+  color: var(--color-muted);
+
+  font-size: 13px;
+
+  line-height: 1.5;
+}
+
+.message.success {
+  color: var(--color-success);
+}
+
+.message.error {
+  color: var(--color-danger);
+}
+
+/* ==================================================
+   RESPONSIVE
+================================================== */
+
+@media (max-width: 480px) {
+  .dashboard {
+    padding: 14px;
+  }
+
+  .card {
+    padding: 17px;
+  }
+
+  .brand {
+    font-size: 22px;
+  }
+}

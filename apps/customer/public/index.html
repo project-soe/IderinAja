@@ -1,12 +1,79 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>IderinAja Customer</title>
-    <link rel="manifest" href="./manifest.json" />
-  </head>
-  <body>
-    <script type="module" src="../src/main.js"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+
+  <title>IderinAja — Pedagang Terdekat</title>
+
+  <link
+    rel="stylesheet"
+    href="style.css"
+  />
+</head>
+
+<body>
+
+  <main class="app">
+
+    <header class="header">
+      <div>
+        <div class="brand">IderinAja</div>
+        <div class="subtitle">
+          Pedagang di sekitar Anda
+        </div>
+      </div>
+
+      <div
+        id="connectionStatus"
+        class="connection"
+      >
+        Menghubungkan...
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="hero-icon">
+        📍
+      </div>
+
+      <div>
+        <h1>Pedagang aktif</h1>
+
+        <p>
+          Lokasi pedagang diperbarui secara realtime.
+        </p>
+      </div>
+    </section>
+
+    <section class="card">
+
+      <div class="section-header">
+        <h2>Mitra di sekitar</h2>
+
+        <span id="vendorCount">
+          0 mitra
+        </span>
+      </div>
+
+      <div id="vendorList">
+        <div class="empty">
+          Mencari pedagang...
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <script
+    type="module"
+    src="script.js"
+  ></script>
+
+</body>
 </html>

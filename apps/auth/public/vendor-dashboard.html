@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+
+    <meta
+      name="description"
+      content="Dashboard Mitra Pedagang IderinAja."
+    />
+
+    <title>Dashboard Mitra — IderinAja</title>
+
+    <link
+      rel="stylesheet"
+      href="vendor-dashboard.css"
+    />
+  </head>
+
+  <body>
+    <main class="dashboard">
+      <!-- =========================================
+           HEADER
+      ========================================== -->
+      <header class="header">
+        <div>
+          <div class="brand">IderinAja</div>
+
+          <div class="role">
+            Mitra Pedagang
+          </div>
+        </div>
+      </header>
+
+      <!-- =========================================
+           PROFIL USAHA
+      ========================================== -->
+      <section class="card">
+        <div class="section-heading">
+          <div>
+            <h2>Profil Usaha</h2>
+
+            <p>
+              Informasi yang akan dikenali oleh konsumen.
+            </p>
+          </div>
+        </div>
+
+        <form id="businessProfileForm">
+          <!-- Nama usaha -->
+          <div class="form-group">
+            <label for="businessName">
+              Nama Usaha
+            </label>
+
+            <input
+              id="businessName"
+              name="businessName"
+              type="text"
+              maxlength="80"
+              autocomplete="organization"
+              placeholder="Contoh: Martabak Bang Udin"
+              required
+            />
+          </div>
+
+          <!-- Username publik -->
+          <div class="form-group">
+            <label for="username">
+              Username
+            </label>
+
+            <div class="username-input">
+              <span>@</span>
+
+              <input
+                id="username"
+                name="username"
+                type="text"
+                maxlength="30"
+                autocomplete="username"
+                placeholder="bangudin"
+                required
+              />
+            </div>
+
+            <small class="field-help">
+              Username digunakan konsumen untuk menemukan usaha Anda.
+            </small>
+          </div>
+
+          <!-- Kategori -->
+          <div class="form-group">
+            <label for="category">
+              Kategori Dagangan
+            </label>
+
+            <select
+              id="category"
+              name="category"
+              required
+            >
+              <option value="">
+                Pilih kategori
+              </option>
+
+              <option value="makanan">
+                Makanan
+              </option>
+
+              <option value="minuman">
+                Minuman
+              </option>
+
+              <option value="buah-sayur">
+                Buah & Sayur
+              </option>
+
+              <option value="sembako">
+                Sembako
+              </option>
+
+              <option value="kopi">
+                Kopi
+              </option>
+
+              <option value="roti-kue">
+                Roti & Kue
+              </option>
+
+              <option value="jasa">
+                Jasa
+              </option>
+
+              <option value="lainnya">
+                Lainnya
+              </option>
+            </select>
+          </div>
+
+          <button
+            id="saveProfile"
+            type="submit"
+            class="primary-button"
+          >
+            Simpan Profil
+          </button>
+
+          <div
+            id="profileMessage"
+            class="message"
+            role="status"
+            aria-live="polite"
+          ></div>
+        </form>
+      </section>
+
+      <!-- =========================================
+           LOKASI MITRA
+      ========================================== -->
+      <section class="card">
+        <h2>Lokasi Mitra</h2>
+
+        <div class="location-status">
+          <span
+            id="statusDot"
+            class="status-dot"
+          ></span>
+
+          <span id="locationStatus">
+            Lokasi belum aktif
+          </span>
+        </div>
+
+        <button
+          id="startLocation"
+          class="primary-button"
+          type="button"
+        >
+          Aktifkan Lokasi Saya
+        </button>
+
+        <button
+          id="stopLocation"
+          class="secondary-button"
+          type="button"
+        >
+          Hentikan Berbagi Lokasi
+        </button>
+
+        <div
+          id="message"
+          class="message"
+          role="status"
+          aria-live="polite"
+        ></div>
+      </section>
+
+      <!-- =========================================
+           INFORMASI GPS
+      ========================================== -->
+      <section class="card">
+        <h2>Informasi GPS</h2>
+
+        <div class="info">
+          <div>
+            Latitude:
+            <strong id="latitude">—</strong>
+          </div>
+
+          <div>
+            Longitude:
+            <strong id="longitude">—</strong>
+          </div>
+
+          <div>
+            Akurasi:
+            <strong id="accuracy">—</strong>
+          </div>
+
+          <div>
+            Status:
+            <strong id="onlineState">
+              Offline
+            </strong>
+          </div>
+        </div>
+      </section>
+      <!-- =========================================
+     MENU & STOK
+========================================== -->
+<section class="card">
+  <div class="section-heading">
+    <div>
+      <h2>Menu & Stok</h2>
+
+      <p>
+        Kelola produk yang dapat dilihat dan dipesan konsumen.
+      </p>
+    </div>
+  </div>
+
+  <!-- FORM MENU -->
+  <form id="menuForm">
+
+    <input
+      id="menuId"
+      type="hidden"
+    />
+
+    <!-- Nama produk -->
+    <div class="form-group">
+      <label for="menuName">
+        Nama Produk
+      </label>
+
+      <input
+        id="menuName"
+        name="menuName"
+        type="text"
+        maxlength="80"
+        placeholder="Contoh: Martabak Coklat"
+        required
+      />
+    </div>
+
+    <!-- Deskripsi -->
+    <div class="form-group">
+      <label for="menuDescription">
+        Deskripsi
+      </label>
+
+      <textarea
+        id="menuDescription"
+        name="menuDescription"
+        maxlength="250"
+        rows="3"
+        placeholder="Contoh: Martabak mini dengan taburan coklat."
+      ></textarea>
+    </div>
+
+    <!-- Harga -->
+    <div class="form-group">
+      <label for="menuPrice">
+        Harga
+      </label>
+
+      <input
+        id="menuPrice"
+        name="menuPrice"
+        type="number"
+        min="0"
+        step="500"
+        placeholder="15000"
+        required
+      />
+    </div>
+
+    <!-- Stok -->
+    <div class="form-group">
+      <label for="menuStock">
+        Stok
+      </label>
+
+      <input
+        id="menuStock"
+        name="menuStock"
+        type="number"
+        min="0"
+        step="1"
+        placeholder="20"
+        required
+      />
+    </div>
+
+    <!-- Status -->
+    <div class="form-group">
+      <label for="menuAvailable">
+        Status Produk
+      </label>
+
+      <select
+        id="menuAvailable"
+        name="menuAvailable"
+        required
+      >
+        <option value="true">
+          Tersedia
+        </option>
+
+        <option value="false">
+          Tidak tersedia
+        </option>
+      </select>
+    </div>
+
+    <div class="menu-form-actions">
+
+      <button
+        id="saveMenu"
+        type="submit"
+        class="primary-button"
+      >
+        Tambah Menu
+      </button>
+
+      <button
+        id="cancelMenuEdit"
+        type="button"
+        class="secondary-button"
+        style="display: none;"
+      >
+        Batal Edit
+      </button>
+
+    </div>
+
+    <div
+      id="menuMessage"
+      class="message"
+      role="status"
+      aria-live="polite"
+    ></div>
+
+  </form>
+
+
+  <!-- DAFTAR MENU -->
+  <div class="menu-list-container">
+
+    <div class="menu-list-header">
+      <h3>Daftar Menu</h3>
+
+      <span
+        id="menuCount"
+        class="menu-count"
+      >
+        0 menu
+      </span>
+    </div>
+
+    <div
+      id="menuList"
+      class="menu-list"
+    >
+
+      <div
+        id="menuEmpty"
+        class="menu-empty"
+      >
+        Belum ada menu.
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+    </main>
+
+    <script
+      type="module"
+      src="vendor-dashboard.js"
+    ></script>
+  </body>
+</html>

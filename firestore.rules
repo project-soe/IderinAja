@@ -2,6 +2,220 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    /* ==================================================
+       USERS
+    ================================================== */
+
+    match /users/{userId} {
+
+      allow create: if
+        request.auth != null
+        && request.auth.uid == userId
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.role in ['vendor', 'customer'];
+
+      allow read: if
+        request.auth != null
+        && request.auth.uid == userId;
+
+      allow update: if
+        request.auth != null
+        && request.auth.uid == userId
+        && request.resource.data.uid == resource.data.uid
+        && request.resource.data.role == resource.data.role;
+
+      allow delete: if false;
+    }
+
+
+    /* ==================================================
+       VENDOR PROFILE
+       Public discovery information.
+
+       NOTE:
+       GPS MUST NOT be stored here in final architecture.
+       ================================================== */
+
+    match /vendorProfiles/{vendorId} {
+
+      allow read: if
+        request.auth != null;
+
+      allow create, update: if
+        request.auth != null
+        && request.auth.uid == vendorId
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.role == 'vendor';
+
+      allow delete: if
+        request.auth != null
+        && request.auth.uid == vendorId;
+    }
+
+
+    /* ==================================================
+       VENDOR LOCATIONS
+
+       Customer can read ONLY when subscribed.
+       Vendor can read/write own location.
+       ================================================== */
+
+    match /vendorLocations/{vendorId} {
+
+  allow read: if
+    request.auth != null
+    && (
+      request.auth.uid == vendorId
+      ||
+      (
+        exists(
+          /databases/$(database)/documents/subscriptions/$(request.auth.uid)
+        )
+        &&
+        get(
+          /databases/$(database)/documents/subscriptions/$(request.auth.uid)
+        ).data.vendors[vendorId] == true
+      )
+    );
+
+  allow create, update: if
+    request.auth != null
+    && request.auth.uid == vendorId
+    && request.resource.data.uid == request.auth.uid;
+
+  allow delete: if
+    request.auth != null
+    && request.auth.uid == vendorId;
+}
+
+
+    /* ==================================================
+       SUBSCRIPTIONS
+
+       Document ID:
+        subscriptions/
+  {customerUID}
+
+    customerId: "..."
+    vendors:
+      vendorUID1: true
+      vendorUID2: true
+    ================================================== */
+
+    match /subscriptions/{subscriptionId} {
+
+      allow read: if
+        request.auth != null
+        && request.auth.uid ==
+          resource.data.customerId;
+
+      allow create: if
+        request.auth != null
+        && request.resource.data.customerId ==
+          request.auth.uid
+        && request.resource.data.vendorId is string
+        && request.resource.data.active == true;
+
+      allow update: if
+        request.auth != null
+        && request.auth.uid ==
+          resource.data.customerId
+        && request.resource.data.customerId ==
+          resource.data.customerId
+        && request.resource.data.vendorId ==
+          resource.data.vendorId;
+
+      allow delete: if
+        request.auth != null
+        && request.auth.uid ==
+          resource.data.customerId;
+    }
+
+
+    /* ==================================================
+       USERNAME RESERVATION
+       ================================================== */
+
+    match /usernames/{username} {
+
+      allow read: if
+        request.auth != null;
+
+      allow create: if
+        request.auth != null
+        && request.resource.data.uid ==
+          request.auth.uid
+        && request.resource.data.username ==
+          username;
+
+      allow update: if
+        request.auth != null
+        && resource.data.uid ==
+          request.auth.uid
+        && request.resource.data.uid ==
+          request.auth.uid
+        && request.resource.data.username ==
+          username;
+
+      allow delete: if false;
+    }
+
+
+    /* ==================================================
+       LEGACY VENDORS
+
+       Kept temporarily so the current MVP does not
+       suddenly break while migration to:
+
+       vendorProfiles
+       vendorLocations
+
+       is being completed.
+       ================================================== */
+
+    match /vendors/{vendorId} {
+
+      allow create, update: if
+        request.auth != null
+        && request.auth.uid == vendorId
+        && request.resource.data.uid ==
+          request.auth.uid
+        && request.resource.data.role == 'vendor';
+
+      allow read: if
+        request.auth != null;
+
+      allow delete: if
+        request.auth != null
+        && request.auth.uid == vendorId;
+    }
+
+    match /vendorMenus/{vendorId}/items/{itemId} {
+
+  allow read: if
+    request.auth != null;
+
+  allow create: if
+    request.auth != null
+    && request.auth.uid == vendorId
+    && request.resource.data.vendorId == request.auth.uid;
+
+  allow update: if
+    request.auth != null
+    && request.auth.uid == vendorId
+    && resource.data.vendorId == request.auth.uid
+    && request.resource.data.vendorId == resource.data.vendorId;
+
+  allow delete: if
+    request.auth != null
+    && request.auth.uid == vendorId;
+}
+
+    /* ==================================================
+       DEFAULT DENY
+       ================================================== */
+
     match /{document=**} {
       allow read, write: if false;
     }

@@ -1,0 +1,439 @@
+:root {
+  --yellow: #ffc21a;
+  --yellow-dark: #f5a900;
+
+  --navy: #081a24;
+  --navy-deep: #06131b;
+
+  --white: #ffffff;
+  --muted: #9aaeb7;
+
+  --border: rgba(255,255,255,0.09);
+
+  --font-primary: "Plus Jakarta Sans", sans-serif;
+  --font-secondary: "Manrope", sans-serif;
+}
+
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+
+html,
+body {
+  width: 100%;
+  min-height: 100%;
+}
+
+
+body {
+  background: var(--navy-deep);
+  color: var(--white);
+
+  font-family: var(--font-primary);
+
+  -webkit-font-smoothing: antialiased;
+}
+
+
+button {
+  font: inherit;
+}
+
+
+.login-screen {
+  position: relative;
+
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+
+  overflow: hidden;
+
+  background:
+    radial-gradient(
+      circle at 90% 0%,
+      rgba(255,194,26,0.13),
+      transparent 30%
+    ),
+    linear-gradient(
+      160deg,
+      #0b202b,
+      #071923 50%,
+      #06131b
+    );
+
+  display: flex;
+  flex-direction: column;
+}
+
+
+.ambient {
+  position: absolute;
+
+  width: 280px;
+  height: 280px;
+
+  border-radius: 50%;
+
+  filter: blur(90px);
+
+  pointer-events: none;
+}
+
+
+.ambient-one {
+  top: -150px;
+  right: -130px;
+
+  background: rgba(255,194,26,0.14);
+}
+
+
+.ambient-two {
+  bottom: -150px;
+  left: -120px;
+
+  background: rgba(30,100,125,0.13);
+}
+
+
+/* Header */
+
+.login-header {
+  position: relative;
+  z-index: 2;
+
+  display: grid;
+  grid-template-columns: 40px 1fr 40px;
+
+  align-items: center;
+
+  padding:
+    max(20px, env(safe-area-inset-top))
+    22px
+    10px;
+}
+
+
+.back-button {
+  width: 40px;
+  height: 40px;
+
+  border-radius: 50%;
+
+  background: rgba(255,255,255,0.07);
+
+  border: 1px solid var(--border);
+
+  color: white;
+
+  cursor: pointer;
+}
+
+
+.mini-brand {
+  text-align: center;
+
+  font-size: 19px;
+  font-weight: 800;
+
+  letter-spacing: -0.8px;
+}
+
+
+.mini-brand span {
+  color: var(--yellow);
+}
+
+
+.header-spacer {
+  width: 40px;
+}
+
+
+/* Main */
+
+.login-content {
+  position: relative;
+  z-index: 1;
+
+  width: min(100%, 500px);
+
+  margin: 0 auto;
+
+  padding:
+    clamp(30px, 6vh, 55px)
+    24px
+    25px;
+
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
+}
+
+
+.account-symbol {
+  width: 68px;
+  height: 68px;
+
+  border-radius: 22px;
+
+  display: grid;
+  place-items: center;
+
+  margin-bottom: 22px;
+}
+
+
+.account-symbol svg {
+  width: 38px;
+  height: 38px;
+}
+
+
+.vendor-symbol {
+  color: var(--yellow);
+
+  background: rgba(255,194,26,0.12);
+
+  border: 1px solid rgba(255,194,26,0.16);
+}
+
+
+.customer-symbol {
+  color: white;
+
+  background: rgba(255,255,255,0.08);
+
+  border: 1px solid var(--border);
+}
+
+
+.eyebrow {
+  color: var(--yellow);
+
+  font-family: var(--font-secondary);
+
+  font-size: 10px;
+
+  font-weight: 800;
+
+  letter-spacing: 1.7px;
+}
+
+
+h1 {
+  margin-top: 12px;
+
+  font-size: clamp(31px, 8vw, 43px);
+
+  line-height: 1.08;
+
+  letter-spacing: -2px;
+
+  font-weight: 800;
+}
+
+
+h1 span {
+  color: var(--yellow);
+}
+
+
+.intro-text {
+  max-width: 430px;
+
+  margin-top: 14px;
+
+  color: var(--muted);
+
+  font-family: var(--font-secondary);
+
+  font-size: 13px;
+
+  line-height: 1.65;
+}
+
+
+/* Actions */
+
+.auth-actions {
+  display: flex;
+  flex-direction: column;
+
+  gap: 11px;
+
+  margin-top: 30px;
+}
+
+
+.primary-button,
+.secondary-button,
+.phone-button {
+  width: 100%;
+
+  min-height: 54px;
+
+  border-radius: 16px;
+
+  cursor: pointer;
+
+  transition:
+    transform 180ms ease,
+    background 180ms ease;
+}
+
+
+.primary-button {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 19px;
+
+  background: var(--yellow);
+
+  color: var(--navy);
+
+  font-weight: 800;
+
+  box-shadow:
+    0 12px 30px rgba(255,194,26,0.12);
+}
+
+
+.primary-button span:last-child {
+  font-size: 20px;
+}
+
+
+.secondary-button {
+  background: rgba(255,255,255,0.07);
+
+  border: 1px solid var(--border);
+
+  color: white;
+
+  font-weight: 700;
+}
+
+
+.primary-button:active,
+.secondary-button:active,
+.phone-button:active {
+  transform: scale(0.985);
+}
+
+
+.divider {
+  position: relative;
+
+  margin: 24px 0;
+
+  text-align: center;
+}
+
+
+.divider::before {
+  content: "";
+
+  position: absolute;
+
+  top: 50%;
+  left: 0;
+  right: 0;
+
+  height: 1px;
+
+  background: rgba(255,255,255,0.08);
+}
+
+
+.divider span {
+  position: relative;
+
+  padding: 0 12px;
+
+  background: var(--navy-deep);
+
+  color: rgba(255,255,255,0.4);
+
+  font-size: 11px;
+}
+
+
+.phone-button {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 10px;
+
+  background: transparent;
+
+  border: 1px solid rgba(255,194,26,0.3);
+
+  color: var(--yellow);
+
+  font-weight: 700;
+}
+
+
+.phone-icon {
+  font-size: 15px;
+}
+
+
+.terms {
+  margin-top: 17px;
+
+  color: rgba(255,255,255,0.35);
+
+  font-size: 9px;
+
+  line-height: 1.6;
+
+  text-align: center;
+}
+
+
+/* Footer */
+
+.login-footer {
+  position: relative;
+  z-index: 2;
+
+  padding:
+    12px
+    24px
+    max(20px, env(safe-area-inset-bottom));
+
+  text-align: center;
+}
+
+
+.login-footer button {
+  background: transparent;
+
+  color: var(--muted);
+
+  font-size: 11px;
+
+  cursor: pointer;
+}
+
+
+@media (min-width: 700px) {
+
+  .login-content {
+    padding-top: 55px;
+  }
+
+}
