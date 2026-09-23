@@ -36,6 +36,7 @@ import {
 import {
   getAuth,
   onAuthStateChanged,
+  signOut,
 } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
 
 import {
@@ -46,6 +47,10 @@ import {
   setDoc,
   addDoc,
   deleteDoc,
+  updateDoc,
+  onSnapshot,
+  query,
+  where,
   runTransaction,
   serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
@@ -92,6 +97,11 @@ const saveProfileButton =
 const profileMessage =
   document.getElementById(
     "profileMessage"
+  );
+
+const logoutButton =
+  document.getElementById(
+    "logoutButton"
   );
 
 
@@ -2003,6 +2013,659 @@ async function deleteMenu(
 }
 
 
+
+/* ==================================================
+   PESANAN MASUK
+================================================== */
+
+const ordersList =
+  document.getElementById(
+    "ordersList"
+  );
+
+const ordersEmpty =
+  document.getElementById(
+    "ordersEmpty"
+  );
+
+const orderCount =
+  document.getElementById(
+    "orderCount"
+  );
+
+const ordersMessage =
+  document.getElementById(
+    "ordersMessage"
+  );
+
+let stopOrdersListener =
+  null;
+
+
+function showOrdersMessage(
+  text,
+  type = ""
+) {
+  if (!ordersMessage) {
+    return;
+  }
+
+  ordersMessage.textContent =
+    text;
+
+  ordersMessage.className =
+    `message ${type}`;
+}
+
+
+function formatOrderDate(
+  timestamp
+) {
+  if (
+    !timestamp ||
+    typeof timestamp.toDate !==
+      "function"
+  ) {
+    return "Waktu belum tersedia";
+  }
+
+  return new Intl.DateTimeFormat(
+    "id-ID",
+    {
+      dateStyle: "medium",
+      timeStyle: "short",
+    }
+  ).format(
+    timestamp.toDate()
+  );
+}
+
+
+function getOrderStatusLabel(
+  status
+) {
+  const labels = {
+    pending:
+      "Menunggu konfirmasi",
+    accepted:
+      "Diterima",
+    rejected:
+      "Ditolak",
+    completed:
+      "Selesai",
+  };
+
+  return (
+    labels[status] ||
+    status ||
+    "Tidak diketahui"
+  );
+}
+
+
+function getOrderStatusClass(
+  status
+) {
+  return (
+    `order-status order-status-${status || "unknown"}`
+  );
+}
+
+
+function renderOrders(
+  orders
+) {
+  if (!ordersList) {
+    return;
+  }
+
+  ordersList.innerHTML = "";
+
+  if (
+    orderCount
+  ) {
+    orderCount.textContent =
+      `${orders.length} pesanan`;
+  }
+
+  if (
+    orders.length === 0
+  ) {
+    const empty =
+      document.createElement(
+        "div"
+      );
+
+    empty.className =
+      "menu-empty";
+
+    empty.textContent =
+      "Belum ada pesanan masuk.";
+
+    ordersList.appendChild(
+      empty
+    );
+
+    return;
+  }
+
+  orders.forEach(
+    (order) => {
+      const card =
+        document.createElement(
+          "article"
+        );
+
+      card.className =
+        "order-item";
+
+      const header =
+        document.createElement(
+          "div"
+        );
+
+      header.className =
+        "order-item-header";
+
+      const title =
+        document.createElement(
+          "h3"
+        );
+
+      title.textContent =
+        `Pesanan #${order.id.slice(
+          0,
+          8
+        )}`;
+
+      const status =
+        document.createElement(
+          "span"
+        );
+
+      status.className =
+        getOrderStatusClass(
+          order.status
+        );
+
+      status.textContent =
+        getOrderStatusLabel(
+          order.status
+        );
+
+      header.appendChild(
+        title
+      );
+
+      header.appendChild(
+        status
+      );
+
+      card.appendChild(
+        header
+      );
+
+      const time =
+        document.createElement(
+          "p"
+        );
+
+      time.className =
+        "order-time";
+
+      time.textContent =
+        formatOrderDate(
+          order.createdAt
+        );
+
+      card.appendChild(
+        time
+      );
+
+      const items =
+        document.createElement(
+          "div"
+        );
+
+      items.className =
+        "order-items";
+
+      const orderItems =
+        Array.isArray(
+          order.items
+        )
+          ? order.items
+          : [];
+
+      orderItems.forEach(
+        (item) => {
+          const row =
+            document.createElement(
+              "div"
+            );
+
+          row.className =
+            "order-line";
+
+          const name =
+            document.createElement(
+              "span"
+            );
+
+          name.textContent =
+            `${item.name || "Produk"} × ${
+              Number(item.quantity) || 0
+            }`;
+
+          const price =
+            document.createElement(
+              "strong"
+            );
+
+          price.textContent =
+            formatCurrency(
+              Number(
+                item.subtotal ??
+                (
+                  Number(item.price) *
+                  Number(item.quantity)
+                )
+              ) || 0
+            );
+
+          row.appendChild(
+            name
+          );
+
+          row.appendChild(
+            price
+          );
+
+          items.appendChild(
+            row
+          );
+        }
+      );
+
+      card.appendChild(
+        items
+      );
+
+      const total =
+        document.createElement(
+          "div"
+        );
+
+      total.className =
+        "order-total";
+
+      const totalLabel =
+        document.createElement(
+          "span"
+        );
+
+      totalLabel.textContent =
+        "Total";
+
+      const totalValue =
+        document.createElement(
+          "strong"
+        );
+
+      totalValue.textContent =
+        formatCurrency(
+          Number(order.total) || 0
+        );
+
+      total.appendChild(
+        totalLabel
+      );
+
+      total.appendChild(
+        totalValue
+      );
+
+      card.appendChild(
+        total
+      );
+
+      if (
+        order.notes
+      ) {
+        const notes =
+          document.createElement(
+            "p"
+          );
+
+        notes.className =
+          "order-notes";
+
+        notes.textContent =
+          `Catatan: ${order.notes}`;
+
+        card.appendChild(
+          notes
+        );
+      }
+
+      if (
+        typeof order.latitude ===
+          "number" &&
+        typeof order.longitude ===
+          "number"
+      ) {
+        const location =
+          document.createElement(
+            "p"
+          );
+
+        location.className =
+          "order-location";
+
+        location.textContent =
+          `📍 Lokasi pelanggan: ${
+            order.latitude.toFixed(6)
+          }, ${
+            order.longitude.toFixed(6)
+          }`;
+
+        card.appendChild(
+          location
+        );
+      }
+
+      if (
+        order.status ===
+        "pending"
+      ) {
+        const actions =
+          document.createElement(
+            "div"
+          );
+
+        actions.className =
+          "order-actions";
+
+        const acceptButton =
+          document.createElement(
+            "button"
+          );
+
+        acceptButton.type =
+          "button";
+
+        acceptButton.className =
+          "primary-button";
+
+        acceptButton.textContent =
+          "Terima Pesanan";
+
+        acceptButton.addEventListener(
+          "click",
+          () =>
+            updateOrderStatus(
+              order.id,
+              "accepted"
+            )
+        );
+
+        const rejectButton =
+          document.createElement(
+            "button"
+          );
+
+        rejectButton.type =
+          "button";
+
+        rejectButton.className =
+          "secondary-button";
+
+        rejectButton.textContent =
+          "Tolak Pesanan";
+
+        rejectButton.addEventListener(
+          "click",
+          () =>
+            updateOrderStatus(
+              order.id,
+              "rejected"
+            )
+        );
+
+        actions.appendChild(
+          acceptButton
+        );
+
+        actions.appendChild(
+          rejectButton
+        );
+
+        card.appendChild(
+          actions
+        );
+      }
+
+      ordersList.appendChild(
+        card
+      );
+    }
+  );
+}
+
+
+async function updateOrderStatus(
+  orderId,
+  status
+) {
+  if (!currentUser) {
+    return;
+  }
+
+  const actionLabel =
+    status === "accepted"
+      ? "menerima"
+      : "menolak";
+
+  const confirmed =
+    window.confirm(
+      `Yakin ingin ${actionLabel} pesanan ini?`
+    );
+
+  if (!confirmed) {
+    return;
+  }
+
+  try {
+    console.log(
+      "[ORDER] Mengirim perubahan status:",
+      {
+        orderId,
+        status,
+        vendorId: currentUser.uid,
+      }
+    );
+
+    showOrdersMessage(
+      "Memperbarui status pesanan..."
+    );
+
+    const orderRef =
+      doc(
+        db,
+        "orders",
+        orderId
+      );
+
+    await updateDoc(
+      orderRef,
+      {
+        status,
+        updatedAt:
+          serverTimestamp(),
+      }
+    );
+
+    console.log(
+      "[ORDER] Status berhasil diperbarui:",
+      {
+        orderId,
+        status,
+      }
+    );
+
+    showOrdersMessage(
+      status === "accepted"
+        ? "Pesanan berhasil diterima."
+        : "Pesanan berhasil ditolak.",
+      "success"
+    );
+
+  } catch (error) {
+    console.error(
+      "Update order status error:",
+      error
+    );
+
+    showOrdersMessage(
+      "Status pesanan gagal diperbarui.",
+      "error"
+    );
+  }
+}
+
+
+function startOrdersListener() {
+  if (
+    !currentUser
+  ) {
+    return;
+  }
+
+  if (
+    stopOrdersListener
+  ) {
+    stopOrdersListener();
+
+    stopOrdersListener =
+      null;
+  }
+
+  const ordersQuery =
+    query(
+      collection(
+        db,
+        "orders"
+      ),
+      where(
+        "vendorId",
+        "==",
+        currentUser.uid
+      )
+    );
+
+  stopOrdersListener =
+    onSnapshot(
+      ordersQuery,
+      (snapshot) => {
+        const orders =
+          snapshot.docs
+            .map(
+              (orderDoc) => ({
+                id:
+                  orderDoc.id,
+                ...orderDoc.data(),
+              })
+            )
+            .sort(
+              (a, b) => {
+                const aTime =
+                  a.createdAt?.toMillis?.() ||
+                  0;
+
+                const bTime =
+                  b.createdAt?.toMillis?.() ||
+                  0;
+
+                return (
+                  bTime - aTime
+                );
+              }
+            );
+
+        renderOrders(
+          orders
+        );
+      },
+      (error) => {
+        console.error(
+          "Orders listener error:",
+          error
+        );
+
+        showOrdersMessage(
+          "Pesanan gagal dimuat.",
+          "error"
+        );
+      }
+    );
+}
+
+
+
+
+/* ==================================================
+   LOGOUT
+================================================== */
+
+async function logoutVendor() {
+  if (!logoutButton) {
+    return;
+  }
+
+  const confirmed =
+    window.confirm(
+      "Yakin ingin keluar dari akun Mitra?"
+    );
+
+  if (!confirmed) {
+    return;
+  }
+
+  logoutButton.disabled = true;
+  logoutButton.textContent = "Keluar...";
+
+  try {
+    console.log("[AUTH] Logout Mitra dimulai.");
+
+    if (watchId !== null) {
+      await stopLocationSharing();
+    }
+
+    await signOut(auth);
+
+    console.log(
+      "[AUTH] Logout berhasil. Session Firebase dihapus."
+    );
+
+    window.location.replace(
+      "login-vendor.html"
+    );
+  } catch (error) {
+    console.error(
+      "[AUTH] Logout gagal:",
+      error
+    );
+
+    logoutButton.disabled = false;
+    logoutButton.textContent = "Keluar";
+
+    alert(
+      "Logout gagal. Silakan coba lagi."
+    );
+  }
+}
+
+
 /* ==================================================
    AUTHENTICATION
 ================================================== */
@@ -2076,6 +2739,8 @@ onAuthStateChanged(
 
       await loadMenus();
 
+      startOrdersListener();
+
     } catch (error) {
 
       console.error(
@@ -2096,6 +2761,18 @@ onAuthStateChanged(
 /* ==================================================
    EVENT LISTENERS
 ================================================== */
+
+
+if (
+  logoutButton
+) {
+
+  logoutButton.addEventListener(
+    "click",
+    logoutVendor
+  );
+}
+
 
 if (
   businessProfileForm

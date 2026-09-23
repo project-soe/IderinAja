@@ -283,6 +283,11 @@ button:disabled {
   color: var(--color-text);
 }
 
+/* Tombol Tolak Pesanan */
+.order-actions .secondary-button {
+  display: block;
+}
+
 /* ==================================================
    LOCATION STATUS
 ================================================== */
@@ -378,4 +383,33 @@ button:disabled {
   .brand {
     font-size: 22px;
   }
+}
+
+
+/* ==================================================
+   LOGOUT
+================================================== */
+
+.logout-button {
+  width: auto;
+  min-width: 82px;
+  min-height: 42px;
+  padding: 10px 16px;
+  margin-left: 12px;
+
+  background: rgba(255, 92, 92, 0.12);
+  border: 1px solid rgba(255, 92, 92, 0.35);
+  border-radius: 12px;
+
+  color: var(--color-danger);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.logout-button:hover {
+  background: rgba(255, 92, 92, 0.2);
+}
+
+.logout-button:active {
+  transform: scale(0.97);
 }

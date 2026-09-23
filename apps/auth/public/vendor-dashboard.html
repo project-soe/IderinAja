@@ -34,6 +34,14 @@
             Mitra Pedagang
           </div>
         </div>
+
+        <button
+          id="logoutButton"
+          class="logout-button"
+          type="button"
+        >
+          Keluar
+        </button>
       </header>
 
       <!-- =========================================
@@ -400,6 +408,38 @@
   </div>
 
 </section>
+
+      <!-- =========================================                                                   PESANAN MASUK                                                                          ========================================== -->                                              <section class="card orders-card">                                                            <div class="section-heading">                                                                 <div>                                                                                         <h2>Pesanan Masuk</h2>                                                                      <p>                                                                                           Pesanan baru dari konsumen akan muncul otomatis.                                          </p>
+          </div>
+
+          <span
+            id="orderCount"
+            class="menu-count"
+          >
+            0 pesanan
+          </span>
+        </div>
+
+        <div
+          id="ordersMessage"
+          class="message"
+          role="status"
+          aria-live="polite"
+        ></div>
+
+        <div
+          id="ordersList"
+          class="orders-list"
+        >
+          <div
+            id="ordersEmpty"
+            class="menu-empty"
+          >
+            Belum ada pesanan masuk.
+          </div>
+        </div>
+      </section>
+
     </main>
 
     <script
