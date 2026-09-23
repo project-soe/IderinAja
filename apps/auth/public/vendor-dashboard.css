@@ -712,3 +712,37 @@ button:disabled {
     font-size:10px;
   }
 }
+
+/* ORDERS — MINIMALIST ACTIVE + HISTORY */
+.orders-card{padding:16px}
+.orders-list{display:grid;gap:10px}
+.order-active-item,.order-history-item{margin:0;padding:14px;border:1px solid var(--color-border);border-radius:16px;background:rgba(255,255,255,.035)}
+.order-active-item{border-color:rgba(255,194,26,.16)}
+.order-item-header{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.order-item-header h3{margin:0;font-size:14px;font-weight:800}
+.order-time{margin:5px 0 12px;color:var(--color-muted);font-size:11px}
+.order-status{display:inline-flex;align-items:center;min-height:25px;padding:4px 9px;border-radius:999px;font-size:10px;font-weight:800;white-space:nowrap}
+.order-status-pending{color:var(--color-primary);background:rgba(255,194,26,.10);border:1px solid rgba(255,194,26,.18)}
+.order-status-accepted{color:var(--color-success);background:rgba(40,199,111,.10);border:1px solid rgba(40,199,111,.18)}
+.order-status-rejected{color:var(--color-danger);background:rgba(255,92,92,.08);border:1px solid rgba(255,92,92,.16)}
+.order-status-completed{color:var(--color-muted);background:rgba(255,255,255,.05);border:1px solid var(--color-border)}
+.order-items{display:grid;gap:7px}
+.order-line{display:flex;justify-content:space-between;gap:12px;color:var(--color-muted);font-size:12px}
+.order-line strong{color:var(--color-text);white-space:nowrap}
+.order-total{display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding-top:10px;border-top:1px solid var(--color-border);font-size:12px}
+.order-total strong{color:var(--color-primary);font-size:14px}
+.order-notes,.order-location{margin:10px 0 0;color:var(--color-muted);font-size:11px;line-height:1.45}
+.order-actions{display:grid;grid-template-columns:1fr;gap:7px;margin-top:12px}
+.order-primary-actions{grid-template-columns:1fr 1fr}
+.order-actions button{min-height:40px;padding:9px 10px;font-size:12px}
+.order-history-card{padding:12px}
+.order-history-toggle{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:52px;padding:8px 4px;border:0;background:transparent;color:var(--color-text);text-align:left}
+.order-history-toggle>span:first-child{display:flex;align-items:center;gap:9px}
+.order-history-toggle strong{font-size:14px}
+.order-history-toggle small{color:var(--color-muted);font-size:11px}
+.order-history-toggle>span:last-child{color:var(--color-muted);font-size:20px}
+.order-history-content{padding-top:4px}
+.order-history-content.hidden{display:none}
+.order-history-item{opacity:.88}
+.order-history-item .order-actions,.order-history-item .order-location{display:none}
+@media(max-width:480px){.orders-card{padding:14px}.order-primary-actions button{min-height:42px}}
