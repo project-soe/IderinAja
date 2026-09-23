@@ -2106,11 +2106,48 @@
   <main
     id="dashboard"
     class="dashboard hidden"
+
   >
 
     <!-- =======================================
          HEADER
     ======================================== -->
+
+    <header class="header">
+      <div class="header-top">
+        <div>
+          <div class="brand">IderinAja</div>
+          <div class="role">Konsumen</div>
+        </div>
+
+        <button
+          id="logoutButton"
+          class="logout-button"
+          type="button"
+        >
+          Keluar
+        </button>
+      </div>
+
+      <div id="connectionStatus" class="status">
+        Menghubungkan...
+      </div>
+    </header>
+
+    <nav class="quick-nav" aria-label="Navigasi Konsumen">
+      <a href="#customerOrdersSection">📦 Pesanan</a>
+      <a href="#searchVendorSection">🔎 Cari</a>
+      <a href="#vendorListSection">🛍️ Mitra</a>
+      <a href="#nearbyMapSection">📍 Peta</a>
+      <button type="button" data-quick-action="cart">🛒 Keranjang</button>
+    </nav>
+
+    <div class="quick-actions" aria-label="Aksi cepat">
+      <button type="button" data-quick-action="orders">📦 Pesanan Saya</button>
+      <button type="button" data-quick-action="search">🔎 Cari Pedagang</button>
+      <button type="button" data-quick-action="map">📍 Pedagang Terdekat</button>
+      <button type="button" data-quick-action="cart">🛒 Keranjang</button>
+    </div>
 
     
     <!-- PESANAN SAYA -->
@@ -2148,7 +2185,7 @@
          SEARCH PEDAGANG
     ========================================== -->
 
-    <section class="card">
+    <section id="searchVendorSection" class="card">
 
       <h2>
         🔎 Cari Pedagang
@@ -2218,7 +2255,7 @@
          PEDAGANG
     ========================================== -->
 
-    <section class="card">
+    <section id="vendorListSection" class="card">
 
       <h2>
         Mitra
@@ -2238,7 +2275,7 @@
          MAP
     ========================================== -->
 
-    <section class="card">
+    <section id="nearbyMapSection" class="card">
 
       <h2>
         📍 Pedagang di Sekitar Anda
@@ -2776,7 +2813,11 @@
 document.addEventListener("click",(event)=>{
   const action=event.target.closest("[data-quick-action]")?.dataset.quickAction;
   if(!action) return;
-  const targets={orders:"#customerOrdersSection",search:"#searchVendorSection",map:"#nearbyMapSection"};
+  const targets={
+    orders:"#customerOrdersSection",
+    search:"#searchVendorSection",
+    map:"#nearbyMapSection"
+  };
   if(action==="cart"){
     document.getElementById("openCartButton")?.click();
     return;
@@ -2784,6 +2825,5 @@ document.addEventListener("click",(event)=>{
   document.querySelector(targets[action])?.scrollIntoView({behavior:"smooth",block:"start"});
 });
 </script>
-
 </body>
 </html>
