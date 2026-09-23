@@ -447,15 +447,25 @@
           </div>
         </div>
       </section>
-
-    </main>
+<section id="orderHistorySection" class="card order-history-card">
+  <button id="toggleOrderHistory" class="order-history-toggle" type="button" aria-expanded="false">
+    <span><strong>🕘 Riwayat Pesanan</strong><small id="orderHistoryCount">0 pesanan</small></span>
+    <span id="orderHistoryChevron">⌄</span>
+  </button>
+  <div id="orderHistoryContent" class="order-history-content hidden">
+    <div id="orderHistoryList" class="orders-list">
+      <div class="menu-empty">Belum ada riwayat pesanan.</div>
+    </div>
+  </div>
+</section>
+</main>
 <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
 <script>
   eruda.init();
   console.log("[ERUDA] Vendor Dashboard Eruda aktif");
 </script>
 
-<script type="module" src="vendor-dashboard.js?v=20260923-03"></script>
+<script type="module" src="vendor-dashboard.js?v=20260924-01"></script>
   
 </body>
 </html>
