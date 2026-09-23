@@ -746,3 +746,8 @@ button:disabled {
 .order-history-item{opacity:.88}
 .order-history-item .order-actions,.order-history-item .order-location{display:none}
 @media(max-width:480px){.orders-card{padding:14px}.order-primary-actions button{min-height:42px}}
+
+/* Ensure collapsed history stays hidden even if generic styles change */
+#orderHistoryContent.hidden{
+  display:none !important;
+}
