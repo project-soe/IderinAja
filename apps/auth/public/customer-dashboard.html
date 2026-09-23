@@ -2094,7 +2094,60 @@
   .quick-nav{top:6px}
 }
 
-  </style>
+  
+/* APP-LIKE NAVIGATION */
+.quick-nav{display:none}
+.quick-actions{display:none}
+.app-bottom-nav{
+  position:fixed;left:50%;bottom:10px;transform:translateX(-50%);
+  z-index:9500;width:min(calc(100% - 20px),560px);
+  display:grid;grid-template-columns:repeat(5,1fr);gap:4px;
+  padding:7px;border:1px solid var(--border);border-radius:20px;
+  background:rgba(6,19,27,.94);backdrop-filter:blur(16px);
+  box-shadow:0 12px 35px rgba(0,0,0,.35);
+}
+.app-bottom-nav button{
+  min-height:52px;padding:7px 3px;border:0;border-radius:14px;
+  background:transparent;color:var(--muted);font-size:11px;font-weight:800;
+}
+.app-bottom-nav button span{display:block;font-size:18px;line-height:1.15;margin-bottom:2px}
+.app-bottom-nav button.active,.app-bottom-nav button:hover{
+  background:rgba(255,194,26,.12);color:var(--yellow)
+}
+.dashboard{padding-bottom:95px}
+@media(min-width:801px){
+ .app-bottom-nav{position:sticky;top:12px;bottom:auto;transform:none;left:auto;width:100%;margin-bottom:16px}
+ .dashboard{padding-bottom:20px}
+ .app-bottom-nav{grid-template-columns:repeat(5,1fr)}
+}
+
+
+/* APP-LIKE NAVIGATION */
+.quick-nav{display:none}
+.quick-actions{display:none}
+.app-bottom-nav{
+  position:fixed;left:50%;bottom:10px;transform:translateX(-50%);
+  z-index:9500;width:min(calc(100% - 20px),560px);
+  display:grid;grid-template-columns:repeat(5,1fr);gap:4px;
+  padding:7px;border:1px solid var(--border);border-radius:20px;
+  background:rgba(6,19,27,.94);backdrop-filter:blur(16px);
+  box-shadow:0 12px 35px rgba(0,0,0,.35);
+}
+.app-bottom-nav button{
+  min-height:52px;padding:7px 3px;border:0;border-radius:14px;
+  background:transparent;color:var(--muted);font-size:11px;font-weight:800;
+}
+.app-bottom-nav button span{display:block;font-size:18px;line-height:1.15;margin-bottom:2px}
+.app-bottom-nav button.active,.app-bottom-nav button:hover{
+  background:rgba(255,194,26,.12);color:var(--yellow)
+}
+.dashboard{padding-bottom:95px}
+@media(min-width:801px){
+ .app-bottom-nav{position:sticky;top:12px;bottom:auto;transform:none;left:auto;width:100%;margin-bottom:16px}
+ .dashboard{padding-bottom:20px}
+ .app-bottom-nav{grid-template-columns:repeat(5,1fr)}
+}
+</style>
 </head>
 
 <body>
@@ -2134,20 +2187,13 @@
       </div>
     </header>
 
-    <nav class="quick-nav" aria-label="Navigasi Konsumen">
-      <a href="#customerOrdersSection">📦 Pesanan</a>
-      <a href="#searchVendorSection">🔎 Cari</a>
-      <a href="#vendorListSection">🛍️ Mitra</a>
-      <a href="#nearbyMapSection">📍 Peta</a>
-      <button type="button" data-quick-action="cart">🛒 Keranjang</button>
-    </nav>
-
-    <div class="quick-actions" aria-label="Aksi cepat">
-      <button type="button" data-quick-action="orders">📦 Pesanan Saya</button>
-      <button type="button" data-quick-action="search">🔎 Cari Pedagang</button>
-      <button type="button" data-quick-action="map">📍 Pedagang Terdekat</button>
-      <button type="button" data-quick-action="cart">🛒 Keranjang</button>
-    </div>
+    <nav class="app-bottom-nav" aria-label="Navigasi utama">
+  <button type="button" data-app-nav="orders"><span>📦</span>Pesanan</button>
+  <button type="button" data-app-nav="search"><span>🔎</span>Cari</button>
+  <button type="button" data-app-nav="vendors"><span>🛍️</span>Mitra</button>
+  <button type="button" data-app-nav="map"><span>📍</span>Peta</button>
+  <button type="button" data-app-nav="cart"><span>🛒</span>Keranjang</button>
+</nav>
 
     
     <!-- PESANAN SAYA -->
@@ -2811,19 +2857,19 @@
 
 <script>
 document.addEventListener("click",(event)=>{
-  const action=event.target.closest("[data-quick-action]")?.dataset.quickAction;
-  if(!action) return;
-  const targets={
-    orders:"#customerOrdersSection",
-    search:"#searchVendorSection",
-    map:"#nearbyMapSection"
-  };
-  if(action==="cart"){
-    document.getElementById("openCartButton")?.click();
-    return;
-  }
-  document.querySelector(targets[action])?.scrollIntoView({behavior:"smooth",block:"start"});
+ const action=event.target.closest("[data-app-nav]")?.dataset.appNav;
+ if(!action)return;
+ const targets={orders:"#customerOrdersSection",search:"#searchVendorSection",vendors:"#vendorListSection",map:"#nearbyMapSection"};
+ if(action==="cart"){document.getElementById("openCartButton")?.click();return;}
+ document.querySelector(targets[action])?.scrollIntoView({behavior:"smooth",block:"start"});
 });
 </script>
+<nav class="app-bottom-nav" aria-label="Navigasi utama">
+  <button type="button" data-app-nav="orders"><span>📦</span>Pesanan</button>
+  <button type="button" data-app-nav="search"><span>🔎</span>Cari</button>
+  <button type="button" data-app-nav="vendors"><span>🛍️</span>Mitra</button>
+  <button type="button" data-app-nav="map"><span>📍</span>Peta</button>
+  <button type="button" data-app-nav="cart"><span>🛒</span>Keranjang</button>
+</nav>
 </body>
 </html>
