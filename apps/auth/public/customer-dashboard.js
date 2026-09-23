@@ -471,6 +471,7 @@ function startCustomerLocation() {
           longitude,
           accuracy,
         };
+        updateCheckoutLocationUI();
 
         const location = [
           latitude,
