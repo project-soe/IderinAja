@@ -2699,6 +2699,12 @@ if (
 }
 
 document.addEventListener("click", (event) => {
+  const topButton = event.target.closest('[data-quick-action="top"]');
+  if (topButton) {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    return;
+  }
+
   const toggle = event.target.closest("#toggleOrderHistory");
   if (!toggle) return;
 
