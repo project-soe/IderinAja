@@ -144,6 +144,8 @@ let vendorMarkers = new Map();
 
 let stopVendorListener = null;
 let vendorLocationListeners = new Map();
+let vendorProximityState = new Map();
+let notificationServiceWorkerRegistration = null;
 
 let watchId = null;
 
@@ -3245,6 +3247,164 @@ function startCustomerOrdersListener() {
     );
 }
 
+async function initializeNearbyNotifications() {
+  const button = document.getElementById("enableNearbyNotifications");
+
+  if (!("Notification" in window)) {
+    if (button) button.classList.add("hidden");
+    return;
+  }
+
+  if (Notification.permission === "granted") {
+    if (button) {
+      button.textContent = "🔔 Notifikasi aktif";
+      button.classList.add("enabled");
+    }
+
+    if ("serviceWorker" in navigator) {
+      try {
+        notificationServiceWorkerRegistration =
+          await navigator.serviceWorker.register(
+            "nearby-notifications-sw.js",
+            { scope: "./" }
+          );
+      } catch (error) {
+        console.warn("[NOTIFY] Service worker gagal didaftarkan:", error);
+      }
+    }
+
+    return;
+  }
+
+  if (Notification.permission === "denied") {
+    if (button) {
+      button.textContent = "🔕 Notifikasi diblokir";
+      button.disabled = true;
+    }
+    return;
+  }
+
+  if (button) button.classList.remove("hidden");
+}
+
+async function enableNearbyNotifications() {
+  const button = document.getElementById("enableNearbyNotifications");
+
+  if (!("Notification" in window)) {
+    alert("Browser ini belum mendukung notifikasi.");
+    return;
+  }
+
+  try {
+    const permission = await Notification.requestPermission();
+
+    if (permission !== "granted") {
+      if (button) {
+        button.textContent =
+          permission === "denied"
+            ? "🔕 Notifikasi diblokir"
+            : "🔔 Aktifkan notifikasi";
+      }
+      return;
+    }
+
+    await initializeNearbyNotifications();
+
+    if (notificationServiceWorkerRegistration) {
+      await notificationServiceWorkerRegistration.showNotification(
+        "IderinAja",
+        {
+          body: "Notifikasi pedagang sekitar sudah aktif.",
+          tag: "iderinaja-notification-test",
+          icon: "/favicon.ico",
+          badge: "/favicon.ico",
+        }
+      );
+    }
+  } catch (error) {
+    console.error("[NOTIFY] Aktivasi notifikasi gagal:", error);
+  }
+}
+
+async function notifyNearbyVendor(vendor, distanceMeters) {
+  if (!("Notification" in window) || Notification.permission !== "granted") {
+    return;
+  }
+
+  const vendorId = vendor.id;
+  const businessName = vendor.businessName || "Mitra IderinAja";
+
+  try {
+    if (!notificationServiceWorkerRegistration && "serviceWorker" in navigator) {
+      notificationServiceWorkerRegistration =
+        await navigator.serviceWorker.getRegistration("./");
+    }
+
+    const options = {
+      body:
+        businessName +
+        " sedang berada sekitar " +
+        Math.round(distanceMeters) +
+        " meter dari Anda.",
+      tag: "iderinaja-nearby-" + vendorId,
+      renotify: false,
+      icon: "/favicon.ico",
+      badge: "/favicon.ico",
+      data: {
+        vendorId,
+        distanceMeters: Math.round(distanceMeters),
+      },
+    };
+
+    if (notificationServiceWorkerRegistration) {
+      await notificationServiceWorkerRegistration.showNotification(
+        "Mitra IderinAja di sekitar Anda",
+        options
+      );
+      return;
+    }
+
+    try {
+      new Notification("Mitra IderinAja di sekitar Anda", options);
+    } catch (error) {
+      console.warn("[NOTIFY] Fallback Notification gagal:", error);
+    }
+  } catch (error) {
+    console.warn("[NOTIFY] Gagal menampilkan notifikasi:", error);
+  }
+}
+
+function checkNearbyVendorNotification(vendor) {
+  if (
+    !customerPosition ||
+    vendor.isOnline !== true ||
+    typeof vendor.latitude !== "number" ||
+    typeof vendor.longitude !== "number"
+  ) {
+    return;
+  }
+
+  const distanceMeters = calculateDistance(
+    customerPosition.latitude,
+    customerPosition.longitude,
+    vendor.latitude,
+    vendor.longitude
+  );
+
+  const isNearby = distanceMeters <= 50;
+  const wasNearby = vendorProximityState.get(vendor.id) === true;
+
+  if (isNearby && !wasNearby) {
+    vendorProximityState.set(vendor.id, true);
+    notifyNearbyVendor(vendor, distanceMeters);
+    return;
+  }
+
+  if (!isNearby && distanceMeters > 80 && wasNearby) {
+    vendorProximityState.set(vendor.id, false);
+  }
+}
+
 function stopAllVendorLocationListeners() {
   vendorLocationListeners.forEach((unsubscribe) => {
     try {
@@ -3345,6 +3505,7 @@ function syncVendorLocationListeners() {
 
         renderVendorResults();
         updateVendorMarkers(allVendors);
+        checkNearbyVendorNotification(allVendors[vendorIndex]);
 
         const onlineCount = allVendors.filter(
           (vendor) =>
@@ -3386,6 +3547,15 @@ function syncVendorLocationListeners() {
 
     vendorLocationListeners.set(vendorId, unsubscribe);
   });
+}
+
+function bindNearbyNotificationButton() {
+  const button = document.getElementById("enableNearbyNotifications");
+
+  if (!button || button.dataset.bound === "true") return;
+
+  button.dataset.bound = "true";
+  button.addEventListener("click", enableNearbyNotifications);
 }
 
 function startVendorListener() {
@@ -3796,6 +3966,9 @@ onAuthStateChanged(
       currentUser =
         user;
       startCustomerOrdersListener();
+      bindNearbyNotificationButton();
+      initializeNearbyNotifications();
+
       console.log(
         "[DASHBOARD 1] currentUser berhasil disimpan."
       );
