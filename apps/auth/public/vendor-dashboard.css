@@ -413,3 +413,74 @@ button:disabled {
 .logout-button:active {
   transform: scale(0.97);
 }
+
+/* ==================================================
+   QUICK NAVIGATION + SHORTCUTS
+================================================== */
+.quick-nav{
+  position:sticky;
+  top:10px;
+  z-index:900;
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding:8px;
+  margin:0 0 12px;
+  border:1px solid var(--color-border);
+  border-radius:16px;
+  background:rgba(6,19,27,.88);
+  backdrop-filter:blur(14px);
+  scrollbar-width:none;
+}
+.quick-nav::-webkit-scrollbar{display:none}
+.quick-nav a,
+.quick-nav button{
+  flex:0 0 auto;
+  min-height:42px;
+  width:auto;
+  padding:9px 12px;
+  border:1px solid var(--color-border);
+  border-radius:12px;
+  background:rgba(255,255,255,.05);
+  color:var(--color-text);
+  text-decoration:none;
+  font-size:12px;
+  font-weight:800;
+}
+.quick-nav a:hover,
+.quick-nav button:hover{
+  background:rgba(255,194,26,.12);
+  border-color:rgba(255,194,26,.3);
+}
+.quick-actions{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+  margin:0 0 16px;
+}
+.quick-actions a,
+.quick-actions button{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:58px;
+  width:100%;
+  padding:10px 8px;
+  border:1px solid var(--color-border);
+  border-radius:15px;
+  background:rgba(255,255,255,.045);
+  color:var(--color-text);
+  text-decoration:none;
+  font-size:12px;
+  font-weight:800;
+  text-align:center;
+}
+.quick-actions a:hover,
+.quick-actions button:hover{
+  background:rgba(255,194,26,.1);
+  border-color:rgba(255,194,26,.25);
+}
+@media(max-width:600px){
+  .quick-actions{grid-template-columns:repeat(2,1fr)}
+  .quick-nav{top:6px}
+}
