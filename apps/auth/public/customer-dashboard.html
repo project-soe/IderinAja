@@ -2037,7 +2037,64 @@
   }
 }
 
-</style>
+
+/* ==================================================
+   QUICK NAVIGATION + SHORTCUTS
+================================================== */
+.quick-nav{
+  position:sticky;
+  top:10px;
+  z-index:900;
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding:8px;
+  margin:0 0 12px;
+  border:1px solid var(--border);
+  border-radius:16px;
+  background:rgba(6,19,27,.88);
+  backdrop-filter:blur(14px);
+  scrollbar-width:none;
+}
+.quick-nav::-webkit-scrollbar{display:none}
+.quick-nav a,
+.quick-nav button{
+  flex:0 0 auto;
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:9px 12px;
+  background:rgba(255,255,255,.05);
+  color:var(--white);
+  text-decoration:none;
+  font-size:12px;
+  font-weight:700;
+}
+.quick-nav a:hover,
+.quick-nav button:hover{background:rgba(255,194,26,.12);border-color:rgba(255,194,26,.3)}
+.quick-actions{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+  margin:0 0 16px;
+}
+.quick-actions button{
+  min-height:58px;
+  padding:10px 8px;
+  border:1px solid var(--border);
+  border-radius:15px;
+  background:rgba(255,255,255,.045);
+  color:var(--white);
+  font-size:12px;
+  font-weight:800;
+}
+.quick-actions button:hover{background:rgba(255,194,26,.1);border-color:rgba(255,194,26,.25)}
+.quick-actions button:active{transform:scale(.98)}
+@media(max-width:600px){
+  .quick-actions{grid-template-columns:repeat(2,1fr)}
+  .quick-nav{top:6px}
+}
+
+  </style>
 </head>
 
 <body>
@@ -2055,43 +2112,10 @@
          HEADER
     ======================================== -->
 
-    <header class="header">
-
-      <div class="header-top">
-
-        <div>
-
-          <div class="brand">
-            IderinAja
-          </div>
-
-          <div class="role">
-            Konsumen
-          </div>
-
-        </div>
-
-        <button
-          id="logoutButton"
-          class="logout-button"
-          type="button"
-        >
-          Keluar
-        </button>
-
-      </div>
-
-      <div
-        id="connectionStatus"
-        class="status"
-      >
-        Menghubungkan...
-      </div>
-
-    </header>
+    
     <!-- PESANAN SAYA -->
 
-<section class="card customer-orders-card">
+<section id="customerOrdersSection" class="card customer-orders-card">
 
   <div class="customer-orders-heading">
     <div>
@@ -2745,6 +2769,20 @@
 
 <script
   type="module" src="customer-dashboard.js?v=20260923-03"> 
+</script>
+
+
+<script>
+document.addEventListener("click",(event)=>{
+  const action=event.target.closest("[data-quick-action]")?.dataset.quickAction;
+  if(!action) return;
+  const targets={orders:"#customerOrdersSection",search:"#searchVendorSection",map:"#nearbyMapSection"};
+  if(action==="cart"){
+    document.getElementById("openCartButton")?.click();
+    return;
+  }
+  document.querySelector(targets[action])?.scrollIntoView({behavior:"smooth",block:"start"});
+});
 </script>
 
 </body>
