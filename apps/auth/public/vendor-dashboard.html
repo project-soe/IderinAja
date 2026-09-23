@@ -44,10 +44,25 @@
         </button>
       </header>
 
+      <nav class="quick-nav" aria-label="Navigasi Mitra">
+        <a href="#businessProfileSection">👤 Profil</a>
+        <a href="#locationSection">📍 Lokasi</a>
+        <a href="#menuSection">🍽️ Menu</a>
+        <a href="#ordersSection">📦 Pesanan</a>
+        <button type="button" data-quick-action="top">⬆️ Atas</button>
+      </nav>
+
+      <div class="quick-actions" aria-label="Aksi cepat">
+        <a href="#businessProfileSection">👤 Kelola Profil</a>
+        <button type="button" data-quick-action="location">📍 Aktifkan GPS</button>
+        <a href="#menuSection">🍽️ Kelola Menu</a>
+        <a href="#ordersSection">📦 Lihat Pesanan</a>
+      </div>
+
       <!-- =========================================
            PROFIL USAHA
       ========================================== -->
-      <section class="card">
+      <section id="businessProfileSection" class="card">
         <div class="section-heading">
           <div>
             <h2>Profil Usaha</h2>
@@ -170,7 +185,7 @@
       <!-- =========================================
            LOKASI MITRA
       ========================================== -->
-      <section class="card">
+      <section id="locationSection" class="card">
         <h2>Lokasi Mitra</h2>
 
         <div class="location-status">
@@ -211,7 +226,7 @@
       <!-- =========================================
            INFORMASI GPS
       ========================================== -->
-      <section class="card">
+      <section id="gpsSection" class="card">
         <h2>Informasi GPS</h2>
 
         <div class="info">
@@ -241,7 +256,7 @@
       <!-- =========================================
      MENU & STOK
 ========================================== -->
-<section class="card">
+<section id="menuSection" class="card">
   <div class="section-heading">
     <div>
       <h2>Menu & Stok</h2>
@@ -409,7 +424,7 @@
 
 </section>
 
-      <!-- =========================================                                                   PESANAN MASUK                                                                          ========================================== -->                                              <section class="card orders-card">                                                            <div class="section-heading">                                                                 <div>                                                                                         <h2>Pesanan Masuk</h2>                                                                      <p>                                                                                           Pesanan baru dari konsumen akan muncul otomatis.                                          </p>
+      <!-- =========================================                                                   PESANAN MASUK                                                                          ========================================== -->                                              <section id="ordersSection" class="card orders-card">                                                            <div class="section-heading">                                                                 <div>                                                                                         <h2>Pesanan Masuk</h2>                                                                      <p>                                                                                           Pesanan baru dari konsumen akan muncul otomatis.                                          </p>
           </div>
 
           <span
@@ -447,13 +462,18 @@
   console.log("[ERUDA] Vendor Dashboard Eruda aktif");
 </script>
 
-<script
-  type="module"
-  src="vendor-dashboard.js?v=20260922-02"
-></script>
-<script
-  type="module"
-  src="vendor-dashboard.js?v=20260922-01"
-></script>
+<script type="module" src="vendor-dashboard.js?v=20260923-03"></script>
+  
+<script>
+document.addEventListener("click",(event)=>{
+  const action=event.target.closest("[data-quick-action]")?.dataset.quickAction;
+  if(!action) return;
+  if(action==="top"){window.scrollTo({top:0,behavior:"smooth"});return;}
+  if(action==="location"){
+    document.getElementById("startLocation")?.click();
+  }
+});
+</script>
+
   </body>
 </html>
