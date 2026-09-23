@@ -2195,20 +2195,51 @@ function createOrderCard(order, history = false) {
   total.appendChild(totalValue);
   card.appendChild(total);
 
-  if (order.notes) {
-    const notes = document.createElement("p");
-    notes.className = "order-notes";
-    notes.textContent = "Catatan: " + order.notes;
-    card.appendChild(notes);
+  const detailContent = document.createElement("div");
+  detailContent.className = "order-detail-content hidden";
+
+  const payment = document.createElement("p");
+  payment.className = "order-detail-row";
+  payment.innerHTML = "<span>Pembayaran</span><strong>COD</strong>";
+  detailContent.appendChild(payment);
+
+  if (order.deliveryAddress) {
+    const address = document.createElement("p");
+    address.className = "order-detail-row order-detail-stack";
+    address.innerHTML = "<span>Alamat / patokan</span><strong></strong>";
+    address.querySelector("strong").textContent = order.deliveryAddress;
+    detailContent.appendChild(address);
   }
 
-  if (typeof order.latitude === "number" && typeof order.longitude === "number") {
-    const location = document.createElement("p");
-    location.className = "order-location";
-    location.textContent =
-      "📍 " + order.latitude.toFixed(5) + ", " + order.longitude.toFixed(5);
-    card.appendChild(location);
+  if (order.notes) {
+    const notes = document.createElement("p");
+    notes.className = "order-detail-row order-detail-stack";
+    notes.innerHTML = "<span>Catatan</span><strong></strong>";
+    notes.querySelector("strong").textContent = order.notes;
+    detailContent.appendChild(notes);
   }
+
+  if (order.customerLocation && typeof order.customerLocation.lat === "number" && typeof order.customerLocation.lng === "number") {
+    const location = document.createElement("p");
+    location.className = "order-detail-row order-detail-stack";
+    location.innerHTML = "<span>Lokasi GPS</span><strong></strong>";
+    location.querySelector("strong").textContent =
+      "📍 " + order.customerLocation.lat.toFixed(6) + ", " + order.customerLocation.lng.toFixed(6);
+    detailContent.appendChild(location);
+  }
+
+  const detailToggle = document.createElement("button");
+  detailToggle.type = "button";
+  detailToggle.className = "order-detail-toggle";
+  detailToggle.textContent = "Lihat detail";
+  detailToggle.addEventListener("click", () => {
+    const willOpen = detailContent.classList.contains("hidden");
+    detailContent.classList.toggle("hidden", !willOpen);
+    detailToggle.textContent = willOpen ? "Tutup detail" : "Lihat detail";
+  });
+
+  card.appendChild(detailToggle);
+  card.appendChild(detailContent);
 
   if (!history && order.status === "pending") {
     const actions = document.createElement("div");
