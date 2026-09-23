@@ -63,31 +63,43 @@ service cloud.firestore {
 
     match /vendorLocations/{vendorId} {
 
-  allow read: if
-    request.auth != null
-    && (
-      request.auth.uid == vendorId
-      ||
-      (
-        exists(
-          /databases/$(database)/documents/subscriptions/$(request.auth.uid)
-        )
-        &&
-        get(
-          /databases/$(database)/documents/subscriptions/$(request.auth.uid)
-        ).data.vendors[vendorId] == true
-      )
-    );
+      // Mitra dapat membaca dan menulis lokasi miliknya sendiri.
+      // Konsumen hanya dapat membaca lokasi Mitra yang benar-benar
+      // memiliki dokumen subscription aktif untuk konsumen tersebut.
+      allow read: if
+        request.auth != null
+        && (
+          request.auth.uid == vendorId
+          ||
+          (
+            exists(
+              /databases/$(database)/documents/subscriptions/$(request.auth.uid)_$(vendorId)
+            )
+            &&
+            get(
+              /databases/$(database)/documents/subscriptions/$(request.auth.uid)_$(vendorId)
+            ).data.customerId == request.auth.uid
+            &&
+            get(
+              /databases/$(database)/documents/subscriptions/$(request.auth.uid)_$(vendorId)
+            ).data.vendorId == vendorId
+            &&
+            get(
+              /databases/$(database)/documents/subscriptions/$(request.auth.uid)_$(vendorId)
+            ).data.active == true
+          )
+        );
 
-  allow create, update: if
-    request.auth != null
-    && request.auth.uid == vendorId
-    && request.resource.data.uid == request.auth.uid;
+      allow create, update: if
+        request.auth != null
+        && request.auth.uid == vendorId
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.vendorId == vendorId;
 
-  allow delete: if
-    request.auth != null
-    && request.auth.uid == vendorId;
-}
+      allow delete: if
+        request.auth != null
+        && request.auth.uid == vendorId;
+    }
 
 
     /* ==================================================
