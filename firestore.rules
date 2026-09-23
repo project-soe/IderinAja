@@ -73,19 +73,19 @@ service cloud.firestore {
           ||
           (
             exists(
-              /databases/$(database)/documents/subscriptions/$(request.auth.uid)_$(vendorId)
+              /databases/$(database)/documents/subscriptions/$(request.auth.uid + '_' + vendorId)
             )
             &&
             get(
-              /databases/$(database)/documents/subscriptions/$(request.auth.uid)_$(vendorId)
+              /databases/$(database)/documents/subscriptions/$(request.auth.uid + '_' + vendorId)
             ).data.customerId == request.auth.uid
             &&
             get(
-              /databases/$(database)/documents/subscriptions/$(request.auth.uid)_$(vendorId)
+              /databases/$(database)/documents/subscriptions/$(request.auth.uid + '_' + vendorId)
             ).data.vendorId == vendorId
             &&
             get(
-              /databases/$(database)/documents/subscriptions/$(request.auth.uid)_$(vendorId)
+              /databases/$(database)/documents/subscriptions/$(request.auth.uid + '_' + vendorId)
             ).data.active == true
           )
         );
