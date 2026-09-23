@@ -44,20 +44,13 @@
         </button>
       </header>
 
-      <nav class="quick-nav" aria-label="Navigasi Mitra">
-        <a href="#businessProfileSection">👤 Profil</a>
-        <a href="#locationSection">📍 Lokasi</a>
-        <a href="#menuSection">🍽️ Menu</a>
-        <a href="#ordersSection">📦 Pesanan</a>
-        <button type="button" data-quick-action="top">⬆️ Atas</button>
-      </nav>
-
-      <div class="quick-actions" aria-label="Aksi cepat">
-        <a href="#businessProfileSection">👤 Kelola Profil</a>
-        <button type="button" data-quick-action="location">📍 Aktifkan GPS</button>
-        <a href="#menuSection">🍽️ Kelola Menu</a>
-        <a href="#ordersSection">📦 Lihat Pesanan</a>
-      </div>
+      <nav class="app-bottom-nav" aria-label="Navigasi utama">
+  <a href="#businessProfileSection"><span>👤</span>Profil</a>
+  <a href="#locationSection"><span>📍</span>Lokasi</a>
+  <a href="#menuSection"><span>🍽️</span>Menu</a>
+  <a href="#ordersSection"><span>📦</span>Pesanan</a>
+  <button type="button" data-quick-action="top"><span>⬆️</span>Atas</button>
+</nav>
 
       <!-- =========================================
            PROFIL USAHA
@@ -464,16 +457,5 @@
 
 <script type="module" src="vendor-dashboard.js?v=20260923-03"></script>
   
-<script>
-document.addEventListener("click",(event)=>{
-  const action=event.target.closest("[data-quick-action]")?.dataset.quickAction;
-  if(!action) return;
-  if(action==="top"){window.scrollTo({top:0,behavior:"smooth"});return;}
-  if(action==="location"){
-    document.getElementById("startLocation")?.click();
-  }
-});
-</script>
-
-  </body>
+</body>
 </html>
