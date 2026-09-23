@@ -3239,102 +3239,143 @@ function startCustomerOrdersListener() {
     );
 }
 
+async function hydrateSubscribedVendorLocations() {
+  if (!currentUser) {
+    return;
+  }
+
+  const hydratedVendors = await Promise.all(
+    allVendors.map(async (vendor) => {
+      const baseVendor = {
+        ...vendor,
+        latitude: null,
+        longitude: null,
+        accuracy: null,
+        isOnline: false,
+      };
+
+      if (!subscribedVendorIds.has(vendor.id)) {
+        return baseVendor;
+      }
+
+      try {
+        const locationSnapshot = await getDoc(
+          doc(
+            db,
+            "vendorLocations",
+            vendor.id
+          )
+        );
+
+        if (!locationSnapshot.exists()) {
+          return baseVendor;
+        }
+
+        const location = locationSnapshot.data();
+
+        return {
+          ...baseVendor,
+          latitude:
+            typeof location.latitude === "number"
+              ? location.latitude
+              : null,
+          longitude:
+            typeof location.longitude === "number"
+              ? location.longitude
+              : null,
+          accuracy:
+            typeof location.accuracy === "number"
+              ? location.accuracy
+              : null,
+          isOnline:
+            location.isOnline === true,
+        };
+      } catch (error) {
+        console.warn(
+          "[GPS] Lokasi Mitra tidak dapat dibaca:",
+          vendor.id,
+          error
+        );
+
+        return baseVendor;
+      }
+    })
+  );
+
+  allVendors = hydratedVendors;
+}
+
 function startVendorListener() {
   if (stopVendorListener) {
     stopVendorListener();
   }
 
-  const vendorsRef =
-    collection(
-      db,
-      "vendors"
-    );
+  const vendorsRef = collection(
+    db,
+    "vendorProfiles"
+  );
 
-  stopVendorListener =
-    onSnapshot(
-      vendorsRef,
+  stopVendorListener = onSnapshot(
+    vendorsRef,
+    async (snapshot) => {
+      const vendors = [];
 
-      async (snapshot) => {
-        const vendors = [];
+      snapshot.forEach((documentSnapshot) => {
+        const vendor = documentSnapshot.data();
 
-        snapshot.forEach(
-          (documentSnapshot) => {
-            const vendor =
-              documentSnapshot.data();
+        if (vendor.role === "vendor") {
+          vendors.push({
+            id: documentSnapshot.id,
+            ...vendor,
+          });
+        }
+      });
 
-            /**
-             * Every vendor document can be
-             * searched through the public
-             * profile fields.
-             *
-             * GPS is only used when the vendor
-             * is currently online.
-             */
-            if (
-              vendor.role ===
-                "vendor"
-            ) {
-              vendors.push({
-                id:
-                  documentSnapshot.id,
+      allVendors = vendors;
 
-                ...vendor,
-              });
-            }
-          }
-        );
+      await loadSubscriptions();
+      await hydrateSubscribedVendorLocations();
 
-        allVendors =
-          vendors;
+      renderVendorResults();
+      updateVendorMarkers(allVendors);
 
-        await loadSubscriptions();
+      const onlineCount = allVendors.filter(
+        (vendor) =>
+          vendor.isOnline === true &&
+          typeof vendor.latitude === "number" &&
+          typeof vendor.longitude === "number"
+      ).length;
 
-        renderVendorResults();
+      connectionStatus.textContent =
+        `Realtime aktif • ${onlineCount} mitra online • GPS berdasarkan langganan`;
 
-        updateVendorMarkers(
-          vendors
-        );
+      connectionStatus.classList.add("online");
 
-        const onlineCount =
-          vendors.filter(
-            (vendor) =>
-              vendor.isOnline ===
-              true
-          ).length;
+      console.log(
+        "[VENDOR] Profil realtime + GPS subscription:",
+        allVendors
+      );
+    },
+    (error) => {
+      console.error(
+        "Vendor listener error:",
+        error
+      );
 
-        connectionStatus.textContent =
-          `Realtime aktif • ${onlineCount} mitra online`;
+      connectionStatus.textContent =
+        "Gagal membaca data mitra";
 
-        connectionStatus.classList.add(
-          "online"
-        );
+      connectionStatus.classList.remove(
+        "online"
+      );
 
-        console.log(
-          "Realtime vendors:",
-          vendors
-        );
-      },
-
-      (error) => {
-        console.error(
-          "Vendor listener error:",
-          error
-        );
-
-        connectionStatus.textContent =
-          "Gagal membaca data mitra";
-
-        connectionStatus.classList.remove(
-          "online"
-        );
-
-        vendorList.innerHTML = `
-          <div class="empty error">
-            Gagal mengambil data mitra.
-          </div>
-        `;
-      }
-    );
+      vendorList.innerHTML = `
+        <div class="empty error">
+          Gagal mengambil data mitra.
+        </div>
+      `;
+    }
+  );
 }
 
 /* ==================================================
