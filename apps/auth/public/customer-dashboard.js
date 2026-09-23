@@ -57,6 +57,8 @@ import {
   deleteDoc,
   collection,
   onSnapshot,
+  query,
+  where,
   serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
 console.log("[BOOT] customer-dashboard.js BERHASIL DIEKSEKUSI");
@@ -170,6 +172,7 @@ let cart = {
  * IDs of vendors subscribed by the customer.
  */
 let subscribedVendorIds = new Set();
+let stopCustomerOrdersListener = null;
 
 /* ==================================================
    MAP ICONS
@@ -2721,6 +2724,93 @@ function closeVendorProfile() {
 /* ==================================================
    REALTIME VENDOR LISTENER
 ================================================== */
+/* ==================================================
+   REALTIME CUSTOMER ORDER STATUS
+================================================== */
+
+function startCustomerOrdersListener() {
+  if (!currentUser) {
+    return;
+  }
+
+  if (stopCustomerOrdersListener) {
+    stopCustomerOrdersListener();
+    stopCustomerOrdersListener = null;
+  }
+
+  const ordersQuery = query(
+    collection(db, "orders"),
+    where(
+      "customerId",
+      "==",
+      currentUser.uid
+    )
+  );
+
+  console.log(
+    "[CUSTOMER ORDERS] Listener dimulai:",
+    currentUser.uid
+  );
+
+  stopCustomerOrdersListener =
+    onSnapshot(
+      ordersQuery,
+
+      (snapshot) => {
+        const orders =
+          snapshot.docs
+            .map((orderSnapshot) => ({
+              id:
+                orderSnapshot.id,
+
+              ...orderSnapshot.data(),
+            }))
+            .sort((a, b) => {
+              const timeA =
+                a.createdAt?.toMillis?.() ||
+                0;
+
+              const timeB =
+                b.createdAt?.toMillis?.() ||
+                0;
+
+              return (
+                timeB - timeA
+              );
+            });
+
+        console.log(
+          "[CUSTOMER ORDERS] Realtime update:",
+          orders.map(
+            (order) => ({
+              id: order.id,
+              status:
+                order.status,
+              vendorId:
+                order.vendorId,
+              vendorName:
+                order.vendorName,
+            })
+          )
+        );
+
+        orders.forEach(
+          (order) => {
+            console.log(
+              `[CUSTOMER ORDERS] ${order.id} → ${order.status}`
+            );
+          }
+        );
+      },
+
+      (error) => {
+        console.error(
+          "[CUSTOMER ORDERS] Listener error:",
+          error
+        );
+      }
+    );
+}
 
 function startVendorListener() {
   if (stopVendorListener) {
@@ -3151,7 +3241,7 @@ onAuthStateChanged(
 
       currentUser =
         user;
-
+      startCustomerOrdersListener();
       console.log(
         "[DASHBOARD 1] currentUser berhasil disimpan."
       );
