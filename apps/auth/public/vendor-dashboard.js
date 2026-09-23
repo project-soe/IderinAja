@@ -973,14 +973,6 @@ async function uploadLocation(
     );
 
 
-  const legacyVendorRef =
-    doc(
-      db,
-      "vendors",
-      currentUser.uid
-    );
-
-
   try {
 
     await setDoc(
@@ -992,30 +984,6 @@ async function uploadLocation(
         vendorId:
           currentUser.uid,
 
-        latitude,
-
-        longitude,
-
-        accuracy,
-
-        isOnline:
-          true,
-
-        isLocationVisible:
-          true,
-
-        updatedAt:
-          serverTimestamp(),
-      },
-      {
-        merge: true,
-      }
-    );
-
-
-    await setDoc(
-      legacyVendorRef,
-      {
         latitude,
 
         longitude,
@@ -1277,14 +1245,6 @@ async function stopLocationSharing() {
         );
 
 
-      const legacyVendorRef =
-        doc(
-          db,
-          "vendors",
-          currentUser.uid
-        );
-
-
       await setDoc(
         locationRef,
         {
@@ -1299,20 +1259,6 @@ async function stopLocationSharing() {
         }
       );
 
-
-      await setDoc(
-        legacyVendorRef,
-        {
-          isOnline:
-            false,
-
-          updatedAt:
-            serverTimestamp(),
-        },
-        {
-          merge: true,
-        }
-      );
 
     } catch (error) {
 
