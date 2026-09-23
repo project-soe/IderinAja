@@ -2727,7 +2727,172 @@ function closeVendorProfile() {
 /* ==================================================
    REALTIME CUSTOMER ORDER STATUS
 ================================================== */
+const customerOrderStatusMeta = {
+  pending: {
+    label: "Menunggu konfirmasi",
+    icon: "⏳",
+    className: "pending",
+  },
 
+  accepted: {
+    label: "Pesanan diterima",
+    icon: "✅",
+    className: "accepted",
+  },
+
+  rejected: {
+    label: "Pesanan ditolak",
+    icon: "❌",
+    className: "rejected",
+  },
+
+  completed: {
+    label: "Pesanan selesai",
+    icon: "🏁",
+    className: "completed",
+  },
+};
+
+function formatOrderDate(timestamp) {
+  if (!timestamp?.toDate) {
+    return "Waktu belum tersedia";
+  }
+
+  return new Intl.DateTimeFormat(
+    "id-ID",
+    {
+      dateStyle: "medium",
+      timeStyle: "short",
+    }
+  ).format(timestamp.toDate());
+}
+
+function renderCustomerOrders(orders) {
+  const list =
+    document.getElementById(
+      "customerOrdersList"
+    );
+
+  const count =
+    document.getElementById(
+      "customerOrderCount"
+    );
+
+  if (!list) {
+    return;
+  }
+
+  if (count) {
+    count.textContent =
+      `${orders.length} pesanan`;
+  }
+
+  if (orders.length === 0) {
+    list.innerHTML = `
+      <div class="customer-orders-empty">
+        Belum ada pesanan.
+      </div>
+    `;
+
+    return;
+  }
+
+  list.innerHTML = orders
+    .map((order) => {
+
+      const meta =
+        customerOrderStatusMeta[
+          order.status
+        ] || {
+          label: "Status tidak diketahui",
+          icon: "ℹ️",
+          className: "unknown",
+        };
+
+      const itemSummary =
+        Array.isArray(order.items) &&
+        order.items.length
+          ? order.items
+              .map(
+                (item) =>
+                  `${escapeHtml(
+                    item.name || "Menu"
+                  )} × ${Number(
+                    item.quantity || 0
+                  )}`
+              )
+              .join(" • ")
+          : "Item pesanan tidak tersedia";
+
+      return `
+        <article
+          class="customer-order-item"
+        >
+
+          <div
+            class="customer-order-top"
+          >
+
+            <div>
+
+              <div
+                class="customer-order-vendor"
+              >
+                ${escapeHtml(
+                  order.vendorName ||
+                  "Mitra IderinAja"
+                )}
+              </div>
+
+              <div
+                class="customer-order-id"
+              >
+                ID:
+                ${escapeHtml(
+                  order.id
+                )}
+              </div>
+
+            </div>
+
+            <span
+              class="customer-order-status ${meta.className}"
+            >
+              ${meta.icon}
+              ${meta.label}
+            </span>
+
+          </div>
+
+          <div
+            class="customer-order-items"
+          >
+            ${itemSummary}
+          </div>
+
+          <div
+            class="customer-order-bottom"
+          >
+
+            <span>
+              ${formatOrderDate(
+                order.createdAt
+              )}
+            </span>
+
+            <strong>
+              ${formatRupiah(
+                order.total
+              )}
+            </strong>
+
+          </div>
+
+        </article>
+      `;
+    })
+    .join("");
+}
 function startCustomerOrdersListener() {
   if (!currentUser) {
     return;
@@ -2778,6 +2943,9 @@ function startCustomerOrdersListener() {
                 timeB - timeA
               );
             });
+        renderCustomerOrders(
+  orders
+);
 
         console.log(
           "[CUSTOMER ORDERS] Realtime update:",

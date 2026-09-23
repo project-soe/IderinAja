@@ -1450,6 +1450,130 @@
   opacity: 0.55;
 }
 
+.customer-orders-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.customer-orders-heading h2 {
+  margin: 0;
+}
+
+.customer-orders-description {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.customer-order-count {
+  flex-shrink: 0;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: rgba(255, 194, 26, 0.08);
+  border: 1px solid rgba(255, 194, 26, 0.2);
+  color: var(--yellow);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.customer-orders-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.customer-orders-empty {
+  padding: 18px 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid var(--border-soft);
+  color: var(--muted);
+  text-align: center;
+  font-size: 12px;
+}
+
+.customer-order-item {
+  padding: 13px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid var(--border-soft);
+}
+
+.customer-order-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.customer-order-vendor {
+  color: var(--white);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.customer-order-id {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 9px;
+  word-break: break-all;
+}
+
+.customer-order-status {
+  flex-shrink: 0;
+  padding: 6px 8px;
+  border-radius: 999px;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.customer-order-status.pending {
+  color: var(--yellow);
+  background: rgba(255, 194, 26, 0.08);
+}
+
+.customer-order-status.accepted {
+  color: var(--green);
+  background: rgba(40, 199, 111, 0.08);
+}
+
+.customer-order-status.rejected {
+  color: var(--red);
+  background: rgba(255, 82, 82, 0.08);
+}
+
+.customer-order-status.completed {
+  color: #55a9ff;
+  background: rgba(85, 169, 255, 0.08);
+}
+
+.customer-order-items {
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.customer-order-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-soft);
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.customer-order-bottom strong {
+  color: var(--yellow);
+  font-size: 13px;
+}
+
 </style>
 </head>
 
@@ -1502,6 +1626,36 @@
       </div>
 
     </header>
+    <!-- PESANAN SAYA -->
+
+<section class="card customer-orders-card">
+
+  <div class="customer-orders-heading">
+    <div>
+      <h2>📦 Pesanan Saya</h2>
+      <p class="customer-orders-description">
+        Pantau status pesanan Anda secara realtime.
+      </p>
+    </div>
+
+    <span
+      id="customerOrderCount"
+      class="customer-order-count"
+    >
+      0 pesanan
+    </span>
+  </div>
+
+  <div
+    id="customerOrdersList"
+    class="customer-orders-list"
+  >
+    <div class="customer-orders-empty">
+      Belum ada pesanan.
+    </div>
+  </div>
+
+</section>
 
     <!-- =========================================
          SEARCH PEDAGANG
@@ -2042,10 +2196,10 @@
        CUSTOMER DASHBOARD JAVASCRIPT
   ========================================== -->
 
-  <script
-    type="module"
-    src="customer-dashboard.js?v=20260922-02"
-  ></script>
+<script
+  type="module"
+  src="customer-dashboard.js?v=20260923-01"
+></script>
 
 </body>
 </html>
