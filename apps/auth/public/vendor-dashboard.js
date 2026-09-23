@@ -2112,388 +2112,162 @@ function getOrderStatusClass(
 }
 
 
-function renderOrders(
-  orders
-) {
-  if (!ordersList) {
-    return;
-  }
+function renderOrders(orders) {
+  if (!ordersList) return;
+
+  const activeOrders = orders.filter(
+    (order) => order.status === "pending" || order.status === "accepted"
+  );
+  const historyOrders = orders.filter(
+    (order) => order.status === "rejected" || order.status === "completed"
+  );
 
   ordersList.innerHTML = "";
+  if (orderCount) orderCount.textContent = activeOrders.length + " aktif";
 
-  if (
-    orderCount
-  ) {
-    orderCount.textContent =
-      `${orders.length} pesanan`;
+  if (activeOrders.length === 0) {
+    const empty = document.createElement("div");
+    empty.className = "menu-empty";
+    empty.textContent = "Tidak ada pesanan aktif.";
+    ordersList.appendChild(empty);
+  } else {
+    activeOrders.forEach((order) => ordersList.appendChild(createOrderCard(order, false)));
   }
 
-  if (
-    orders.length === 0
-  ) {
-    const empty =
-      document.createElement(
-        "div"
-      );
+  renderOrderHistory(historyOrders);
+}
 
-    empty.className =
-      "menu-empty";
+function createOrderCard(order, history = false) {
+  const card = document.createElement("article");
+  card.className = history ? "order-item order-history-item" : "order-item order-active-item";
 
-    empty.textContent =
-      "Belum ada pesanan masuk.";
+  const header = document.createElement("div");
+  header.className = "order-item-header";
 
-    ordersList.appendChild(
-      empty
+  const title = document.createElement("h3");
+  title.textContent = "Pesanan #" + order.id.slice(0, 8);
+
+  const status = document.createElement("span");
+  status.className = getOrderStatusClass(order.status);
+  status.textContent = getOrderStatusLabel(order.status);
+
+  header.appendChild(title);
+  header.appendChild(status);
+  card.appendChild(header);
+
+  const time = document.createElement("p");
+  time.className = "order-time";
+  time.textContent = formatOrderDate(order.createdAt);
+  card.appendChild(time);
+
+  const items = document.createElement("div");
+  items.className = "order-items";
+
+  (Array.isArray(order.items) ? order.items : []).forEach((item) => {
+    const row = document.createElement("div");
+    row.className = "order-line";
+
+    const name = document.createElement("span");
+    name.textContent = (item.name || "Produk") + " × " + (Number(item.quantity) || 0);
+
+    const price = document.createElement("strong");
+    price.textContent = formatCurrency(
+      Number(item.subtotal ?? (Number(item.price) * Number(item.quantity))) || 0
     );
 
+    row.appendChild(name);
+    row.appendChild(price);
+    items.appendChild(row);
+  });
+
+  card.appendChild(items);
+
+  const total = document.createElement("div");
+  total.className = "order-total";
+
+  const totalLabel = document.createElement("span");
+  totalLabel.textContent = "Total";
+
+  const totalValue = document.createElement("strong");
+  totalValue.textContent = formatCurrency(Number(order.total) || 0);
+
+  total.appendChild(totalLabel);
+  total.appendChild(totalValue);
+  card.appendChild(total);
+
+  if (order.notes) {
+    const notes = document.createElement("p");
+    notes.className = "order-notes";
+    notes.textContent = "Catatan: " + order.notes;
+    card.appendChild(notes);
+  }
+
+  if (typeof order.latitude === "number" && typeof order.longitude === "number") {
+    const location = document.createElement("p");
+    location.className = "order-location";
+    location.textContent =
+      "📍 " + order.latitude.toFixed(5) + ", " + order.longitude.toFixed(5);
+    card.appendChild(location);
+  }
+
+  if (!history && order.status === "pending") {
+    const actions = document.createElement("div");
+    actions.className = "order-actions order-primary-actions";
+
+    const acceptButton = document.createElement("button");
+    acceptButton.type = "button";
+    acceptButton.className = "primary-button";
+    acceptButton.textContent = "Terima";
+    acceptButton.addEventListener("click", () => updateOrderStatus(order.id, "accepted"));
+
+    const rejectButton = document.createElement("button");
+    rejectButton.type = "button";
+    rejectButton.className = "secondary-button";
+    rejectButton.textContent = "Tolak";
+    rejectButton.addEventListener("click", () => updateOrderStatus(order.id, "rejected"));
+
+    actions.appendChild(acceptButton);
+    actions.appendChild(rejectButton);
+    card.appendChild(actions);
+  }
+
+  if (!history && order.status === "accepted") {
+    const actions = document.createElement("div");
+    actions.className = "order-actions";
+
+    const completeButton = document.createElement("button");
+    completeButton.type = "button";
+    completeButton.className = "primary-button";
+    completeButton.textContent = "Selesaikan Pesanan";
+    completeButton.addEventListener("click", () => updateOrderStatus(order.id, "completed"));
+
+    actions.appendChild(completeButton);
+    card.appendChild(actions);
+  }
+
+  return card;
+}
+
+function renderOrderHistory(historyOrders) {
+  const historyList = document.getElementById("orderHistoryList");
+  const historyCount = document.getElementById("orderHistoryCount");
+
+  if (!historyList) return;
+
+  historyList.innerHTML = "";
+  if (historyCount) {
+    historyCount.textContent = historyOrders.length === 0 ? "Kosong" : historyOrders.length + " pesanan";
+  }
+
+  if (historyOrders.length === 0) {
+    const empty = document.createElement("div");
+    empty.className = "menu-empty";
+    empty.textContent = "Belum ada riwayat pesanan.";
+    historyList.appendChild(empty);
     return;
   }
 
-  orders.forEach(
-    (order) => {
-      const card =
-        document.createElement(
-          "article"
-        );
-
-      card.className =
-        "order-item";
-
-      const header =
-        document.createElement(
-          "div"
-        );
-
-      header.className =
-        "order-item-header";
-
-      const title =
-        document.createElement(
-          "h3"
-        );
-
-      title.textContent =
-        `Pesanan #${order.id.slice(
-          0,
-          8
-        )}`;
-
-      const status =
-        document.createElement(
-          "span"
-        );
-
-      status.className =
-        getOrderStatusClass(
-          order.status
-        );
-
-      status.textContent =
-        getOrderStatusLabel(
-          order.status
-        );
-
-      header.appendChild(
-        title
-      );
-
-      header.appendChild(
-        status
-      );
-
-      card.appendChild(
-        header
-      );
-
-      const time =
-        document.createElement(
-          "p"
-        );
-
-      time.className =
-        "order-time";
-
-      time.textContent =
-        formatOrderDate(
-          order.createdAt
-        );
-
-      card.appendChild(
-        time
-      );
-
-      const items =
-        document.createElement(
-          "div"
-        );
-
-      items.className =
-        "order-items";
-
-      const orderItems =
-        Array.isArray(
-          order.items
-        )
-          ? order.items
-          : [];
-
-      orderItems.forEach(
-        (item) => {
-          const row =
-            document.createElement(
-              "div"
-            );
-
-          row.className =
-            "order-line";
-
-          const name =
-            document.createElement(
-              "span"
-            );
-
-          name.textContent =
-            `${item.name || "Produk"} × ${
-              Number(item.quantity) || 0
-            }`;
-
-          const price =
-            document.createElement(
-              "strong"
-            );
-
-          price.textContent =
-            formatCurrency(
-              Number(
-                item.subtotal ??
-                (
-                  Number(item.price) *
-                  Number(item.quantity)
-                )
-              ) || 0
-            );
-
-          row.appendChild(
-            name
-          );
-
-          row.appendChild(
-            price
-          );
-
-          items.appendChild(
-            row
-          );
-        }
-      );
-
-      card.appendChild(
-        items
-      );
-
-      const total =
-        document.createElement(
-          "div"
-        );
-
-      total.className =
-        "order-total";
-
-      const totalLabel =
-        document.createElement(
-          "span"
-        );
-
-      totalLabel.textContent =
-        "Total";
-
-      const totalValue =
-        document.createElement(
-          "strong"
-        );
-
-      totalValue.textContent =
-        formatCurrency(
-          Number(order.total) || 0
-        );
-
-      total.appendChild(
-        totalLabel
-      );
-
-      total.appendChild(
-        totalValue
-      );
-
-      card.appendChild(
-        total
-      );
-
-      if (
-        order.notes
-      ) {
-        const notes =
-          document.createElement(
-            "p"
-          );
-
-        notes.className =
-          "order-notes";
-
-        notes.textContent =
-          `Catatan: ${order.notes}`;
-
-        card.appendChild(
-          notes
-        );
-      }
-
-      if (
-        typeof order.latitude ===
-          "number" &&
-        typeof order.longitude ===
-          "number"
-      ) {
-        const location =
-          document.createElement(
-            "p"
-          );
-
-        location.className =
-          "order-location";
-
-        location.textContent =
-          `📍 Lokasi pelanggan: ${
-            order.latitude.toFixed(6)
-          }, ${
-            order.longitude.toFixed(6)
-          }`;
-
-        card.appendChild(
-          location
-        );
-      }
-
-      if (
-        order.status ===
-        "pending"
-      ) {
-        const actions =
-          document.createElement(
-            "div"
-          );
-
-        actions.className =
-          "order-actions";
-
-        const acceptButton =
-          document.createElement(
-            "button"
-          );
-
-        acceptButton.type =
-          "button";
-
-        acceptButton.className =
-          "primary-button";
-
-        acceptButton.textContent =
-          "Terima Pesanan";
-
-        acceptButton.addEventListener(
-          "click",
-          () =>
-            updateOrderStatus(
-              order.id,
-              "accepted"
-            )
-        );
-
-        const rejectButton =
-          document.createElement(
-            "button"
-          );
-
-        rejectButton.type =
-          "button";
-
-        rejectButton.className =
-          "secondary-button";
-
-        rejectButton.textContent =
-          "Tolak Pesanan";
-
-        rejectButton.addEventListener(
-          "click",
-          () =>
-            updateOrderStatus(
-              order.id,
-              "rejected"
-            )
-        );
-
-        actions.appendChild(
-          acceptButton
-        );
-
-        actions.appendChild(
-          rejectButton
-        );
-
-        card.appendChild(
-          actions
-        );
-      }
-
-      if (
-        order.status ===
-        "accepted"
-      ) {
-        const actions =
-          document.createElement(
-            "div"
-          );
-
-        actions.className =
-          "order-actions";
-
-        const completeButton =
-          document.createElement(
-            "button"
-          );
-
-        completeButton.type =
-          "button";
-
-        completeButton.className =
-          "primary-button";
-
-        completeButton.textContent =
-          "Selesaikan Pesanan";
-
-        completeButton.addEventListener(
-          "click",
-          () =>
-            updateOrderStatus(
-              order.id,
-              "completed"
-            )
-        );
-
-        actions.appendChild(
-          completeButton
-        );
-
-        card.appendChild(
-          actions
-        );
-      }
-
-      ordersList.appendChild(
-        card
-      );
-    }
-  );
+  historyOrders.forEach((order) => historyList.appendChild(createOrderCard(order, true)));
 }
 
 
@@ -2891,4 +2665,17 @@ if (
       );
     }
   );
+}
+
+const toggleOrderHistory = document.getElementById("toggleOrderHistory");
+const orderHistoryContent = document.getElementById("orderHistoryContent");
+const orderHistoryChevron = document.getElementById("orderHistoryChevron");
+
+if (toggleOrderHistory && orderHistoryContent) {
+  toggleOrderHistory.addEventListener("click", () => {
+    const isOpen = !orderHistoryContent.classList.contains("hidden");
+    orderHistoryContent.classList.toggle("hidden", isOpen);
+    toggleOrderHistory.setAttribute("aria-expanded", String(!isOpen));
+    if (orderHistoryChevron) orderHistoryChevron.textContent = isOpen ? "⌄" : "⌃";
+  });
 }
