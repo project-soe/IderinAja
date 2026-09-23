@@ -2445,6 +2445,50 @@ function renderOrders(
         );
       }
 
+      if (
+        order.status ===
+        "accepted"
+      ) {
+        const actions =
+          document.createElement(
+            "div"
+          );
+
+        actions.className =
+          "order-actions";
+
+        const completeButton =
+          document.createElement(
+            "button"
+          );
+
+        completeButton.type =
+          "button";
+
+        completeButton.className =
+          "primary-button";
+
+        completeButton.textContent =
+          "Selesaikan Pesanan";
+
+        completeButton.addEventListener(
+          "click",
+          () =>
+            updateOrderStatus(
+              order.id,
+              "completed"
+            )
+        );
+
+        actions.appendChild(
+          completeButton
+        );
+
+        card.appendChild(
+          actions
+        );
+      }
+
       ordersList.appendChild(
         card
       );
@@ -2464,7 +2508,9 @@ async function updateOrderStatus(
   const actionLabel =
     status === "accepted"
       ? "menerima"
-      : "menolak";
+      : status === "rejected"
+        ? "menolak"
+        : "menyelesaikan";
 
   const confirmed =
     window.confirm(
@@ -2516,7 +2562,9 @@ async function updateOrderStatus(
     showOrdersMessage(
       status === "accepted"
         ? "Pesanan berhasil diterima."
-        : "Pesanan berhasil ditolak.",
+        : status === "rejected"
+          ? "Pesanan berhasil ditolak."
+          : "Pesanan berhasil diselesaikan.",
       "success"
     );
 
