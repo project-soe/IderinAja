@@ -1170,6 +1170,8 @@ async function subscribeToVendor(
       vendor.id
     );
 
+    syncVendorLocationListeners();
+
     updateSubscribeButton();
 
     renderVendorResults();
@@ -1291,6 +1293,9 @@ console.log(
     subscribedVendorIds.delete(
       vendor.id
     );
+
+    syncVendorLocationListeners();
+
     console.log(
   "[UNSUB DEBUG] State setelah delete:",
   subscribedVendorIds.has(
