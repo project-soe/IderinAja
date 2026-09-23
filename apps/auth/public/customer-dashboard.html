@@ -1760,6 +1760,90 @@
       <div id="map"></div>
 
     </section>
+    <!-- =========================================
+     CUSTOMER ORDER DETAIL MODAL
+========================================== -->
+
+<div
+  id="customerOrderDetailModal"
+  class="customer-order-detail-modal hidden"
+>
+
+  <div class="customer-order-detail-card">
+
+    <div class="customer-order-detail-header">
+
+      <div>
+        <div
+          id="customerOrderDetailVendor"
+          class="customer-order-detail-vendor"
+        >
+          Mitra IderinAja
+        </div>
+
+        <div
+          id="customerOrderDetailId"
+          class="customer-order-detail-id"
+        >
+          ID: -
+        </div>
+      </div>
+
+      <button
+        id="closeCustomerOrderDetail"
+        class="customer-order-detail-close"
+        type="button"
+        aria-label="Tutup"
+      >
+        ×
+      </button>
+
+    </div>
+
+    <div
+      id="customerOrderDetailStatus"
+      class="customer-order-status pending"
+    >
+      ⏳ Menunggu konfirmasi
+    </div>
+
+    <div class="customer-order-detail-section">
+
+      <h3>Progress Pesanan</h3>
+
+      <div
+        id="customerOrderTimeline"
+        class="order-timeline"
+      ></div>
+
+    </div>
+
+    <div class="customer-order-detail-section">
+
+      <h3>Item Pesanan</h3>
+
+      <div
+        id="customerOrderDetailItems"
+        class="order-detail-items"
+      ></div>
+
+    </div>
+
+    <div class="customer-order-detail-total">
+
+      <span>Total</span>
+
+      <strong
+        id="customerOrderDetailTotal"
+      >
+        Rp0
+      </strong>
+
+    </div>
+
+  </div>
+
+</div>
 
   </main>
 

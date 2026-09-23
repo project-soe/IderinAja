@@ -2768,6 +2768,8 @@ function formatOrderDate(timestamp) {
 }
 
 function renderCustomerOrders(orders) {
+  window.__customerOrders = orders;
+
   const list =
     document.getElementById(
       "customerOrdersList"
@@ -2825,10 +2827,10 @@ function renderCustomerOrders(orders) {
           : "Item pesanan tidak tersedia";
 
       return `
-        <article
-          class="customer-order-item"
-        >
-
+          <article
+  class="customer-order-item"
+  data-order-id="${escapeHtml(order.id)}"
+>
           <div
             class="customer-order-top"
           >
@@ -2893,6 +2895,242 @@ function renderCustomerOrders(orders) {
     })
     .join("");
 }
+function showCustomerOrderDetail(orderId) {
+  const order = window.__customerOrders?.find(
+    (item) => item.id === orderId
+  );
+
+  if (!order) {
+    console.warn(
+      "[CUSTOMER ORDERS] Pesanan tidak ditemukan:",
+      orderId
+    );
+
+    return;
+  }
+
+  const meta =
+    customerOrderStatusMeta[order.status] || {
+      label: "Status tidak diketahui",
+      icon: "ℹ️",
+      className: "unknown",
+    };
+
+  const items = Array.isArray(order.items)
+    ? order.items
+    : [];
+
+  const itemHtml = items.length
+    ? items
+        .map(
+          (item) => `
+            <div class="order-detail-item">
+              <div>
+                <strong>
+                  ${escapeHtml(
+                    item.name || "Menu"
+                  )}
+                </strong>
+
+                <span>
+                  × ${Number(
+                    item.quantity || 0
+                  )}
+                </span>
+              </div>
+
+              <strong>
+                ${formatRupiah(
+                  Number(item.subtotal || 0)
+                )}
+              </strong>
+            </div>
+          `
+        )
+        .join("")
+    : `
+        <div class="customer-orders-empty">
+          Item pesanan tidak tersedia.
+        </div>
+      `;
+
+  const timeline = [
+    {
+      key: "pending",
+      icon: "📝",
+      label: "Pesanan dibuat",
+    },
+    {
+      key: "accepted",
+      icon: "✅",
+      label: "Pesanan diterima mitra",
+    },
+    {
+      key: "completed",
+      icon: "🏁",
+      label: "Pesanan selesai",
+    },
+  ];
+
+  const currentStatusIndex =
+    order.status === "rejected"
+      ? -1
+      : timeline.findIndex(
+          (item) =>
+            item.key === order.status
+        );
+
+  const timelineHtml = timeline
+    .map((item, index) => {
+
+      let className = "";
+
+      if (
+        order.status !== "rejected" &&
+        currentStatusIndex >= index
+      ) {
+        className = "done";
+      }
+
+      if (
+        order.status === "pending" &&
+        item.key === "pending"
+      ) {
+        className = "active";
+      }
+
+      return `
+        <div
+          class="order-timeline-item ${className}"
+        >
+          <div class="order-timeline-icon">
+            ${item.icon}
+          </div>
+
+          <div class="order-timeline-content">
+            ${item.label}
+          </div>
+        </div>
+      `;
+    })
+    .join("");
+
+  const rejectedHtml =
+    order.status === "rejected"
+      ? `
+        <div class="order-rejected-box">
+          ❌ Pesanan ditolak oleh mitra.
+        </div>
+      `
+      : "";
+
+  const modal =
+    document.getElementById(
+      "customerOrderDetailModal"
+    );
+
+  if (!modal) {
+    console.warn(
+      "[CUSTOMER ORDERS] Modal detail belum tersedia."
+    );
+
+    return;
+  }
+
+  const vendor =
+    document.getElementById(
+      "customerOrderDetailVendor"
+    );
+
+  const status =
+    document.getElementById(
+      "customerOrderDetailStatus"
+    );
+
+  const id =
+    document.getElementById(
+      "customerOrderDetailId"
+    );
+
+  const itemsContainer =
+    document.getElementById(
+      "customerOrderDetailItems"
+    );
+
+  const timelineContainer =
+    document.getElementById(
+      "customerOrderTimeline"
+    );
+
+  const total =
+    document.getElementById(
+      "customerOrderDetailTotal"
+    );
+
+  if (vendor) {
+    vendor.textContent =
+      order.vendorName ||
+      "Mitra IderinAja";
+  }
+
+  if (status) {
+    status.className =
+      `customer-order-status ${meta.className}`;
+
+    status.textContent =
+      `${meta.icon} ${meta.label}`;
+  }
+
+  if (id) {
+    id.textContent =
+      `ID: ${order.id}`;
+  }
+
+  if (itemsContainer) {
+    itemsContainer.innerHTML =
+      itemHtml;
+  }
+
+  if (timelineContainer) {
+    timelineContainer.innerHTML =
+      timelineHtml +
+      rejectedHtml;
+  }
+
+  if (total) {
+    total.textContent =
+      formatRupiah(
+        Number(order.total || 0)
+      );
+  }
+
+  modal.classList.remove("hidden");
+}
+document.addEventListener(
+  "click",
+  (event) => {
+    const orderCard =
+      event.target.closest(
+        ".customer-order-item"
+      );
+
+    if (!orderCard) {
+      return;
+    }
+
+    const orderId =
+      orderCard.dataset.orderId;
+
+    if (!orderId) {
+      return;
+    }
+
+    showCustomerOrderDetail(
+      orderId
+    );
+  }
+);
+
 function startCustomerOrdersListener() {
   if (!currentUser) {
     return;
