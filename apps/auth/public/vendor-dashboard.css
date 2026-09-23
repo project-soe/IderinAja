@@ -758,6 +758,44 @@ button:disabled {
 .order-history-content.hidden{display:none}
 .order-history-item{opacity:.88}
 .order-history-item .order-actions,.order-history-item .order-location{display:none}
+.order-detail-toggle{
+  width:auto;
+  min-height:32px;
+  margin-top:10px;
+  padding:7px 10px;
+  border:1px solid var(--color-border);
+  border-radius:10px;
+  background:rgba(255,255,255,.045);
+  color:var(--color-muted);
+  font-size:11px;
+  font-weight:800;
+}
+.order-detail-toggle:hover{
+  color:var(--color-primary);
+  border-color:rgba(255,194,26,.25);
+  background:rgba(255,194,26,.07);
+}
+.order-detail-content{
+  display:grid;
+  gap:8px;
+  margin-top:10px;
+  padding-top:10px;
+  border-top:1px solid var(--color-border);
+}
+.order-detail-content.hidden{display:none}
+.order-detail-row{
+  display:flex;
+  justify-content:space-between;
+  gap:14px;
+  margin:0;
+  color:var(--color-muted);
+  font-size:11px;
+  line-height:1.45;
+}
+.order-detail-row span{flex:0 0 auto}
+.order-detail-row strong{color:var(--color-text);font-weight:700;text-align:right}
+.order-detail-stack{display:grid;gap:3px}
+.order-detail-stack strong{text-align:left;overflow-wrap:anywhere}
 @media(max-width:480px){.orders-card{padding:14px}.order-primary-actions button{min-height:42px}}
 
 /* Ensure collapsed history stays hidden even if generic styles change */
