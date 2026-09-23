@@ -143,6 +143,7 @@ let customerPosition = null;
 let vendorMarkers = new Map();
 
 let stopVendorListener = null;
+let vendorLocationListeners = new Map();
 
 let watchId = null;
 
@@ -3239,70 +3240,147 @@ function startCustomerOrdersListener() {
     );
 }
 
-async function hydrateSubscribedVendorLocations() {
+function stopAllVendorLocationListeners() {
+  vendorLocationListeners.forEach((unsubscribe) => {
+    try {
+      unsubscribe();
+    } catch (error) {
+      console.warn("[GPS] Gagal menghentikan listener lokasi Mitra:", error);
+    }
+  });
+
+  vendorLocationListeners.clear();
+}
+
+function syncVendorLocationListeners() {
   if (!currentUser) {
     return;
   }
 
-  const hydratedVendors = await Promise.all(
-    allVendors.map(async (vendor) => {
-      const baseVendor = {
-        ...vendor,
-        latitude: null,
-        longitude: null,
-        accuracy: null,
-        isOnline: false,
-      };
+  const subscribedIds = new Set(
+    allVendors
+      .filter((vendor) => subscribedVendorIds.has(vendor.id))
+      .map((vendor) => vendor.id)
+  );
 
-      if (!subscribedVendorIds.has(vendor.id)) {
-        return baseVendor;
+  vendorLocationListeners.forEach((unsubscribe, vendorId) => {
+    if (!subscribedIds.has(vendorId)) {
+      unsubscribe();
+      vendorLocationListeners.delete(vendorId);
+
+      const vendorIndex = allVendors.findIndex(
+        (vendor) => vendor.id === vendorId
+      );
+
+      if (vendorIndex !== -1) {
+        allVendors[vendorIndex] = {
+          ...allVendors[vendorIndex],
+          latitude: null,
+          longitude: null,
+          accuracy: null,
+          isOnline: false,
+        };
       }
+    }
+  });
 
-      try {
-        const locationSnapshot = await getDoc(
-          doc(
-            db,
-            "vendorLocations",
-            vendor.id
-          )
+  subscribedIds.forEach((vendorId) => {
+    if (vendorLocationListeners.has(vendorId)) {
+      return;
+    }
+
+    const locationRef = doc(
+      db,
+      "vendorLocations",
+      vendorId
+    );
+
+    const unsubscribe = onSnapshot(
+      locationRef,
+      (snapshot) => {
+        const vendorIndex = allVendors.findIndex(
+          (vendor) => vendor.id === vendorId
         );
 
-        if (!locationSnapshot.exists()) {
-          return baseVendor;
+        if (vendorIndex === -1) {
+          return;
         }
 
-        const location = locationSnapshot.data();
+        const baseVendor = allVendors[vendorIndex];
 
-        return {
-          ...baseVendor,
-          latitude:
-            typeof location.latitude === "number"
-              ? location.latitude
-              : null,
-          longitude:
-            typeof location.longitude === "number"
-              ? location.longitude
-              : null,
-          accuracy:
-            typeof location.accuracy === "number"
-              ? location.accuracy
-              : null,
-          isOnline:
-            location.isOnline === true,
-        };
-      } catch (error) {
+        if (!snapshot.exists()) {
+          allVendors[vendorIndex] = {
+            ...baseVendor,
+            latitude: null,
+            longitude: null,
+            accuracy: null,
+            isOnline: false,
+          };
+        } else {
+          const location = snapshot.data();
+
+          allVendors[vendorIndex] = {
+            ...baseVendor,
+            latitude:
+              typeof location.latitude === "number"
+                ? location.latitude
+                : null,
+            longitude:
+              typeof location.longitude === "number"
+                ? location.longitude
+                : null,
+            accuracy:
+              typeof location.accuracy === "number"
+                ? location.accuracy
+                : null,
+            isOnline:
+              location.isOnline === true,
+          };
+        }
+
+        renderVendorResults();
+        updateVendorMarkers(allVendors);
+
+        const onlineCount = allVendors.filter(
+          (vendor) =>
+            vendor.isOnline === true &&
+            typeof vendor.latitude === "number" &&
+            typeof vendor.longitude === "number"
+        ).length;
+
+        connectionStatus.textContent =
+          `Realtime aktif • ${onlineCount} mitra online • GPS realtime berdasarkan langganan`;
+
+        connectionStatus.classList.add("online");
+      },
+      (error) => {
         console.warn(
-          "[GPS] Lokasi Mitra tidak dapat dibaca:",
-          vendor.id,
+          "[GPS] Listener lokasi Mitra gagal:",
+          vendorId,
           error
         );
 
-        return baseVendor;
-      }
-    })
-  );
+        const vendorIndex = allVendors.findIndex(
+          (vendor) => vendor.id === vendorId
+        );
 
-  allVendors = hydratedVendors;
+        if (vendorIndex !== -1) {
+          allVendors[vendorIndex] = {
+            ...allVendors[vendorIndex],
+            latitude: null,
+            longitude: null,
+            accuracy: null,
+            isOnline: false,
+          };
+
+          renderVendorResults();
+          updateVendorMarkers(allVendors);
+        }
+      }
+    );
+
+    vendorLocationListeners.set(vendorId, unsubscribe);
+  });
 }
 
 function startVendorListener() {
@@ -3331,13 +3409,16 @@ function startVendorListener() {
         }
       });
 
+      stopAllVendorLocationListeners();
+
       allVendors = vendors;
 
       await loadSubscriptions();
-      await hydrateSubscribedVendorLocations();
 
       renderVendorResults();
       updateVendorMarkers(allVendors);
+
+      syncVendorLocationListeners();
 
       const onlineCount = allVendors.filter(
         (vendor) =>
@@ -3347,7 +3428,7 @@ function startVendorListener() {
       ).length;
 
       connectionStatus.textContent =
-        `Realtime aktif • ${onlineCount} mitra online • GPS berdasarkan langganan`;
+        `Realtime aktif • ${onlineCount} mitra online • GPS realtime berdasarkan langganan`;
 
       connectionStatus.classList.add("online");
 
