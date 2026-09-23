@@ -3106,6 +3106,27 @@ function showCustomerOrderDetail(orderId) {
 
   modal.classList.remove("hidden");
 }
+const closeCustomerOrderDetail =
+  document.getElementById(
+    "closeCustomerOrderDetail"
+  );
+
+if (closeCustomerOrderDetail) {
+  closeCustomerOrderDetail.addEventListener(
+    "click",
+    () => {
+      const modal =
+        document.getElementById(
+          "customerOrderDetailModal"
+        );
+
+      if (modal) {
+        modal.classList.add("hidden");
+      }
+    }
+  );
+}
+
 document.addEventListener(
   "click",
   (event) => {

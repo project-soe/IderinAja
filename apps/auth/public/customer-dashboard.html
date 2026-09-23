@@ -1573,7 +1573,246 @@
   color: var(--yellow);
   font-size: 13px;
 }
+/* =========================================
+   CUSTOMER ORDER DETAIL
+========================================= */
 
+.customer-order-detail-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1500;
+
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+
+  padding: 12px;
+
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(6px);
+}
+
+.customer-order-detail-card {
+  width: min(100%, 620px);
+  max-height: min(88vh, 780px);
+
+  overflow-y: auto;
+
+  padding: 18px;
+
+  border-radius: 22px 22px 18px 18px;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(12, 37, 49, 0.99),
+      rgba(8, 26, 36, 0.99)
+    );
+
+  border: 1px solid var(--border);
+
+  box-shadow:
+    0 24px 70px rgba(0, 0, 0, 0.55);
+}
+
+.customer-order-detail-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.customer-order-detail-vendor {
+  color: var(--white);
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.customer-order-detail-id {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 10px;
+  word-break: break-all;
+}
+
+.customer-order-detail-close {
+  flex: 0 0 auto;
+
+  width: 36px;
+  height: 36px;
+
+  border: 1px solid var(--border);
+  border-radius: 10px;
+
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--white);
+
+  font-size: 22px;
+}
+
+.customer-order-detail-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.customer-order-detail-card
+.customer-order-status {
+  display: inline-flex;
+  margin-top: 15px;
+}
+
+.customer-order-detail-section {
+  margin-top: 22px;
+}
+
+.customer-order-detail-section h3 {
+  margin: 0 0 11px;
+
+  color: var(--white);
+
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.order-timeline {
+  display: grid;
+  gap: 9px;
+}
+
+.order-timeline-item {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+
+  padding: 11px 12px;
+
+  border-radius: 13px;
+
+  background: rgba(255, 255, 255, 0.035);
+
+  border: 1px solid var(--border-soft);
+
+  color: var(--muted);
+
+  font-size: 12px;
+}
+
+.order-timeline-item.done {
+  color: var(--green);
+
+  background: rgba(40, 199, 111, 0.06);
+
+  border-color:
+    rgba(40, 199, 111, 0.15);
+}
+
+.order-timeline-item.active {
+  color: var(--yellow);
+
+  background: rgba(255, 194, 26, 0.07);
+
+  border-color:
+    rgba(255, 194, 26, 0.18);
+}
+
+.order-timeline-icon {
+  flex: 0 0 auto;
+
+  width: 28px;
+  height: 28px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.order-detail-items {
+  display: grid;
+  gap: 8px;
+}
+
+.order-detail-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  padding: 12px;
+
+  border-radius: 13px;
+
+  background: rgba(255, 255, 255, 0.035);
+
+  border: 1px solid var(--border-soft);
+
+  color: var(--muted);
+
+  font-size: 12px;
+}
+
+.order-detail-item > div {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.order-detail-item strong {
+  color: var(--white);
+}
+
+.order-detail-item > strong {
+  color: var(--yellow);
+  white-space: nowrap;
+}
+
+.order-rejected-box {
+  margin-top: 10px;
+
+  padding: 12px;
+
+  border-radius: 13px;
+
+  background: rgba(255, 92, 92, 0.08);
+
+  border: 1px solid rgba(255, 92, 92, 0.18);
+
+  color: var(--red);
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.customer-order-detail-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-top: 22px;
+  padding-top: 15px;
+
+  border-top: 1px solid var(--border);
+
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.customer-order-detail-total strong {
+  color: var(--yellow);
+  font-size: 20px;
+  font-weight: 900;
+}
+
+@media (min-width: 700px) {
+  .customer-order-detail-modal {
+    align-items: center;
+  }
+
+  .customer-order-detail-card {
+    border-radius: 22px;
+  }
+}
 </style>
 </head>
 
@@ -2282,8 +2521,8 @@
 
 <script
   type="module"
-  src="customer-dashboard.js?v=20260923-01"
-></script>
+  src="customer-dashboard.js?v=20260923-02">
+</script>
 
 </body>
 </html>
