@@ -512,6 +512,11 @@ function startCustomerLocation() {
 
         renderVendorResults();
 
+        // Re-evaluasi semua Mitra yang dilanggan setiap kali
+        // posisi Konsumen berubah. Ini penting agar notifikasi
+        // tetap bekerja walaupun Mitra sedang diam.
+        checkAllNearbyVendorNotifications();
+
         console.log(
           "Customer GPS:",
           customerPosition
@@ -3310,6 +3315,11 @@ async function enableNearbyNotifications() {
 
     await initializeNearbyNotifications();
 
+    // Jika Konsumen sudah berada dalam radius 50m saat
+    // notifikasi baru diaktifkan, cek langsung tanpa
+    // menunggu GPS Mitra berubah.
+    checkAllNearbyVendorNotifications();
+
     if (notificationServiceWorkerRegistration) {
       await notificationServiceWorkerRegistration.showNotification(
         "IderinAja",
@@ -3405,6 +3415,21 @@ function checkNearbyVendorNotification(vendor) {
   }
 }
 
+function checkAllNearbyVendorNotifications() {
+  if (
+    !customerPosition ||
+    Notification.permission !== "granted"
+  ) {
+    return;
+  }
+
+  allVendors
+    .filter((vendor) => subscribedVendorIds.has(vendor.id))
+    .forEach((vendor) => {
+      checkNearbyVendorNotification(vendor);
+    });
+}
+
 function stopAllVendorLocationListeners() {
   vendorLocationListeners.forEach((unsubscribe) => {
     try {
@@ -3446,6 +3471,8 @@ function syncVendorLocationListeners() {
           isOnline: false,
         };
       }
+
+      vendorProximityState.delete(vendorId);
     }
   });
 
@@ -3481,6 +3508,7 @@ function syncVendorLocationListeners() {
             accuracy: null,
             isOnline: false,
           };
+          vendorProximityState.delete(vendorId);
         } else {
           const location = snapshot.data();
 
