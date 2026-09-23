@@ -16,6 +16,8 @@
   />
 
   <style>
+.nearby-notification-button{width:100%;min-height:42px;margin-top:10px;padding:10px 14px;border:1px solid rgba(255,194,26,.28);border-radius:13px;background:rgba(255,194,26,.08);color:var(--yellow);font-size:12px;font-weight:800}.nearby-notification-button:hover{background:rgba(255,194,26,.14)}.nearby-notification-button.enabled{border-color:rgba(40,199,111,.28);background:rgba(40,199,111,.08);color:var(--green)}.nearby-notification-button.hidden{display:none!important}
+
     :root {
       --yellow: #ffc21a;
       --yellow-dark: #f5a900;
@@ -2185,6 +2187,14 @@
       <div id="connectionStatus" class="status">
         Menghubungkan...
       </div>
+
+      <button
+        id="enableNearbyNotifications"
+        class="nearby-notification-button"
+        type="button"
+      >
+        🔔 Aktifkan notifikasi pedagang 50m
+      </button>
     </header>
 
     <nav class="app-bottom-nav" aria-label="Navigasi utama">
