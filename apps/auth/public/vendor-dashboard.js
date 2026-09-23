@@ -2667,15 +2667,20 @@ if (
   );
 }
 
-const toggleOrderHistory = document.getElementById("toggleOrderHistory");
-const orderHistoryContent = document.getElementById("orderHistoryContent");
-const orderHistoryChevron = document.getElementById("orderHistoryChevron");
+document.addEventListener("click", (event) => {
+  const toggle = event.target.closest("#toggleOrderHistory");
+  if (!toggle) return;
 
-if (toggleOrderHistory && orderHistoryContent) {
-  toggleOrderHistory.addEventListener("click", () => {
-    const isOpen = !orderHistoryContent.classList.contains("hidden");
-    orderHistoryContent.classList.toggle("hidden", isOpen);
-    toggleOrderHistory.setAttribute("aria-expanded", String(!isOpen));
-    if (orderHistoryChevron) orderHistoryChevron.textContent = isOpen ? "⌄" : "⌃";
-  });
-}
+  const content = document.getElementById("orderHistoryContent");
+  const chevron = document.getElementById("orderHistoryChevron");
+
+  if (!content) return;
+
+  const willOpen = content.classList.contains("hidden");
+  content.classList.toggle("hidden", !willOpen);
+  toggle.setAttribute("aria-expanded", String(willOpen));
+
+  if (chevron) {
+    chevron.textContent = willOpen ? "⌃" : "⌄";
+  }
+});
