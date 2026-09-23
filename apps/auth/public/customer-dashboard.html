@@ -1212,7 +1212,245 @@
         align-items: center;
       }
     }
-  </style>
+
+/* ==================================================
+   CHECKOUT
+================================================== */
+
+.checkout-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1300;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.72);
+}
+
+.checkout-modal.hidden {
+  display: none;
+}
+
+.checkout-card {
+  width: min(100%, 620px);
+  max-height: min(88vh, 820px);
+  overflow-y: auto;
+  padding: 18px;
+  border-radius: 22px 22px 18px 18px;
+  background: var(--dark-3);
+  border: 1px solid var(--border);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.checkout-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.checkout-title {
+  color: var(--white);
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.checkout-vendor {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.checkout-close {
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--white);
+  font-size: 20px;
+}
+
+.checkout-items {
+  display: grid;
+  gap: 9px;
+  margin-top: 18px;
+}
+
+.checkout-item {
+  padding: 13px;
+  border-radius: 15px;
+  border: 1px solid var(--border-soft);
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.checkout-item-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.checkout-item-name {
+  color: var(--white);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.checkout-item-price {
+  color: var(--yellow);
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.checkout-item-bottom {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 7px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.checkout-section {
+  margin-top: 18px;
+}
+
+.checkout-section-title {
+  margin-bottom: 9px;
+  color: var(--white);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.checkout-location-status {
+  padding: 11px 12px;
+  border-radius: 12px;
+  background: rgba(40, 199, 111, 0.08);
+  border: 1px solid rgba(40, 199, 111, 0.18);
+  color: var(--green);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.checkout-coordinates {
+  margin-top: 7px;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.checkout-label {
+  display: block;
+  margin-top: 12px;
+  margin-bottom: 6px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.checkout-input {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  outline: none;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--white);
+  font: inherit;
+  font-size: 12px;
+}
+
+.checkout-input::placeholder {
+  color: rgba(145, 160, 168, 0.7);
+}
+
+.checkout-input:focus {
+  border-color: rgba(255, 194, 26, 0.45);
+}
+
+.checkout-payment-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 13px;
+  border-radius: 14px;
+  background: rgba(255, 194, 26, 0.06);
+  border: 1px solid rgba(255, 194, 26, 0.22);
+}
+
+.checkout-payment-title {
+  color: var(--white);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.checkout-payment-description {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.checkout-payment-check {
+  color: var(--yellow);
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.checkout-summary {
+  margin-top: 20px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+.checkout-summary-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.checkout-total-row {
+  margin-top: 8px;
+  color: var(--white);
+  font-size: 14px;
+}
+
+.checkout-total-row strong {
+  color: var(--yellow);
+  font-size: 19px;
+}
+
+.checkout-submit-button {
+  width: 100%;
+  margin-top: 15px;
+  padding: 14px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--yellow);
+  color: var(--dark);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.checkout-submit-button:hover {
+  background: var(--yellow-dark);
+}
+
+.checkout-submit-button:active {
+  transform: scale(0.985);
+}
+
+.checkout-submit-button:disabled {
+  opacity: 0.55;
+}
+
+</style>
 </head>
 
 <body>
@@ -1456,6 +1694,170 @@
        CART MODAL
   ========================================== -->
 
+
+  <!-- =========================================
+       CHECKOUT MODAL
+  ========================================== -->
+
+  <div
+    id="checkoutModal"
+    class="checkout-modal hidden"
+  >
+
+    <div class="checkout-card">
+
+      <div class="checkout-header">
+
+        <div>
+
+          <div class="checkout-title">
+            Checkout
+          </div>
+
+          <div
+            id="checkoutVendorName"
+            class="checkout-vendor"
+          >
+            Mitra
+          </div>
+
+        </div>
+
+        <button
+          id="closeCheckoutButton"
+          class="checkout-close"
+          type="button"
+          aria-label="Tutup checkout"
+        >
+          ×
+        </button>
+
+      </div>
+
+      <div
+        id="checkoutItems"
+        class="checkout-items"
+      ></div>
+
+      <div class="checkout-section">
+
+        <div class="checkout-section-title">
+          Lokasi Pengantaran
+        </div>
+
+        <div
+          id="checkoutLocationStatus"
+          class="checkout-location-status"
+        >
+          Mengambil lokasi GPS...
+        </div>
+
+        <div
+          id="checkoutCoordinates"
+          class="checkout-coordinates"
+        >
+          Lokasi belum tersedia
+        </div>
+
+        <label
+          class="checkout-label"
+          for="checkoutAddress"
+        >
+          Alamat / patokan
+        </label>
+
+        <textarea
+          id="checkoutAddress"
+          class="checkout-input"
+          rows="3"
+          placeholder="Contoh: Rumah warna putih dekat masjid..."
+        ></textarea>
+
+      </div>
+
+      <div class="checkout-section">
+
+        <div class="checkout-section-title">
+          Catatan Pesanan
+        </div>
+
+        <textarea
+          id="checkoutNotes"
+          class="checkout-input"
+          rows="3"
+          placeholder="Contoh: Jangan terlalu manis..."
+        ></textarea>
+
+      </div>
+
+      <div class="checkout-section">
+
+        <div class="checkout-section-title">
+          Metode Pembayaran
+        </div>
+
+        <div class="checkout-payment-option selected">
+
+          <div>
+
+            <div class="checkout-payment-title">
+              Bayar di tempat (COD)
+            </div>
+
+            <div class="checkout-payment-description">
+              Pembayaran dilakukan saat pesanan diterima.
+            </div>
+
+          </div>
+
+          <div class="checkout-payment-check">
+            ✓
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="checkout-summary">
+
+        <div class="checkout-summary-row">
+
+          <span>
+            Subtotal
+          </span>
+
+          <strong id="checkoutSubtotal">
+            Rp0
+          </strong>
+
+        </div>
+
+        <div class="checkout-summary-row checkout-total-row">
+
+          <span>
+            Total
+          </span>
+
+          <strong id="checkoutTotal">
+            Rp0
+          </strong>
+
+        </div>
+
+      </div>
+
+      <button
+        id="placeOrderButton"
+        class="checkout-submit-button"
+        type="button"
+      >
+        Buat Pesanan
+      </button>
+
+    </div>
+
+  </div>
+
   <div
     id="cartModal"
     class="cart-modal hidden"
@@ -1642,7 +2044,7 @@
 
   <script
     type="module"
-    src="customer-dashboard.js"
+    src="customer-dashboard.js?v=20260922-01"
   ></script>
 
 </body>

@@ -216,6 +216,79 @@ service cloud.firestore {
        DEFAULT DENY
        ================================================== */
 
+
+    match /orders/{orderId} {
+
+      // CUSTOMER:
+      // Membuat order baru dengan status pending + COD.
+      allow create: if
+        request.auth != null
+        && request.resource.data.customerId ==
+          request.auth.uid
+        && request.resource.data.vendorId is string
+        && request.resource.data.status ==
+          'pending'
+        && request.resource.data.paymentMethod ==
+          'cod';
+
+      // CUSTOMER atau MITRA:
+      // Hanya pihak yang terkait dengan order yang boleh membaca.
+      allow read: if
+        request.auth != null
+        && (
+          request.auth.uid ==
+            resource.data.customerId
+          ||
+          request.auth.uid ==
+            resource.data.vendorId
+        );
+
+      // MITRA:
+      // Untuk MVP ini mitra hanya boleh mengubah
+      // status dan updatedAt.
+      //
+      // Transisi yang diizinkan:
+      // pending  -> accepted
+      // pending  -> rejected
+      // accepted -> completed
+      allow update: if
+        request.auth != null
+        && request.auth.uid ==
+          resource.data.vendorId
+        && request.resource.data.customerId ==
+          resource.data.customerId
+        && request.resource.data.vendorId ==
+          resource.data.vendorId
+        && request.resource.data.diff(resource.data)
+          .affectedKeys()
+          .hasOnly([
+            'status',
+            'updatedAt'
+          ])
+        && request.resource.data.updatedAt is timestamp
+        && (
+          (
+            resource.data.status ==
+              'pending'
+            &&
+            request.resource.data.status in [
+              'accepted',
+              'rejected'
+            ]
+          )
+          ||
+          (
+            resource.data.status ==
+              'accepted'
+            &&
+            request.resource.data.status ==
+              'completed'
+          )
+        );
+
+      allow delete: if false;
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }

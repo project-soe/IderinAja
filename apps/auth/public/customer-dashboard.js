@@ -2052,11 +2052,131 @@ function closeCartModal() {
   );
 }
 
-function handleCartCheckout() {
+function renderCheckoutItems() {
+
+  const container =
+    document.getElementById(
+      "checkoutItems"
+    );
+
+  if (!container) {
+    return;
+  }
+
+  if (!cart.items.length) {
+
+    container.innerHTML = `
+      <div class="cart-empty">
+        Keranjang masih kosong.
+      </div>
+    `;
+
+    return;
+  }
+
+  container.innerHTML =
+    cart.items
+      .map((item) => {
+
+        const lineTotal =
+          Number(item.price || 0) *
+          Number(item.quantity || 0);
+
+        return `
+          <article class="checkout-item">
+
+            <div class="checkout-item-top">
+
+              <div class="checkout-item-name">
+                ${escapeHtml(
+                  item.name || "Tanpa nama"
+                )}
+              </div>
+
+              <div class="checkout-item-price">
+                ${formatRupiah(lineTotal)}
+              </div>
+
+            </div>
+
+            <div class="checkout-item-bottom">
+
+              <span>
+                ${item.quantity} × ${formatRupiah(
+                  item.price
+                )}
+              </span>
+
+              <span>
+                ${item.quantity} item
+              </span>
+
+            </div>
+
+          </article>
+        `;
+      })
+      .join("");
+}
+
+function updateCheckoutLocationUI() {
+
+  const status =
+    document.getElementById(
+      "checkoutLocationStatus"
+    );
+
+  const coordinates =
+    document.getElementById(
+      "checkoutCoordinates"
+    );
+
+  if (!status || !coordinates) {
+    return;
+  }
 
   if (
-    cart.items.length === 0
+    customerPosition &&
+    Number.isFinite(
+      customerPosition.latitude
+    ) &&
+    Number.isFinite(
+      customerPosition.longitude
+    )
   ) {
+
+    status.textContent =
+      "✓ Lokasi GPS tersedia dan akan dikirim bersama pesanan.";
+
+    coordinates.textContent =
+      `Koordinat: ${customerPosition.latitude.toFixed(
+        6
+      )}, ${customerPosition.longitude.toFixed(
+        6
+      )}`;
+
+    return;
+  }
+
+  status.textContent =
+    "⚠ Lokasi GPS belum tersedia.";
+
+  coordinates.textContent =
+    "Aktifkan lokasi sebelum membuat pesanan.";
+}
+
+function openCheckoutModal() {
+
+  if (!currentUser) {
+
+    alert(
+      "Silakan login terlebih dahulu."
+    );
+
+    return;
+  }
+
+  if (!cart.items.length) {
 
     alert(
       "Keranjang masih kosong."
@@ -2065,9 +2185,435 @@ function handleCartCheckout() {
     return;
   }
 
-  alert(
-    "Cart berhasil.\n\nCheckout akan kita bangun pada tahap berikutnya."
+  const modal =
+    document.getElementById(
+      "checkoutModal"
+    );
+
+  if (!modal) {
+    return;
+  }
+
+  const vendorName =
+    document.getElementById(
+      "checkoutVendorName"
+    );
+
+  const subtotal =
+    document.getElementById(
+      "checkoutSubtotal"
+    );
+
+  const total =
+    document.getElementById(
+      "checkoutTotal"
+    );
+
+  if (vendorName) {
+
+    vendorName.textContent =
+      cart.vendorName || "Mitra";
+  }
+
+  if (subtotal) {
+
+    subtotal.textContent =
+      formatRupiah(
+        getCartTotal()
+      );
+  }
+
+  if (total) {
+
+    total.textContent =
+      formatRupiah(
+        getCartTotal()
+      );
+  }
+
+  renderCheckoutItems();
+
+  updateCheckoutLocationUI();
+
+  modal.classList.remove(
+    "hidden"
   );
+}
+
+function closeCheckoutModal() {
+
+  const modal =
+    document.getElementById(
+      "checkoutModal"
+    );
+
+  if (!modal) {
+    return;
+  }
+
+  modal.classList.add(
+    "hidden"
+  );
+}
+
+async function handleCartCheckout() {
+
+  console.log(
+    "[ORDER DEBUG] handleCartCheckout() TERPANGGIL"
+  );
+
+  console.log(
+    "[ORDER DEBUG] currentUser:",
+    currentUser
+  );
+
+  console.log(
+    "[ORDER DEBUG] cart:",
+    cart
+  );
+
+  console.log(
+    "[ORDER DEBUG] customerPosition:",
+    customerPosition
+  );
+
+  if (!currentUser) {
+
+    alert(
+      "Silakan login terlebih dahulu."
+    );
+
+    return;
+  }
+
+  if (!cart.items.length) {
+
+    alert(
+      "Keranjang masih kosong."
+    );
+
+    return;
+  }
+
+  if (!cart.vendorId) {
+
+    alert(
+      "Mitra pesanan tidak ditemukan."
+    );
+
+    return;
+  }
+
+  if (
+    !customerPosition ||
+    !Number.isFinite(
+      customerPosition.latitude
+    ) ||
+    !Number.isFinite(
+      customerPosition.longitude
+    )
+  ) {
+
+    alert(
+      "Lokasi GPS belum tersedia. Aktifkan izin lokasi lalu coba lagi."
+    );
+
+    return;
+  }
+
+  console.log(
+    "[ORDER DEBUG] CHECKPOINT A: sebelum mengambil elemen checkout"
+  );
+
+  let addressInput;
+  let notesInput;
+  let placeOrderButton;
+
+  try {
+    addressInput =
+      document.getElementById(
+        "checkoutAddress"
+      );
+
+    console.log(
+      "[ORDER DEBUG] CHECKPOINT B: checkoutAddress:",
+      addressInput
+    );
+
+    notesInput =
+      document.getElementById(
+        "checkoutNotes"
+      );
+
+    console.log(
+      "[ORDER DEBUG] CHECKPOINT C: checkoutNotes:",
+      notesInput
+    );
+
+    placeOrderButton =
+      document.getElementById(
+        "placeOrderButton"
+      );
+
+    console.log(
+      "[ORDER DEBUG] CHECKPOINT D: placeOrderButton:",
+      placeOrderButton
+    );
+
+  } catch (error) {
+    console.error(
+      "[ORDER DEBUG] ERROR mengambil elemen checkout:",
+      error
+    );
+
+    alert(
+      "Terjadi error saat membaca form checkout. Cek console."
+    );
+
+    return;
+  }
+
+  console.log(
+    "[ORDER DEBUG] CHECKPOINT E: sebelum membaca alamat"
+  );
+
+  let deliveryAddress = "";
+  let notes = "";
+
+  try {
+    deliveryAddress =
+      addressInput?.value.trim() || "";
+
+    notes =
+      notesInput?.value.trim() || "";
+
+    console.log(
+      "[ORDER DEBUG] CHECKPOINT F: alamat berhasil dibaca"
+    );
+
+  } catch (error) {
+    console.error(
+      "[ORDER DEBUG] ERROR membaca alamat/notes:",
+      error
+    );
+
+    alert(
+      "Terjadi error saat membaca alamat checkout. Cek console."
+    );
+
+    return;
+  }
+
+  console.log("[ORDER DEBUG] deliveryAddress:", deliveryAddress);
+  console.log("[ORDER DEBUG] notes:", notes);
+  console.log("[ORDER DEBUG] customerPosition valid:", {
+    exists: !!customerPosition,
+    latitude: customerPosition?.latitude,
+    longitude: customerPosition?.longitude,
+  });
+  console.log("[ORDER DEBUG] cart validation:", {
+    vendorId: cart?.vendorId,
+    vendorName: cart?.vendorName,
+    itemCount: cart?.items?.length,
+  });
+
+  if (!deliveryAddress) {
+
+    alert(
+      "Mohon isi alamat atau patokan pengantaran."
+    );
+
+    addressInput?.focus();
+
+    return;
+  }
+
+  if (placeOrderButton) {
+
+    placeOrderButton.disabled =
+      true;
+
+    placeOrderButton.textContent =
+      "Membuat pesanan...";
+  }
+
+  try {
+
+    const orderRef =
+      doc(
+        collection(
+          db,
+          "orders"
+        )
+      );
+
+    const items =
+      cart.items.map(
+        (item) => ({
+
+          menuId:
+            String(
+              item.menuId
+            ),
+
+          name:
+            String(
+              item.name || ""
+            ),
+
+          price:
+            Number(
+              item.price || 0
+            ),
+
+          quantity:
+            Number(
+              item.quantity || 0
+            ),
+
+          lineTotal:
+            Number(
+              item.price || 0
+            ) *
+            Number(
+              item.quantity || 0
+            ),
+        })
+      );
+
+    const subtotal =
+      items.reduce(
+        (sum, item) =>
+          sum +
+          Number(
+            item.lineTotal || 0
+          ),
+        0
+      );
+
+    console.log(
+      "[ORDER DEBUG] SIAP MENULIS KE FIRESTORE"
+    );
+
+    console.log(
+      "[ORDER DEBUG] orderRef:",
+      orderRef.id
+    );
+
+    console.log(
+      "[ORDER DEBUG] orderData:",
+      {
+        customerId: currentUser.uid,
+        vendorId: cart.vendorId,
+        vendorName: cart.vendorName,
+        items,
+        subtotal,
+        total: subtotal,
+        paymentMethod: "cod",
+        status: "pending",
+        customerLocation: {
+          lat: Number(customerPosition.latitude),
+          lng: Number(customerPosition.longitude),
+        },
+        deliveryAddress,
+        notes,
+      }
+    );
+
+    await setDoc(
+      orderRef,
+      {
+
+        customerId:
+          currentUser.uid,
+
+        vendorId:
+          cart.vendorId,
+
+        vendorName:
+          cart.vendorName || "",
+
+        items,
+
+        subtotal,
+
+        total:
+          subtotal,
+
+        paymentMethod:
+          "cod",
+
+        status:
+          "pending",
+
+        customerLocation: {
+
+          lat:
+            Number(
+              customerPosition.latitude
+            ),
+
+          lng:
+            Number(
+              customerPosition.longitude
+            ),
+        },
+
+        deliveryAddress,
+
+        notes,
+
+        createdAt:
+          serverTimestamp(),
+
+        updatedAt:
+          serverTimestamp(),
+      }
+    );
+
+    const orderId =
+      orderRef.id;
+
+    console.log(
+      "[ORDER DEBUG] FIRESTORE WRITE BERHASIL:",
+      orderId
+    );
+
+    clearCart();
+
+    closeCheckoutModal();
+
+    alert(
+      `Pesanan berhasil dibuat.\n\nNomor pesanan: ${orderId}\nStatus: Menunggu konfirmasi mitra.`
+    );
+
+    console.log(
+      "[ORDER] Pesanan berhasil dibuat:",
+      orderId
+    );
+
+  } catch (error) {
+
+    console.error(
+      "[ORDER] Gagal membuat pesanan:",
+      error
+    );
+
+    alert(
+      "Pesanan gagal dibuat. Silakan coba lagi."
+    );
+
+  } finally {
+
+    if (placeOrderButton) {
+
+      placeOrderButton.disabled =
+        false;
+
+      placeOrderButton.textContent =
+        "Buat Pesanan";
+    }
+  }
 }
 
 
@@ -2923,6 +3469,32 @@ if (
       )
     ) {
 
+      openCheckoutModal();
+
+      return;
+    }
+
+    if (
+      event.target.closest(
+        "#closeCheckoutButton"
+      )
+    ) {
+
+      closeCheckoutModal();
+
+      return;
+    }
+
+    if (
+      event.target.closest(
+        "#placeOrderButton"
+      )
+    ) {
+
+      console.log(
+        "[ORDER DEBUG] TOMBOL BUAT PESANAN DIKLIK"
+      );
+
       handleCartCheckout();
 
       return;
@@ -2934,10 +3506,24 @@ if (
     ) {
 
       closeCartModal();
+
+      return;
+    }
+
+    if (
+      event.target.id ===
+      "checkoutModal"
+    ) {
+
+      closeCheckoutModal();
     }
   }
 );
 
 console.log(
   "[CART] Event delegation aktif"
+);
+
+console.log(
+  "[ORDER DEBUG] Checkout event handler aktif"
 );
