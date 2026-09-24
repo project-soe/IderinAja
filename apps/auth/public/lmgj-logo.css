@@ -1,0 +1,26 @@
+/* LMGJ BRAND LOGO */
+.lmgj-logo{display:block;width:100%;height:auto;object-fit:contain}
+.lmgj-logo .logo-color{transition:fill .3s ease}
+.lmgj-logo-wrap:hover .lmgj-logo .logo-color{fill:#d4d464}
+
+.lmgj-logo--splash{width:clamp(150px,42vw,260px);height:auto;filter:drop-shadow(0 16px 34px rgba(184,184,84,.18));animation:lmgj-logo-reveal 1.1s cubic-bezier(.2,.75,.25,1) both}
+.lmgj-logo--splash + *{margin-top:18px}
+@keyframes lmgj-logo-reveal{0%{opacity:0;transform:scale(.72) translateY(18px);filter:blur(8px) drop-shadow(0 16px 34px rgba(184,184,84,0))}60%{opacity:1;transform:scale(1.04) translateY(0);filter:blur(0) drop-shadow(0 16px 34px rgba(184,184,84,.22))}100%{opacity:1;transform:scale(1);filter:blur(0) drop-shadow(0 16px 34px rgba(184,184,84,.18))}}
+
+.lmgj-logo--nav{width:34px;height:42px}
+.lmgj-logo--nav-wide{width:32px;height:38px}
+.lmgj-logo--phone{width:44px;height:56px}
+.lmgj-logo--account{width:30px;height:38px}
+
+.lmgj-nav-brand{display:inline-flex;align-items:center;gap:9px;text-decoration:none;color:inherit;min-width:0}
+.lmgj-nav-brand .lmgj-logo-wrap{display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.lmgj-nav-brand .lmgj-wordmark{font-weight:800;letter-spacing:-.03em}
+.lmgj-nav-brand .lmgj-wordmark span{color:#b8b854}
+
+.lmgj-page-brand{display:flex;align-items:center;gap:10px}
+.lmgj-page-brand .lmgj-wordmark{font-size:20px;font-weight:800}
+.lmgj-page-brand .lmgj-wordmark span{color:#b8b854}
+
+.lmgj-splash-mark{display:flex;justify-content:center;align-items:center;min-height:220px}
+@media(max-width:480px){.lmgj-logo--splash{width:clamp(145px,48vw,220px)}}
+@media(prefers-reduced-motion:reduce){.lmgj-logo--splash{animation:none}}
