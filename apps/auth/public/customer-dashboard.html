@@ -2150,6 +2150,24 @@
  .dashboard{padding-bottom:20px}
  .app-bottom-nav{grid-template-columns:repeat(5,1fr)}
 }
+
+    /* COMPANY FOOTER */
+    .company-footer{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:6px;
+      margin:28px 0 24px;
+      padding:18px 0 6px;
+      color:var(--muted);
+      text-align:center;
+      border-top:1px solid var(--border);
+    }
+    .company-footer-logo{display:block;width:58px;height:42px;object-fit:contain}
+    .company-footer-name{color:var(--muted);font-size:10px;font-weight:800;letter-spacing:.18em}
+    .dashboard{position:relative;isolation:isolate}
+    .app-bottom-nav{z-index:50}
 </style>
 </head>
 
@@ -2425,6 +2443,10 @@
   </div>
 
 </div>
+  <footer class="company-footer" aria-label="Perusahaan pengelola platform">
+    <img class="company-footer-logo" src="assets/lmgj-logo.svg" alt="Logo LMGJ" width="58" height="42" />
+    <span class="company-footer-name">LMGJ</span>
+  </footer>
 
   </main>
 
