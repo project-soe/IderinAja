@@ -1,1 +1,23 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" width="600" height="800" role="img" aria-labelledby="title desc"><title id="title">LMGJ Logo</title><desc id="desc">LMGJ geometric logo</desc><defs><style>.logo-color{fill:#b8b854}</style></defs><polygon class="logo-color" points="180,60 240,100 240,660 200,700 120,660 120,100"/><polygon class="logo-color" points="120,660 200,700 350,700 350,760 290,800 120,800"/><polygon class="logo-color" points="270,150 330,190 330,550 290,590 230,550 230,190"/><polygon class="logo-color" points="330,190 380,220 380,380 350,400 320,380 320,240"/><polygon class="logo-color" points="280,330 320,310 360,330 360,490 320,520 280,490"/><polygon class="logo-color" points="370,190 430,150 430,550 370,590 310,550 310,190"/><polygon class="logo-color" points="320,460 380,440 380,600 340,630 280,600 280,500"/><polygon class="logo-color" points="460,100 520,60 520,660 460,700 400,660 400,100"/></svg>
+<svg viewBox="0 0 520 220" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" aria-label="LMGJ Bakery Logo">
+  <defs>
+    <linearGradient id="bakeryLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3A2211" />
+      <stop offset="35%" stop-color="#794824" />
+      <stop offset="70%" stop-color="#C28E58" />
+      <stop offset="100%" stop-color="#E5BE9D" />
+    </linearGradient>
+    <linearGradient id="innerGlowGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FCEADE" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#B07D4F" stop-opacity="0.3"/>
+    </linearGradient>
+  </defs>
+  <g fill="none" stroke="url(#bakeryLogoGrad)" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M 45 40 L 45 155 C 45 170, 55 180, 75 180 L 95 180 C 110 180, 120 170, 120 155 L 120 90" stroke-width="14" />
+    <path d="M 95 90 L 140 160 L 185 85 L 225 155" stroke-width="14" />
+    <path d="M 95 90 L 140 160 L 185 85 L 225 155" stroke="url(#innerGlowGrad)" stroke-width="6" />
+    <path d="M 225 155 C 240 180, 260 185, 280 165 C 300 145, 290 100, 265 85 C 240 70, 215 95, 235 125 C 255 155, 305 160, 345 135" stroke-width="14" />
+    <path d="M 330 60 C 370 30, 420 50, 420 95 L 420 185 C 420 205, 395 215, 375 195 C 360 180, 365 165, 385 155" stroke-width="14" />
+    <path d="M 45 40 L 45 155" stroke="url(#innerGlowGrad)" stroke-width="5" />
+    <path d="M 390 95 L 390 175" stroke="url(#innerGlowGrad)" stroke-width="5" />
+  </g>
+</svg>
