@@ -21,6 +21,6 @@
 .lmgj-page-brand .lmgj-wordmark{font-size:20px;font-weight:800}
 .lmgj-page-brand .lmgj-wordmark span{color:#b8b854}
 
-.lmgj-splash-mark{display:flex;justify-content:center;align-items:center;min-height:220px}
+.brand-logo.lmgj-splash-mark{width:clamp(170px,48vw,280px);max-width:280px;margin:0 auto}.lmgj-splash-mark{display:flex;justify-content:center;align-items:center;min-height:220px}
 @media(max-width:480px){.lmgj-logo--splash{width:clamp(145px,48vw,220px)}}
 @media(prefers-reduced-motion:reduce){.lmgj-logo--splash{animation:none}}
