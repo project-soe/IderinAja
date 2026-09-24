@@ -1359,3 +1359,69 @@ body {
     }
 
 }
+
+/* ============================================================
+   PLATFORM SPLASH BRAND + COMPANY FOOTER
+   ============================================================ */
+
+.platform-splash-mark{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:auto;
+    min-height:0;
+    margin:0 auto;
+    filter:drop-shadow(0 10px 24px rgba(0,0,0,.28));
+}
+
+.platform-splash-mark span{
+    display:inline-block;
+    color:var(--color-white);
+    font-size:clamp(3.1rem,14vw,6.4rem);
+    line-height:.95;
+    letter-spacing:-.065em;
+    font-weight:800;
+    text-shadow:var(--shadow-text);
+}
+
+.platform-splash-mark strong{
+    color:var(--color-brand-yellow);
+    font-weight:800;
+}
+
+.splash-company-footer{
+    position:absolute;
+    z-index:5;
+    left:50%;
+    bottom:max(1.15rem,env(safe-area-inset-bottom));
+    transform:translateX(-50%);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:4px;
+    color:var(--color-white-60);
+    text-align:center;
+}
+
+.splash-company-footer img{
+    display:block;
+    width:48px;
+    height:36px;
+    object-fit:contain;
+}
+
+.splash-company-footer span{
+    font-size:.58rem;
+    font-weight:800;
+    letter-spacing:.18em;
+}
+
+@media (max-height:680px){
+    .platform-splash-mark span{
+        font-size:2.7rem;
+    }
+    .splash-company-footer{
+        bottom:1rem;
+    }
+}
