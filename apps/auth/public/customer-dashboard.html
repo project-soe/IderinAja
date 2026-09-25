@@ -2225,37 +2225,6 @@
 </nav>
 
     
-    <!-- PESANAN SAYA -->
-
-<section id="customerOrdersSection" class="card customer-orders-card">
-
-  <div class="customer-orders-heading">
-    <div>
-      <h2>📦 Pesanan Saya</h2>
-      <p class="customer-orders-description">
-        Pantau status pesanan Anda secara realtime.
-      </p>
-    </div>
-
-    <span
-      id="customerOrderCount"
-      class="customer-order-count"
-    >
-      0 pesanan
-    </span>
-  </div>
-
-  <div
-    id="customerOrdersList"
-    class="customer-orders-list"
-  >
-    <div class="customer-orders-empty">
-      Belum ada pesanan.
-    </div>
-  </div>
-
-</section>
-
     <!-- =========================================
          SEARCH PEDAGANG
     ========================================== -->
@@ -2878,8 +2847,9 @@
 document.addEventListener("click",(event)=>{
  const action=event.target.closest("[data-app-nav]")?.dataset.appNav;
  if(!action)return;
- const targets={orders:"#customerOrdersSection",search:"#searchVendorSection",vendors:"#vendorListSection",map:"#nearbyMapSection"};
+ if(action==="orders"){window.location.href="customer-orders.html";return;}
  if(action==="cart"){document.getElementById("openCartButton")?.click();return;}
+ const targets={search:"#searchVendorSection",vendors:"#vendorListSection",map:"#nearbyMapSection"};
  document.querySelector(targets[action])?.scrollIntoView({behavior:"smooth",block:"start"});
 });
 </script>
