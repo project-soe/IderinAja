@@ -225,21 +225,31 @@
             <span class="notification-toggle-text">Aktifkan notifikasi radius</span>
           </label>
 
-          <div class="form-group notification-radius-group">
-            <label for="nearbyNotificationRadius">Radius Notifikasi (meter)</label>
-            <div class="notification-radius-input">
+          <div class="notification-radius-group">
+            <div class="notification-radius-header">
+              <div>
+                <label for="nearbyNotificationRadius">Radius Notifikasi</label>
+                <small class="field-help">Geser untuk mengatur jarak 50–200 meter.</small>
+              </div>
+              <output id="nearbyNotificationRadiusValue" class="notification-radius-value" for="nearbyNotificationRadius">50 m</output>
+            </div>
+
+            <div class="notification-range">
               <input
                 id="nearbyNotificationRadius"
-                type="number"
+                type="range"
                 min="50"
                 max="200"
                 step="1"
                 value="50"
-                inputmode="numeric"
+                aria-label="Radius notifikasi dalam meter"
               />
-              <span>meter</span>
+              <div class="notification-range-labels">
+                <span>50 m</span>
+                <span>125 m</span>
+                <span>200 m</span>
+              </div>
             </div>
-            <small class="field-help">Radius dapat diatur dari 50 sampai 200 meter.</small>
           </div>
 
           <button
