@@ -154,6 +154,18 @@ const onlineState =
     "onlineState"
   );
 
+const nearbyNotificationEnabledInput =
+  document.getElementById("nearbyNotificationEnabled");
+
+const nearbyNotificationRadiusInput =
+  document.getElementById("nearbyNotificationRadius");
+
+const saveNearbyNotificationSettingsButton =
+  document.getElementById("saveNearbyNotificationSettings");
+
+const nearbyNotificationMessage =
+  document.getElementById("nearbyNotificationMessage");
+
 
 /* ==================================================
    DOM — MENU
@@ -241,6 +253,9 @@ let lastVendorOrderIds = new Set();
 let vendorOrderNotificationRegistration = null;
 let vendorOrderNotificationInitialized = false;
 
+let nearbyNotificationEnabled = true;
+let nearbyNotificationRadiusMeters = 50;
+
 
 
 /* ==================================================
@@ -253,6 +268,9 @@ const USERNAME_PATTERN =
 
 const MIN_LOCATION_UPDATE_DISTANCE_METERS =
   10;
+
+const MIN_NEARBY_NOTIFICATION_RADIUS_METERS = 50;
+const MAX_NEARBY_NOTIFICATION_RADIUS_METERS = 200;
 
 
 
@@ -520,6 +538,8 @@ function calculateDistance(
 
 async function loadVendorProfile() {
 
+  let vendorProfileData = {};
+
   if (!currentUser) {
     return;
   }
@@ -543,6 +563,8 @@ async function loadVendorProfile() {
 
     const vendor =
       snapshot.data();
+
+    vendorProfileData = vendor;
 
 
     businessNameInput.value =
@@ -586,6 +608,8 @@ async function loadVendorProfile() {
       const vendor =
         legacySnapshot.data();
 
+      vendorProfileData = vendor;
+
 
       businessNameInput.value =
         vendor.businessName ||
@@ -605,6 +629,33 @@ async function loadVendorProfile() {
     }
   }
 
+
+  /* ----------------------------------------------
+     LOAD NEARBY NOTIFICATION SETTINGS
+  ---------------------------------------------- */
+
+  nearbyNotificationEnabled =
+    vendorProfileData.nearbyNotificationEnabled !== false;
+
+  const storedNearbyRadius =
+    Number(vendorProfileData.nearbyNotificationRadiusMeters);
+
+  nearbyNotificationRadiusMeters =
+    Number.isFinite(storedNearbyRadius) &&
+    storedNearbyRadius >= MIN_NEARBY_NOTIFICATION_RADIUS_METERS &&
+    storedNearbyRadius <= MAX_NEARBY_NOTIFICATION_RADIUS_METERS
+      ? Math.round(storedNearbyRadius)
+      : MIN_NEARBY_NOTIFICATION_RADIUS_METERS;
+
+  if (nearbyNotificationEnabledInput) {
+    nearbyNotificationEnabledInput.checked =
+      nearbyNotificationEnabled;
+  }
+
+  if (nearbyNotificationRadiusInput) {
+    nearbyNotificationRadiusInput.value =
+      String(nearbyNotificationRadiusMeters);
+  }
 
   /* ----------------------------------------------
      LOAD LOCATION STATE
@@ -901,6 +952,12 @@ async function saveVendorProfile() {
 
         category,
 
+        nearbyNotificationEnabled:
+          nearbyNotificationEnabled,
+
+        nearbyNotificationRadiusMeters:
+          nearbyNotificationRadiusMeters,
+
         isAcceptingOrders:
           true,
 
@@ -982,6 +1039,89 @@ async function saveVendorProfile() {
   }
 }
 
+
+/* ==================================================
+   NEARBY NOTIFICATION SETTINGS
+================================================== */
+
+function showNearbyNotificationMessage(text, type = "") {
+  if (!nearbyNotificationMessage) return;
+  nearbyNotificationMessage.textContent = text;
+  nearbyNotificationMessage.className = `message ${type}`;
+}
+
+function getNearbyNotificationSettingsFromForm() {
+  const enabled =
+    nearbyNotificationEnabledInput?.checked === true;
+
+  const radius =
+    Number(nearbyNotificationRadiusInput?.value);
+
+  if (
+    !Number.isFinite(radius) ||
+    radius < MIN_NEARBY_NOTIFICATION_RADIUS_METERS ||
+    radius > MAX_NEARBY_NOTIFICATION_RADIUS_METERS
+  ) {
+    throw new Error("INVALID_NEARBY_NOTIFICATION_RADIUS");
+  }
+
+  return {
+    enabled,
+    radiusMeters: Math.round(radius),
+  };
+}
+
+async function saveNearbyNotificationSettings() {
+  if (!currentUser) {
+    showNearbyNotificationMessage("Sesi login belum siap.", "error");
+    return;
+  }
+
+  try {
+    const settings =
+      getNearbyNotificationSettingsFromForm();
+
+    if (saveNearbyNotificationSettingsButton) {
+      saveNearbyNotificationSettingsButton.disabled = true;
+      saveNearbyNotificationSettingsButton.textContent = "Menyimpan...";
+    }
+
+    nearbyNotificationEnabled = settings.enabled;
+    nearbyNotificationRadiusMeters = settings.radiusMeters;
+
+    await setDoc(
+      doc(db, "vendorProfiles", currentUser.uid),
+      {
+        nearbyNotificationEnabled: settings.enabled,
+        nearbyNotificationRadiusMeters: settings.radiusMeters,
+        updatedAt: serverTimestamp(),
+      },
+      { merge: true }
+    );
+
+    showNearbyNotificationMessage(
+      settings.enabled
+        ? `Notifikasi radius aktif pada ${settings.radiusMeters} meter.`
+        : "Notifikasi radius dinonaktifkan.",
+      "success"
+    );
+  } catch (error) {
+    console.error("[NEARBY NOTIFY] Gagal menyimpan pengaturan:", error);
+
+    showNearbyNotificationMessage(
+      error.message === "INVALID_NEARBY_NOTIFICATION_RADIUS"
+        ? "Radius harus berada antara 50–200 meter."
+        : "Pengaturan notifikasi gagal disimpan.",
+      "error"
+    );
+  } finally {
+    if (saveNearbyNotificationSettingsButton) {
+      saveNearbyNotificationSettingsButton.disabled = false;
+      saveNearbyNotificationSettingsButton.textContent =
+        "Simpan Pengaturan Notifikasi";
+    }
+  }
+}
 
 /* ==================================================
    UPLOAD LOCATION
@@ -2643,6 +2783,14 @@ onAuthStateChanged(
 /* ==================================================
    EVENT LISTENERS
 ================================================== */
+
+if (saveNearbyNotificationSettingsButton) {
+  saveNearbyNotificationSettingsButton.addEventListener(
+    "click",
+    saveNearbyNotificationSettings
+  );
+}
+
 
 
 const enableOrderNotificationsButton =
