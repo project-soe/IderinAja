@@ -3394,6 +3394,29 @@ function checkNearbyVendorNotification(vendor) {
     return;
   }
 
+  /*
+   * Radius dikontrol oleh Mitra.
+   * Field yang belum ada dianggap aktif dengan default 50m
+   * agar vendor lama tetap kompatibel.
+   */
+  if (vendor.nearbyNotificationEnabled === false) {
+    vendorProximityState.delete(vendor.id);
+    return;
+  }
+
+  const configuredRadius =
+    Number(vendor.nearbyNotificationRadiusMeters);
+
+  const radiusMeters =
+    Number.isFinite(configuredRadius) &&
+    configuredRadius >= 50 &&
+    configuredRadius <= 200
+      ? configuredRadius
+      : 50;
+
+  const resetRadiusMeters =
+    Math.min(radiusMeters + 30, 230);
+
   const distanceMeters = calculateDistance(
     customerPosition.latitude,
     customerPosition.longitude,
@@ -3401,8 +3424,11 @@ function checkNearbyVendorNotification(vendor) {
     vendor.longitude
   );
 
-  const isNearby = distanceMeters <= 50;
-  const wasNearby = vendorProximityState.get(vendor.id) === true;
+  const isNearby =
+    distanceMeters <= radiusMeters;
+
+  const wasNearby =
+    vendorProximityState.get(vendor.id) === true;
 
   if (isNearby && !wasNearby) {
     vendorProximityState.set(vendor.id, true);
@@ -3410,7 +3436,11 @@ function checkNearbyVendorNotification(vendor) {
     return;
   }
 
-  if (!isNearby && distanceMeters > 80 && wasNearby) {
+  if (
+    !isNearby &&
+    distanceMeters > resetRadiusMeters &&
+    wasNearby
+  ) {
     vendorProximityState.set(vendor.id, false);
   }
 }
