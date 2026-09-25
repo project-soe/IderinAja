@@ -31,6 +31,7 @@
 import {
   firebaseApp,
   firestoreDb,
+  FCM_VAPID_KEY,
 } from "./firebase/config.js";
 
 import {
@@ -54,6 +55,12 @@ import {
   runTransaction,
   serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+
+import {
+  getMessaging,
+  getToken,
+  onMessage,
+} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-messaging.js";
 
 
 /* ==================================================
@@ -255,6 +262,9 @@ let stopVendorOrderListener = null;
 let lastVendorOrderIds = new Set();
 let vendorOrderNotificationRegistration = null;
 let vendorOrderNotificationInitialized = false;
+let vendorPushMessaging = null;
+let vendorPushInitialized = false;
+let vendorPushForegroundUnsubscribe = null;
 
 let nearbyNotificationEnabled = true;
 let nearbyNotificationRadiusMeters = 50;
@@ -294,11 +304,11 @@ async function initializeVendorOrderNotifications() {
     try {
       vendorOrderNotificationRegistration =
         await navigator.serviceWorker.register(
-          "vendor-orders-sw.js",
+          "firebase-messaging-sw.js",
           { scope: "./" }
         );
     } catch (error) {
-      console.warn("[ORDER NOTIFY] Service worker gagal:", error);
+      console.warn("[FCM] Service worker gagal:", error);
     }
   }
 
@@ -306,21 +316,12 @@ async function initializeVendorOrderNotifications() {
 }
 
 function updateVendorOrderNotificationButton() {
-  const button =
-    document.getElementById("enableOrderNotifications");
-
+  const button = document.getElementById("enableOrderNotifications");
   if (!button) return;
 
   if (!("Notification" in window)) {
     button.textContent = "🔕 Notifikasi tidak didukung";
     button.disabled = true;
-    return;
-  }
-
-  if (Notification.permission === "granted") {
-    button.textContent = "🔔 Notifikasi aktif";
-    button.classList.add("notification-enabled");
-    button.disabled = false;
     return;
   }
 
@@ -331,49 +332,112 @@ function updateVendorOrderNotificationButton() {
     return;
   }
 
-  button.textContent = "🔔 Aktifkan notifikasi";
+  if (vendorPushInitialized) {
+    button.textContent = "🔔 Push aktif";
+    button.classList.add("notification-enabled");
+    button.disabled = false;
+    return;
+  }
+
+  button.textContent = "🔔 Aktifkan push";
   button.classList.remove("notification-enabled");
   button.disabled = false;
 }
 
-async function notifyVendorNewOrder(order) {
-  const title = "Pesanan baru masuk";
-  const body =
-    `Pesanan baru • ${Array.isArray(order.items) ? order.items.length : 0} item • ${formatCurrency(Number(order.total) || 0)}`;
+async function initializeVendorPushNotifications() {
+  if (!currentUser) throw new Error("VENDOR_SESSION_NOT_READY");
+  if (!FCM_VAPID_KEY) throw new Error("FCM_VAPID_KEY_NOT_CONFIGURED");
+  if (!("Notification" in window)) throw new Error("NOTIFICATION_NOT_SUPPORTED");
+  if (!("serviceWorker" in navigator)) throw new Error("SERVICE_WORKER_NOT_SUPPORTED");
 
-  if ("Notification" in window && Notification.permission === "granted") {
-    try {
-      if (vendorOrderNotificationRegistration) {
-        await vendorOrderNotificationRegistration.showNotification(title, {
-          body,
-          tag: `order-${order.id}`,
-          renotify: true,
-          data: { orderId: order.id },
-        });
-      } else {
-        new Notification(title, { body, tag: `order-${order.id}` });
-      }
-    } catch (error) {
-      console.warn("[ORDER NOTIFY] Notifikasi gagal:", error);
-    }
-  }
-}
-
-async function requestVendorOrderNotifications() {
-  if (!("Notification" in window)) {
-    showOrdersMessage("Browser tidak mendukung notifikasi.", "error");
-    return;
-  }
-
-  const permission = await Notification.requestPermission();
+  const permission =
+    Notification.permission === "granted"
+      ? "granted"
+      : await Notification.requestPermission();
 
   updateVendorOrderNotificationButton();
 
-  if (permission === "granted") {
-    await initializeVendorOrderNotifications();
-    showOrdersMessage("Notifikasi pesanan aktif.", "success");
-  } else {
-    showOrdersMessage("Notifikasi pesanan belum diizinkan.", "error");
+  if (permission !== "granted") {
+    throw new Error("NOTIFICATION_PERMISSION_NOT_GRANTED");
+  }
+
+  if (!vendorOrderNotificationRegistration) {
+    vendorOrderNotificationRegistration =
+      await navigator.serviceWorker.register(
+        "firebase-messaging-sw.js",
+        { scope: "./" }
+      );
+  }
+
+  await navigator.serviceWorker.ready;
+
+  if (!vendorPushMessaging) {
+    vendorPushMessaging = getMessaging(firebaseApp);
+  }
+
+  const token = await getToken(vendorPushMessaging, {
+    vapidKey: FCM_VAPID_KEY,
+    serviceWorkerRegistration: vendorOrderNotificationRegistration,
+  });
+
+  if (!token) {
+    throw new Error("FCM_TOKEN_EMPTY");
+  }
+
+  await setDoc(
+    doc(db, "vendorPushTokens", currentUser.uid),
+    {
+      uid: currentUser.uid,
+      role: "vendor",
+      token,
+      updatedAt: serverTimestamp(),
+    },
+    { merge: true }
+  );
+
+  if (vendorPushForegroundUnsubscribe) {
+    vendorPushForegroundUnsubscribe();
+  }
+
+  vendorPushForegroundUnsubscribe = onMessage(
+    vendorPushMessaging,
+    (payload) => {
+      console.log("[FCM] Foreground message:", payload);
+      const notification = payload.notification || {};
+
+      showOrdersMessage(
+        (notification.title || "Pesanan baru") +
+          ": " +
+          (notification.body || "Ada pesanan baru."),
+        "success"
+      );
+    }
+  );
+
+  vendorPushInitialized = true;
+  updateVendorOrderNotificationButton();
+}
+
+async function requestVendorOrderNotifications() {
+  try {
+    await initializeVendorPushNotifications();
+
+    showOrdersMessage(
+      "Push notification aktif. Pesanan baru akan dikirim ke HP Mitra.",
+      "success"
+    );
+  } catch (error) {
+    console.error("[FCM] Aktivasi push gagal:", error);
+
+    const message =
+      error.message === "FCM_VAPID_KEY_NOT_CONFIGURED"
+        ? "FCM belum dikonfigurasi: isi VAPID key Firebase terlebih dahulu."
+        : error.message === "NOTIFICATION_PERMISSION_NOT_GRANTED"
+          ? "Izin notifikasi belum diberikan."
+          : "Push notification gagal diaktifkan. Cek izin notifikasi browser.";
+
+    showOrdersMessage(message, "error");
+    updateVendorOrderNotificationButton();
   }
 }
 
@@ -2612,99 +2676,72 @@ async function updateOrderStatus(
 
 
 function startOrdersListener() {
-  if (!currentUser) {
-    return;
-  }
+  if (!currentUser) return;
 
-  lastVendorOrderIds = new Set();
-
-  if (
-    stopOrdersListener
-  ) {
+  if (stopOrdersListener) {
     stopOrdersListener();
-
-    stopOrdersListener =
-      null;
+    stopOrdersListener = null;
   }
 
-  const ordersQuery =
-    query(
-      collection(
-        db,
-        "orders"
-      ),
-      where(
-        "vendorId",
-        "==",
-        currentUser.uid
-      )
-    );
+  let isInitialSnapshot = true;
 
-  stopOrdersListener =
-    onSnapshot(
-      ordersQuery,
-      (snapshot) => {
-        const orders =
-          snapshot.docs
-            .map(
-              (orderDoc) => ({
-                id:
-                  orderDoc.id,
-                ...orderDoc.data(),
-              })
-            )
-            .sort(
-              (a, b) => {
-                const aTime =
-                  a.createdAt?.toMillis?.() ||
-                  0;
+  const ordersQuery = query(
+    collection(db, "orders"),
+    where("vendorId", "==", currentUser.uid)
+  );
 
-                const bTime =
-                  b.createdAt?.toMillis?.() ||
-                  0;
+  stopOrdersListener = onSnapshot(
+    ordersQuery,
+    (snapshot) => {
+      const orders = snapshot.docs
+        .map((orderDoc) => ({
+          id: orderDoc.id,
+          ...orderDoc.data(),
+        }))
+        .sort(
+          (a, b) =>
+            (b.createdAt?.toMillis?.() || 0) -
+            (a.createdAt?.toMillis?.() || 0)
+        );
 
-                return (
-                  bTime - aTime
-                );
-              }
+      if (!isInitialSnapshot) {
+        snapshot.docChanges().forEach((change) => {
+          if (change.type !== "added") return;
+
+          const order = {
+            id: change.doc.id,
+            ...change.doc.data(),
+          };
+
+          if (order.status === "pending") {
+            console.log(
+              "[FCM] Pesanan baru terdeteksi:",
+              order.id
             );
 
-        const currentPendingIds = new Set(
-          orders
-            .filter((order) => order.status === "pending")
-            .map((order) => order.id)
-        );
-
-        if (lastVendorOrderIds.size > 0) {
-          orders
-            .filter(
-              (order) =>
-                order.status === "pending" &&
-                !lastVendorOrderIds.has(order.id)
-            )
-            .forEach((order) => {
-              notifyVendorNewOrder(order);
-            });
-        }
-
-        lastVendorOrderIds = currentPendingIds;
-
-        renderOrders(
-          orders
-        );
-      },
-      (error) => {
-        console.error(
-          "Orders listener error:",
-          error
-        );
-
-        showOrdersMessage(
-          "Pesanan gagal dimuat.",
-          "error"
-        );
+            showOrdersMessage(
+              "Pesanan baru masuk. Push notification sedang dikirim.",
+              "success"
+            );
+          }
+        });
       }
-    );
+
+      isInitialSnapshot = false;
+      renderOrders(orders);
+    },
+    (error) => {
+      console.error(
+        "Orders listener error:",
+        error
+      );
+
+      showOrdersMessage(
+        "Pesanan gagal dimuat.",
+        "error"
+      );
+    }
+  );
 }
 
 
