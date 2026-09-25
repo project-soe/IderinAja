@@ -11,25 +11,9 @@ firebase.initializeApp({
   measurementId: "G-XBPX4ZMJ43",
 });
 
-const messaging = firebase.messaging();
-
-messaging.onBackgroundMessage((payload) => {
-  const notification = payload.notification || {};
-
-  self.registration.showNotification(
-    notification.title || "Pesanan baru masuk",
-    {
-      body:
-        notification.body ||
-        "Ada pesanan baru untuk Mitra.",
-      tag: payload.data?.orderId
-        ? "order-" + payload.data.orderId
-        : "iderinaja-order",
-      renotify: true,
-      data: payload.data || {},
-    }
-  );
-});
+// Initialize FCM in the service worker.
+// Background notification payloads are displayed automatically by FCM.
+firebase.messaging();
 
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
