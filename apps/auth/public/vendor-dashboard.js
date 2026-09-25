@@ -160,6 +160,9 @@ const nearbyNotificationEnabledInput =
 const nearbyNotificationRadiusInput =
   document.getElementById("nearbyNotificationRadius");
 
+const nearbyNotificationRadiusValue =
+  document.getElementById("nearbyNotificationRadiusValue");
+
 const saveNearbyNotificationSettingsButton =
   document.getElementById("saveNearbyNotificationSettings");
 
@@ -657,6 +660,8 @@ async function loadVendorProfile() {
       String(nearbyNotificationRadiusMeters);
   }
 
+  updateNearbyNotificationRadiusUI();
+
   /* ----------------------------------------------
      LOAD LOCATION STATE
   ---------------------------------------------- */
@@ -1043,6 +1048,33 @@ async function saveVendorProfile() {
 /* ==================================================
    NEARBY NOTIFICATION SETTINGS
 ================================================== */
+
+function updateNearbyNotificationRadiusUI() {
+  if (!nearbyNotificationRadiusInput) return;
+
+  const value =
+    Math.min(
+      200,
+      Math.max(
+        50,
+        Number(nearbyNotificationRadiusInput.value) || 50
+      )
+    );
+
+  nearbyNotificationRadiusInput.value = String(value);
+
+  if (nearbyNotificationRadiusValue) {
+    nearbyNotificationRadiusValue.textContent = `${value} m`;
+  }
+
+  const progress =
+    ((value - 50) / (200 - 50)) * 100;
+
+  nearbyNotificationRadiusInput.style.setProperty(
+    "--range-progress",
+    `${progress}%`
+  );
+}
 
 function showNearbyNotificationMessage(text, type = "") {
   if (!nearbyNotificationMessage) return;
@@ -2783,6 +2815,13 @@ onAuthStateChanged(
 /* ==================================================
    EVENT LISTENERS
 ================================================== */
+
+if (nearbyNotificationRadiusInput) {
+  nearbyNotificationRadiusInput.addEventListener(
+    "input",
+    updateNearbyNotificationRadiusUI
+  );
+}
 
 if (saveNearbyNotificationSettingsButton) {
   saveNearbyNotificationSettingsButton.addEventListener(
