@@ -209,6 +209,50 @@
           Hentikan Berbagi Lokasi
         </button>
 
+        <div class="notification-settings">
+          <div class="notification-settings-heading">
+            <div>
+              <h3>Notifikasi Konsumen</h3>
+              <p>
+                Atur apakah konsumen yang berlangganan akan mendapat notifikasi saat Anda berada di dekat mereka.
+              </p>
+            </div>
+          </div>
+
+          <label class="notification-toggle">
+            <input id="nearbyNotificationEnabled" type="checkbox" checked />
+            <span class="notification-toggle-track" aria-hidden="true"></span>
+            <span class="notification-toggle-text">Aktifkan notifikasi radius</span>
+          </label>
+
+          <div class="form-group notification-radius-group">
+            <label for="nearbyNotificationRadius">Radius Notifikasi (meter)</label>
+            <div class="notification-radius-input">
+              <input
+                id="nearbyNotificationRadius"
+                type="number"
+                min="50"
+                max="200"
+                step="1"
+                value="50"
+                inputmode="numeric"
+              />
+              <span>meter</span>
+            </div>
+            <small class="field-help">Radius dapat diatur dari 50 sampai 200 meter.</small>
+          </div>
+
+          <button
+            id="saveNearbyNotificationSettings"
+            class="secondary-button notification-settings-button"
+            type="button"
+          >
+            Simpan Pengaturan Notifikasi
+          </button>
+
+          <div id="nearbyNotificationMessage" class="message" role="status" aria-live="polite"></div>
+        </div>
+
         <div
           id="message"
           class="message"
