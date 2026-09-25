@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IderinAja — Pesanan</title>
+  <link rel="stylesheet" href="lmgj-logo.css" />
+  <style>
+    :root{--yellow:#ffc21a;--yellow-dark:#f5a900;--dark:#081a24;--dark-2:#06131b;--dark-3:#0c2531;--white:#fff;--muted:#91a0a8;--green:#28c76f;--red:#ff5c5c;--blue:#168cff;--border:rgba(255,255,255,.08);--border-soft:rgba(255,255,255,.05)}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-height:100vh;font-family:Arial,sans-serif;background:radial-gradient(circle at top right,rgba(255,194,26,.12),transparent 35%),radial-gradient(circle at bottom left,rgba(22,140,255,.06),transparent 35%),var(--dark-2);color:var(--white)}
+    button{font:inherit;cursor:pointer}button:disabled{cursor:wait}.hidden{display:none!important}
+    .page{width:min(100%,800px);margin:auto;padding:20px 20px 110px}.header{margin-bottom:18px}.header-top{display:flex;align-items:center;justify-content:space-between;gap:12px}.brand{color:var(--yellow);font-size:25px;font-weight:800}.role{margin-top:4px;color:var(--muted);font-size:13px}.back-button{border:1px solid var(--border);border-radius:12px;padding:9px 13px;background:rgba(255,255,255,.05);color:var(--white);font-size:12px;font-weight:800}.back-button:hover{background:rgba(255,194,26,.1)}
+    .status{margin-top:16px;padding:12px 14px;border-radius:14px;border:1px solid var(--border);background:rgba(255,255,255,.025);color:var(--muted);font-size:13px}.status.online{color:var(--green);border-color:rgba(40,199,111,.18);background:rgba(40,199,111,.05)}
+    .card{margin-bottom:16px;padding:16px;border-radius:20px;background:rgba(255,255,255,.04);border:1px solid var(--border);box-shadow:0 10px 30px rgba(0,0,0,.08)}
+    .hero h1{margin:0;font-size:22px}.hero p{margin:7px 0 0;color:var(--muted);font-size:13px;line-height:1.5}
+    .tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px}.tab{min-height:44px;border:1px solid var(--border);border-radius:13px;background:rgba(255,255,255,.04);color:var(--muted);font-size:12px;font-weight:800}.tab.active{background:var(--yellow);border-color:var(--yellow);color:var(--dark)}
+    .summary{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}.summary h2{margin:0;font-size:16px}.count{display:inline-flex;align-items:center;min-height:28px;padding:5px 10px;border:1px solid var(--border);border-radius:999px;color:var(--muted);font-size:11px;font-weight:800}
+    .orders{display:grid;gap:10px}.order{padding:14px;border:1px solid var(--border);border-radius:16px;background:rgba(255,255,255,.035);transition:.18s ease}.order:hover{border-color:rgba(255,194,26,.2);background:rgba(255,255,255,.05);transform:translateY(-1px)}
+    .order-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}.vendor{min-width:0}.vendor-name{font-size:14px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.order-id{margin-top:4px;color:var(--muted);font-size:10px}
+    .badge{display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;padding:6px 9px;border-radius:999px;font-size:10px;font-weight:800}.badge.pending{background:rgba(255,194,26,.1);color:var(--yellow)}.badge.accepted{background:rgba(22,140,255,.1);color:#62b1ff}.badge.completed{background:rgba(40,199,111,.1);color:var(--green)}.badge.rejected{background:rgba(255,92,92,.1);color:var(--red)}
+    .items{margin-top:12px;color:var(--muted);font-size:12px;line-height:1.5}.bottom{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:13px;padding-top:12px;border-top:1px solid var(--border-soft);color:var(--muted);font-size:11px}.bottom strong{color:var(--yellow);font-size:14px}
+    .empty{padding:30px 15px;text-align:center;color:var(--muted);font-size:13px;line-height:1.5}.empty-icon{font-size:28px;margin-bottom:8px}
+    .detail-modal{position:fixed;inset:0;z-index:1000;display:flex;align-items:flex-end;justify-content:center;padding:12px;background:rgba(0,0,0,.7);backdrop-filter:blur(6px)}.detail-card{width:min(100%,620px);max-height:88vh;overflow:auto;padding:18px;border-radius:22px 22px 18px 18px;background:var(--dark-3);border:1px solid var(--border);box-shadow:0 20px 60px rgba(0,0,0,.45)}.detail-head{display:flex;justify-content:space-between;gap:12px}.detail-head h2{margin:0;font-size:18px}.detail-id{margin-top:4px;color:var(--muted);font-size:10px}.close{width:36px;height:36px;border:1px solid var(--border);border-radius:10px;background:rgba(255,255,255,.04);color:var(--white);font-size:20px}.detail-status{margin-top:16px}.detail-section{margin-top:18px}.detail-section h3{margin:0 0 10px;font-size:13px}.detail-items{display:grid;gap:8px}.detail-item{display:flex;justify-content:space-between;gap:10px;padding:11px;border:1px solid var(--border-soft);border-radius:12px;background:rgba(255,255,255,.03);font-size:12px}.detail-item span{color:var(--muted)}.timeline{display:grid;gap:8px}.timeline-item{display:flex;gap:10px;align-items:center;padding:10px 11px;border-radius:12px;background:rgba(255,255,255,.03);color:var(--muted);font-size:12px}.timeline-item.done{color:var(--white);border:1px solid rgba(40,199,111,.15)}.timeline-icon{width:25px;height:25px;display:grid;place-items:center;border-radius:50%;background:rgba(255,255,255,.06)}.rejected{margin-top:10px;padding:12px;border-radius:12px;background:rgba(255,92,92,.08);border:1px solid rgba(255,92,92,.18);color:var(--red);font-size:12px}.total{display:flex;justify-content:space-between;align-items:center;margin-top:20px;padding-top:14px;border-top:1px solid var(--border);color:var(--muted);font-size:13px}.total strong{color:var(--yellow);font-size:19px}
+    .bottom-nav{position:fixed;left:50%;bottom:10px;transform:translateX(-50%);z-index:50;width:min(calc(100% - 20px),560px);display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:7px;border:1px solid var(--border);border-radius:20px;background:rgba(6,19,27,.94);backdrop-filter:blur(16px);box-shadow:0 12px 35px rgba(0,0,0,.35)}.bottom-nav button{min-height:50px;border:0;border-radius:14px;background:transparent;color:var(--muted);font-size:11px;font-weight:800}.bottom-nav button span{display:block;font-size:18px;margin-bottom:2px}.bottom-nav button.active,.bottom-nav button:hover{background:rgba(255,194,26,.12);color:var(--yellow)}
+    .company-footer{display:flex;flex-direction:column;align-items:center;gap:5px;margin:28px 0 10px;padding:18px 0 6px;border-top:1px solid var(--border);color:var(--muted);text-align:center}.company-footer img{display:block;width:48px;height:36px;object-fit:contain}.company-footer span{font-size:9px;font-weight:800;letter-spacing:.18em}
+    @media(min-width:700px){.detail-modal{align-items:center}.detail-card{border-radius:22px}}
+  </style>
+</head>
+<body>
+  <main id="page" class="page hidden">
+    <header class="header">
+      <div class="header-top">
+        <div><div class="brand">IderinAja</div><div class="role">Konsumen</div></div>
+        <button id="backButton" class="back-button" type="button">← Kembali</button>
+      </div>
+      <div id="connectionStatus" class="status">Memuat pesanan...</div>
+    </header>
+
+    <section class="card hero">
+      <h1>📦 Pesanan</h1>
+      <p>Tinjau pesanan yang sedang berjalan dan lihat riwayat pesanan Anda dengan lebih rapi.</p>
+      <div class="tabs">
+        <button class="tab active" data-tab="active" type="button">Sedang berlangsung</button>
+        <button class="tab" data-tab="history" type="button">Riwayat pesanan</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="summary">
+        <h2 id="sectionTitle">Sedang Berlangsung</h2>
+        <span id="orderCount" class="count">0 pesanan</span>
+      </div>
+      <div id="ordersList" class="orders"></div>
+    </section>
+
+    <footer class="company-footer" aria-label="Perusahaan pengelola platform">
+      <img src="assets/lmgj-logo.svg" alt="Logo LMGJ" width="48" height="36" />
+      <span>LMGJ</span>
+    </footer>
+  </main>
+
+  <div id="loading" class="page"><div class="card"><div class="empty">Memverifikasi akun...</div></div></div>
+
+  <div id="error" class="page hidden"><div class="card"><div class="empty"><div class="empty-icon">⚠️</div><div id="errorMessage"></div></div></div></div>
+
+  <div id="detailModal" class="detail-modal hidden">
+    <div class="detail-card">
+      <div class="detail-head">
+        <div><h2 id="detailVendor">Mitra IderinAja</h2><div id="detailId" class="detail-id">ID: -</div></div>
+        <button id="closeDetail" class="close" type="button" aria-label="Tutup">×</button>
+      </div>
+      <div id="detailStatus" class="detail-status badge pending">⏳ Menunggu konfirmasi</div>
+      <div class="detail-section"><h3>Progress Pesanan</h3><div id="detailTimeline" class="timeline"></div></div>
+      <div class="detail-section"><h3>Item Pesanan</h3><div id="detailItems" class="detail-items"></div></div>
+      <div class="total"><span>Total</span><strong id="detailTotal">Rp0</strong></div>
+    </div>
+  </div>
+
+  <nav class="bottom-nav" aria-label="Navigasi Pesanan">
+    <button type="button" class="active"><span>📦</span>Pesanan</button>
+    <button type="button" id="homeButton"><span>🏠</span>Beranda</button>
+    <button type="button" id="logoutButton"><span>↪</span>Keluar</button>
+  </nav>
+
+  <script type="module" src="customer-orders.js?v=20260925-01"></script>
+</body>
+</html>
