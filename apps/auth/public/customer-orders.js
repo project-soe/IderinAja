@@ -19,6 +19,9 @@ const detailId = document.getElementById("detailId");
 const detailStatus = document.getElementById("detailStatus");
 const detailTimeline = document.getElementById("detailTimeline");
 const detailItems = document.getElementById("detailItems");
+const detailAddress = document.getElementById("detailAddress");
+const detailNotes = document.getElementById("detailNotes");
+const detailPayment = document.getElementById("detailPayment");
 const detailTotal = document.getElementById("detailTotal");
 
 let currentUser = null;
@@ -146,6 +149,13 @@ function showOrderDetail(order){
   `).join("") + (order.status === "rejected"
     ? `<div class="rejected">❌ Pesanan ditolak oleh mitra.</div>`
     : "");
+
+  detailAddress.textContent = order.address || "Belum ada alamat";
+  detailNotes.textContent = order.notes || "Tidak ada catatan";
+  detailPayment.textContent =
+    order.paymentMethod === "cod"
+      ? "COD (Bayar di tempat)"
+      : String(order.paymentMethod || "Belum ditentukan").toUpperCase();
 
   detailTotal.textContent = formatRupiah(order.total);
   detailModal.classList.remove("hidden");
