@@ -833,3 +833,106 @@ button:disabled {
 /* Keep app navigation above content without creating a full-page stacking layer. */
 .dashboard{position:relative;isolation:isolate;}
 .app-bottom-nav{z-index:50;}
+
+
+/* ==================================================
+   NEARBY NOTIFICATION SETTINGS
+================================================== */
+
+.notification-settings{
+  margin-top:20px;
+  padding-top:18px;
+  border-top:1px solid var(--color-border);
+}
+
+.notification-settings-heading h3{
+  margin:0 0 6px;
+  font-size:15px;
+  font-weight:800;
+}
+
+.notification-settings-heading p{
+  margin:0 0 14px;
+  color:var(--color-muted);
+  font-size:12px;
+  line-height:1.5;
+}
+
+.notification-toggle{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-height:44px;
+  margin-bottom:14px;
+  cursor:pointer;
+}
+
+.notification-toggle input{
+  position:absolute;
+  opacity:0;
+  pointer-events:none;
+}
+
+.notification-toggle-track{
+  position:relative;
+  flex:0 0 auto;
+  width:46px;
+  height:26px;
+  border-radius:999px;
+  background:#33424a;
+  border:1px solid var(--color-border);
+  transition:background .18s ease;
+}
+
+.notification-toggle-track::after{
+  content:"";
+  position:absolute;
+  top:3px;
+  left:3px;
+  width:18px;
+  height:18px;
+  border-radius:50%;
+  background:#fff;
+  transition:transform .18s ease;
+}
+
+.notification-toggle input:checked + .notification-toggle-track{
+  background:var(--color-primary);
+}
+
+.notification-toggle input:checked + .notification-toggle-track::after{
+  transform:translateX(20px);
+}
+
+.notification-toggle-text{
+  font-size:13px;
+  font-weight:800;
+}
+
+.notification-radius-input{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.notification-radius-input input{
+  max-width:180px;
+}
+
+.notification-radius-input span{
+  color:var(--color-muted);
+  font-size:13px;
+  font-weight:700;
+}
+
+.notification-settings-button{
+  display:block;
+  margin-top:4px;
+  background:rgba(255,255,255,.06);
+  border:1px solid var(--color-border);
+}
+
+.notification-settings-button:hover{
+  background:rgba(255,194,26,.10);
+  border-color:rgba(255,194,26,.28);
+}
