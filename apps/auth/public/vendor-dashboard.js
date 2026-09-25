@@ -236,6 +236,11 @@ let watchId = null;
 let lastUploadedLocation = null;
 
 let currentUsername = null;
+let stopVendorOrderListener = null;
+let lastVendorOrderIds = new Set();
+let vendorOrderNotificationRegistration = null;
+let vendorOrderNotificationInitialized = false;
+
 
 
 /* ==================================================
@@ -249,6 +254,65 @@ const USERNAME_PATTERN =
 const MIN_LOCATION_UPDATE_DISTANCE_METERS =
   10;
 
+
+
+async function initializeVendorOrderNotifications() {
+  if (vendorOrderNotificationInitialized) return;
+  vendorOrderNotificationInitialized = true;
+
+  if (!("Notification" in window)) return;
+
+  if (Notification.permission === "granted" && "serviceWorker" in navigator) {
+    try {
+      vendorOrderNotificationRegistration =
+        await navigator.serviceWorker.register(
+          "vendor-orders-sw.js",
+          { scope: "./" }
+        );
+    } catch (error) {
+      console.warn("[ORDER NOTIFY] Service worker gagal:", error);
+    }
+  }
+}
+
+async function notifyVendorNewOrder(order) {
+  const title = "Pesanan baru masuk";
+  const body =
+    `${order.vendorName || "IderinAja"} • ${Array.isArray(order.items) ? order.items.length : 0} item • ${formatCurrency(Number(order.total) || 0)}`;
+
+  if ("Notification" in window && Notification.permission === "granted") {
+    try {
+      if (vendorOrderNotificationRegistration) {
+        await vendorOrderNotificationRegistration.showNotification(title, {
+          body,
+          tag: `order-${order.id}`,
+          renotify: true,
+          data: { orderId: order.id },
+        });
+      } else {
+        new Notification(title, { body, tag: `order-${order.id}` });
+      }
+    } catch (error) {
+      console.warn("[ORDER NOTIFY] Notifikasi gagal:", error);
+    }
+  }
+}
+
+async function requestVendorOrderNotifications() {
+  if (!("Notification" in window)) {
+    showOrdersMessage("Browser tidak mendukung notifikasi.", "error");
+    return;
+  }
+
+  const permission = await Notification.requestPermission();
+
+  if (permission === "granted") {
+    await initializeVendorOrderNotifications();
+    showOrdersMessage("Notifikasi pesanan aktif.", "success");
+  } else {
+    showOrdersMessage("Notifikasi pesanan belum diizinkan.", "error");
+  }
+}
 
 /* ==================================================
    UI HELPERS
@@ -2334,9 +2398,7 @@ async function updateOrderStatus(
 
 
 function startOrdersListener() {
-  if (
-    !currentUser
-  ) {
+  if (!currentUser) {
     return;
   }
 
@@ -2390,6 +2452,26 @@ function startOrdersListener() {
                 );
               }
             );
+
+        const currentPendingIds = new Set(
+          orders
+            .filter((order) => order.status === "pending")
+            .map((order) => order.id)
+        );
+
+        if (lastVendorOrderIds.size > 0) {
+          orders
+            .filter(
+              (order) =>
+                order.status === "pending" &&
+                !lastVendorOrderIds.has(order.id)
+            )
+            .forEach((order) => {
+              notifyVendorNewOrder(order);
+            });
+        }
+
+        lastVendorOrderIds = currentPendingIds;
 
         renderOrders(
           orders
@@ -2538,6 +2620,7 @@ onAuthStateChanged(
 
       await loadMenus();
 
+      await initializeVendorOrderNotifications();
       startOrdersListener();
 
     } catch (error) {
@@ -2561,6 +2644,16 @@ onAuthStateChanged(
    EVENT LISTENERS
 ================================================== */
 
+
+const enableOrderNotificationsButton =
+  document.getElementById("enableOrderNotifications");
+
+if (enableOrderNotificationsButton) {
+  enableOrderNotificationsButton.addEventListener(
+    "click",
+    requestVendorOrderNotifications
+  );
+}
 
 if (
   logoutButton
