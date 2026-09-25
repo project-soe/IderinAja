@@ -278,10 +278,17 @@ const MAX_NEARBY_NOTIFICATION_RADIUS_METERS = 200;
 
 
 async function initializeVendorOrderNotifications() {
-  if (vendorOrderNotificationInitialized) return;
+  if (vendorOrderNotificationInitialized) {
+    updateVendorOrderNotificationButton();
+    return;
+  }
+
   vendorOrderNotificationInitialized = true;
 
-  if (!("Notification" in window)) return;
+  if (!("Notification" in window)) {
+    updateVendorOrderNotificationButton();
+    return;
+  }
 
   if (Notification.permission === "granted" && "serviceWorker" in navigator) {
     try {
@@ -294,12 +301,45 @@ async function initializeVendorOrderNotifications() {
       console.warn("[ORDER NOTIFY] Service worker gagal:", error);
     }
   }
+
+  updateVendorOrderNotificationButton();
+}
+
+function updateVendorOrderNotificationButton() {
+  const button =
+    document.getElementById("enableOrderNotifications");
+
+  if (!button) return;
+
+  if (!("Notification" in window)) {
+    button.textContent = "🔕 Notifikasi tidak didukung";
+    button.disabled = true;
+    return;
+  }
+
+  if (Notification.permission === "granted") {
+    button.textContent = "🔔 Notifikasi aktif";
+    button.classList.add("notification-enabled");
+    button.disabled = false;
+    return;
+  }
+
+  if (Notification.permission === "denied") {
+    button.textContent = "🔕 Notifikasi diblokir";
+    button.classList.remove("notification-enabled");
+    button.disabled = true;
+    return;
+  }
+
+  button.textContent = "🔔 Aktifkan notifikasi";
+  button.classList.remove("notification-enabled");
+  button.disabled = false;
 }
 
 async function notifyVendorNewOrder(order) {
   const title = "Pesanan baru masuk";
   const body =
-    `${order.vendorName || "IderinAja"} • ${Array.isArray(order.items) ? order.items.length : 0} item • ${formatCurrency(Number(order.total) || 0)}`;
+    `Pesanan baru • ${Array.isArray(order.items) ? order.items.length : 0} item • ${formatCurrency(Number(order.total) || 0)}`;
 
   if ("Notification" in window && Notification.permission === "granted") {
     try {
@@ -326,6 +366,8 @@ async function requestVendorOrderNotifications() {
   }
 
   const permission = await Notification.requestPermission();
+
+  updateVendorOrderNotificationButton();
 
   if (permission === "granted") {
     await initializeVendorOrderNotifications();
@@ -2574,6 +2616,8 @@ function startOrdersListener() {
     return;
   }
 
+  lastVendorOrderIds = new Set();
+
   if (
     stopOrdersListener
   ) {
@@ -2840,6 +2884,8 @@ if (enableOrderNotificationsButton) {
     "click",
     requestVendorOrderNotifications
   );
+
+  updateVendorOrderNotificationButton();
 }
 
 if (
