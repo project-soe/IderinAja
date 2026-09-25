@@ -203,6 +203,26 @@ service cloud.firestore {
         && request.auth.uid == vendorId;
     }
 
+    /* ==================================================
+       VENDOR FCM PUSH TOKEN
+       ================================================== */
+    match /vendorPushTokens/{vendorId} {
+      allow read: if
+        request.auth != null
+        && request.auth.uid == vendorId;
+
+      allow create, update: if
+        request.auth != null
+        && request.auth.uid == vendorId
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.role == 'vendor'
+        && request.resource.data.token is string;
+
+      allow delete: if
+        request.auth != null
+        && request.auth.uid == vendorId;
+    }
+
     match /vendorMenus/{vendorId}/items/{itemId} {
 
   allow read: if
