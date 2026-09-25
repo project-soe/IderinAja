@@ -1,4 +1,8 @@
 {
+  "functions": {
+    "source": "functions"
+  },
+
   "firestore": [
     {
       "database": "default",
