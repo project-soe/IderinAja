@@ -3993,7 +3993,6 @@ onAuthStateChanged(
 
       currentUser =
         user;
-      startCustomerOrdersListener();
       bindNearbyNotificationButton();
       initializeNearbyNotifications();
 
