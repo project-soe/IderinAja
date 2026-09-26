@@ -50,6 +50,7 @@
   <a href="#locationSection"><span>📍</span>Lokasi</a>
   <a href="#menuSection"><span>🍽️</span>Menu</a>
   <a href="#ordersSection"><span>📦</span>Pesanan</a>
+  <a href="#routeHistorySection"><span>🛣️</span>Rute</a>
   <button type="button" data-quick-action="top"><span>⬆️</span>Atas</button>
 </nav>
 
@@ -307,6 +308,48 @@
           role="status"
           aria-live="polite"
         ></div>
+      </section>
+
+      <!-- =========================================
+           HISTORY PERJALANAN
+      ========================================== -->
+      <section id="routeHistorySection" class="card route-history-card">
+        <div class="section-heading">
+          <div>
+            <h2>History Perjalanan</h2>
+            <p>Simpan rute GPS Mitra dan gunakan kembali kapan saja.</p>
+          </div>
+          <span id="routeCount" class="menu-count">0 rute</span>
+        </div>
+
+        <div class="route-recording-box">
+          <div class="route-status">
+            <span id="activeRouteStatus">Belum ada perjalanan yang direkam.</span>
+          </div>
+
+          <div class="form-group">
+            <label for="routeName">Nama perjalanan (opsional)</label>
+            <input id="routeName" type="text" maxlength="60" placeholder="Contoh: Rute Pagi" />
+          </div>
+
+          <button id="saveRoute" class="primary-button" type="button" disabled>
+            Simpan Perjalanan
+          </button>
+
+          <div class="field-help">
+            Perjalanan direkam otomatis saat GPS aktif. Titik GPS dicatat saat Mitra berpindah minimal 10 meter.
+          </div>
+        </div>
+
+        <div id="routeMessage" class="message" role="status" aria-live="polite"></div>
+
+        <div class="route-list-header">
+          <h3>Rute Tersimpan</h3>
+        </div>
+
+        <div id="routeList" class="route-list">
+          <div id="routeEmpty" class="menu-empty">Belum ada perjalanan tersimpan.</div>
+        </div>
       </section>
 
       <!-- =========================================
