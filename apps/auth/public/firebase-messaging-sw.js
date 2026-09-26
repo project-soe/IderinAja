@@ -2,7 +2,7 @@ importScripts("https://www.gstatic.com/firebasejs/12.2.1/firebase-app-compat.js"
 importScripts("https://www.gstatic.com/firebasejs/12.2.1/firebase-messaging-compat.js");
 
 firebase.initializeApp({
-  apiKey: "AIzaSyCo2mE2do07zqR4B8Q8w5mux9oO7cc2lj3I",
+  apiKey: "AIzaSyCo2mE2do07rZq4B8Qw5mux9oO7cc2lj3I",
   authDomain: "absensitamu.firebaseapp.com",
   projectId: "absensitamu",
   storageBucket: "absensitamu.firebasestorage.app",
