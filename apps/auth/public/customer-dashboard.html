@@ -2168,6 +2168,9 @@
     .company-footer-name{color:var(--muted);font-size:10px;font-weight:800;letter-spacing:.18em}
     .dashboard{position:relative;isolation:isolate}
     .app-bottom-nav{z-index:50}
+    .vendor-notification-toggle{display:flex;align-items:center;gap:9px;margin-top:12px;padding:10px 12px;border:1px solid var(--border);border-radius:12px;background:rgba(255,255,255,.04);font-size:12px;font-weight:700}
+    .vendor-notification-toggle input{width:18px;height:18px}
+    .vendor-notification-hint{margin-top:7px;color:var(--muted);font-size:11px;line-height:1.45}
 </style>
 </head>
 
@@ -2819,6 +2822,24 @@
         >
           ⭐ Berlangganan
         </button>
+
+        <label
+          id="vendorNotificationToggleWrap"
+          class="vendor-notification-toggle hidden"
+        >
+          <input
+            id="vendorNotificationEnabled"
+            type="checkbox"
+          />
+          <span>🔔 Notifikasi pedagang ini</span>
+        </label>
+
+        <div
+          id="vendorNotificationHint"
+          class="vendor-notification-hint"
+        >
+          Aktifkan langganan untuk menerima notifikasi dari pedagang ini.
+        </div>
 
       </div>
 
