@@ -321,6 +321,38 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    /* ==================================================
+       VENDOR SAVED ROUTES / TRAVEL HISTORY
+       ================================================== */
+
+    match /vendorRoutes/{vendorId}/routes/{routeId} {
+      allow read: if
+        request.auth != null
+        && request.auth.uid == vendorId;
+
+      allow create: if
+        request.auth != null
+        && request.auth.uid == vendorId
+        && request.resource.data.vendorId == vendorId
+        && request.resource.data.name is string
+        && request.resource.data.name.size() >= 2
+        && request.resource.data.name.size() <= 60
+        && request.resource.data.points is list
+        && request.resource.data.points.size() >= 2
+        && request.resource.data.points.size() <= 500
+        && request.resource.data.pointCount is int;
+
+      allow update: if
+        request.auth != null
+        && request.auth.uid == vendorId
+        && resource.data.vendorId == vendorId
+        && request.resource.data.vendorId == vendorId;
+
+      allow delete: if
+        request.auth != null
+        && request.auth.uid == vendorId;
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }
