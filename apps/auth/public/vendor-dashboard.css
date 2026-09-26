@@ -503,7 +503,7 @@ button:disabled {
 .app-bottom-nav{
   position:fixed;left:50%;bottom:10px;transform:translateX(-50%);
   z-index:9500;width:min(calc(100% - 20px),560px);
-  display:grid;grid-template-columns:repeat(5,1fr);gap:4px;
+  display:grid;grid-template-columns:repeat(6,1fr);gap:4px;
   padding:7px;border:1px solid var(--color-border);border-radius:20px;
   background:rgba(6,19,27,.94);backdrop-filter:blur(16px);
   box-shadow:0 12px 35px rgba(0,0,0,.35);
