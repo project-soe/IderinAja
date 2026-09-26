@@ -3782,6 +3782,25 @@ function startVendorListener() {
 
       syncVendorLocationListeners();
 
+      const requestedVendorId =
+        new URLSearchParams(window.location.search).get("vendor");
+
+      if (requestedVendorId) {
+        const requestedVendor =
+          allVendors.find(
+            (vendor) => vendor.id === requestedVendorId
+          );
+
+        if (requestedVendor) {
+          openVendorProfile(requestedVendor);
+          window.history.replaceState(
+            {},
+            document.title,
+            window.location.pathname
+          );
+        }
+      }
+
       const onlineCount = allVendors.filter(
         (vendor) =>
           vendor.isOnline === true &&
