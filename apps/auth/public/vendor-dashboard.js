@@ -62,6 +62,13 @@ import {
   onMessage,
 } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-messaging.js";
 
+import {
+  getStorage,
+  ref,
+  uploadBytes,
+  getDownloadURL,
+} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-storage.js";
+
 
 /* ==================================================
    FIREBASE
@@ -70,6 +77,7 @@ import {
 const auth = getAuth(firebaseApp);
 
 const db = firestoreDb;
+const storage = getStorage(firebaseApp);
 
 
 /* ==================================================
@@ -176,6 +184,18 @@ const saveNearbyNotificationSettingsButton =
 const nearbyNotificationMessage =
   document.getElementById("nearbyNotificationMessage");
 
+const nearbyNotificationTitleInput =
+  document.getElementById("nearbyNotificationTitle");
+
+const nearbyNotificationMessageTextInput =
+  document.getElementById("nearbyNotificationMessageText");
+
+const nearbyNotificationSoundInput =
+  document.getElementById("nearbyNotificationSound");
+
+const nearbyNotificationSoundStatus =
+  document.getElementById("nearbyNotificationSoundStatus");
+
 
 /* ==================================================
    DOM — MENU
@@ -268,6 +288,10 @@ let vendorPushForegroundUnsubscribe = null;
 
 let nearbyNotificationEnabled = true;
 let nearbyNotificationRadiusMeters = 50;
+let nearbyNotificationTitle = "";
+let nearbyNotificationMessageText = "";
+let nearbyNotificationSoundUrl = "";
+let nearbyNotificationSoundName = "";
 
 
 
@@ -768,6 +792,43 @@ async function loadVendorProfile() {
 
   updateNearbyNotificationRadiusUI();
 
+  nearbyNotificationTitle =
+    typeof vendorProfileData.nearbyNotificationTitle === "string"
+      ? vendorProfileData.nearbyNotificationTitle
+      : "";
+
+  nearbyNotificationMessageText =
+    typeof vendorProfileData.nearbyNotificationMessage === "string"
+      ? vendorProfileData.nearbyNotificationMessage
+      : "";
+
+  nearbyNotificationSoundUrl =
+    typeof vendorProfileData.nearbyNotificationSoundUrl === "string"
+      ? vendorProfileData.nearbyNotificationSoundUrl
+      : "";
+
+  nearbyNotificationSoundName =
+    typeof vendorProfileData.nearbyNotificationSoundName === "string"
+      ? vendorProfileData.nearbyNotificationSoundName
+      : "";
+
+  if (nearbyNotificationTitleInput) {
+    nearbyNotificationTitleInput.value =
+      nearbyNotificationTitle;
+  }
+
+  if (nearbyNotificationMessageTextInput) {
+    nearbyNotificationMessageTextInput.value =
+      nearbyNotificationMessageText;
+  }
+
+  if (nearbyNotificationSoundStatus) {
+    nearbyNotificationSoundStatus.textContent =
+      nearbyNotificationSoundName
+        ? `Suara tersimpan: ${nearbyNotificationSoundName}`
+        : "Suara bawaan sistem";
+  }
+
   /* ----------------------------------------------
      LOAD LOCATION STATE
   ---------------------------------------------- */
@@ -1216,26 +1277,74 @@ async function saveNearbyNotificationSettings() {
   }
 
   try {
-    const settings =
-      getNearbyNotificationSettingsFromForm();
+    const settings = getNearbyNotificationSettingsFromForm();
+
+    const title =
+      (nearbyNotificationTitleInput?.value || "").trim().slice(0, 80);
+
+    const messageText =
+      (nearbyNotificationMessageTextInput?.value || "").trim().slice(0, 220);
 
     if (saveNearbyNotificationSettingsButton) {
       saveNearbyNotificationSettingsButton.disabled = true;
       saveNearbyNotificationSettingsButton.textContent = "Menyimpan...";
     }
 
+    let soundUrl = nearbyNotificationSoundUrl;
+    let soundName = nearbyNotificationSoundName;
+    const soundFile = nearbyNotificationSoundInput?.files?.[0];
+
+    if (soundFile) {
+      if (!soundFile.type.startsWith("audio/")) {
+        throw new Error("INVALID_AUDIO_TYPE");
+      }
+
+      if (soundFile.size > 5 * 1024 * 1024) {
+        throw new Error("AUDIO_TOO_LARGE");
+      }
+
+      showNearbyNotificationMessage("Mengunggah suara notifikasi...", "");
+
+      const safeName =
+        soundFile.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+
+      const soundRef = ref(
+        storage,
+        `vendorNotificationSounds/${currentUser.uid}/${Date.now()}_${safeName}`
+      );
+
+      const uploadSnapshot = await uploadBytes(soundRef, soundFile);
+      soundUrl = await getDownloadURL(uploadSnapshot.ref);
+      soundName = soundFile.name;
+    }
+
     nearbyNotificationEnabled = settings.enabled;
     nearbyNotificationRadiusMeters = settings.radiusMeters;
+    nearbyNotificationTitle = title;
+    nearbyNotificationMessageText = messageText;
+    nearbyNotificationSoundUrl = soundUrl;
+    nearbyNotificationSoundName = soundName;
 
     await setDoc(
       doc(db, "vendorProfiles", currentUser.uid),
       {
         nearbyNotificationEnabled: settings.enabled,
         nearbyNotificationRadiusMeters: settings.radiusMeters,
+        nearbyNotificationTitle: title,
+        nearbyNotificationMessage: messageText,
+        nearbyNotificationSoundUrl: soundUrl,
+        nearbyNotificationSoundName: soundName,
         updatedAt: serverTimestamp(),
       },
       { merge: true }
     );
+
+    if (nearbyNotificationSoundStatus) {
+      nearbyNotificationSoundStatus.textContent =
+        soundName
+          ? `Suara tersimpan: ${soundName}`
+          : "Suara bawaan sistem";
+    }
 
     showNearbyNotificationMessage(
       settings.enabled
@@ -1246,12 +1355,16 @@ async function saveNearbyNotificationSettings() {
   } catch (error) {
     console.error("[NEARBY NOTIFY] Gagal menyimpan pengaturan:", error);
 
-    showNearbyNotificationMessage(
+    const message =
       error.message === "INVALID_NEARBY_NOTIFICATION_RADIUS"
         ? "Radius harus berada antara 50–200 meter."
-        : "Pengaturan notifikasi gagal disimpan.",
-      "error"
-    );
+        : error.message === "INVALID_AUDIO_TYPE"
+          ? "File harus berupa audio."
+          : error.message === "AUDIO_TOO_LARGE"
+            ? "Ukuran audio maksimal 5 MB."
+            : "Pengaturan notifikasi gagal disimpan.";
+
+    showNearbyNotificationMessage(message, "error");
   } finally {
     if (saveNearbyNotificationSettingsButton) {
       saveNearbyNotificationSettingsButton.disabled = false;
@@ -2909,6 +3022,17 @@ if (saveNearbyNotificationSettingsButton) {
     "click",
     saveNearbyNotificationSettings
   );
+}
+
+if (nearbyNotificationSoundInput) {
+  nearbyNotificationSoundInput.addEventListener("change", () => {
+    const file = nearbyNotificationSoundInput.files?.[0];
+    if (!file) return;
+    if (nearbyNotificationSoundStatus) {
+      nearbyNotificationSoundStatus.textContent =
+        `Siap diunggah: ${file.name}`;
+    }
+  });
 }
 
 
