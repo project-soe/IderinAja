@@ -3484,6 +3484,30 @@ async function notifyNearbyVendor(vendor, distanceMeters) {
         customTitle,
         options
       );
+
+      // Audio custom diputar best-effort ketika halaman masih aktif.
+      // Browser tidak menjamin autoplay audio custom ketika tab/background tertutup.
+      const soundUrl =
+        typeof vendor.nearbyNotificationSoundUrl === "string"
+          ? vendor.nearbyNotificationSoundUrl
+          : "";
+
+      if (
+        soundUrl &&
+        document.visibilityState === "visible"
+      ) {
+        try {
+          const audio = new Audio(soundUrl);
+          audio.volume = 1;
+          await audio.play();
+        } catch (error) {
+          console.warn(
+            "[NOTIFY] Audio custom tidak dapat autoplay:",
+            error
+          );
+        }
+      }
+
       return;
     }
 
