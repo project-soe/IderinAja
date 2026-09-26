@@ -225,7 +225,21 @@
             <span class="notification-toggle-text">Aktifkan notifikasi radius</span>
           </label>
 
-          <div class="notification-radius-group">
+          <div class="form-group notification-custom-group">
+              <label for="nearbyNotificationTitle">Judul Notifikasi</label>
+              <input id="nearbyNotificationTitle" type="text" maxlength="80" placeholder="Halo Bang Udin 👋" />
+            </div>
+            <div class="form-group notification-custom-group">
+              <label for="nearbyNotificationMessageText">Pesan Notifikasi</label>
+              <textarea id="nearbyNotificationMessageText" maxlength="220" rows="3" placeholder="Bang Udin ada di sekitar kamu. Klik notifikasi ini untuk menemukan saya."></textarea>
+            </div>
+            <div class="form-group notification-custom-group">
+              <label for="nearbyNotificationSound">Suara Notifikasi</label>
+              <input id="nearbyNotificationSound" type="file" accept="audio/*" />
+              <small class="field-help">MP3/WAV/M4A, maksimal 5 MB.</small>
+              <div id="nearbyNotificationSoundStatus" class="field-help">Suara bawaan sistem</div>
+            </div>
+            <div class="notification-radius-group">
             <div class="form-group notification-custom-group">
               <label for="nearbyNotificationTitle">Judul Notifikasi</label>
               <input
