@@ -128,6 +128,15 @@ const modalVendorCategory =
 const subscribeButton =
   document.getElementById("subscribeButton");
 
+const vendorNotificationToggleWrap =
+  document.getElementById("vendorNotificationToggleWrap");
+
+const vendorNotificationEnabledInput =
+  document.getElementById("vendorNotificationEnabled");
+
+const vendorNotificationHint =
+  document.getElementById("vendorNotificationHint");
+
 /* ==================================================
    APPLICATION STATE
 ================================================== */
@@ -175,6 +184,7 @@ let cart = {
  * IDs of vendors subscribed by the customer.
  */
 let subscribedVendorIds = new Set();
+let vendorNotificationEnabledById = new Map();
 let stopCustomerOrdersListener = null;
 
 /* ==================================================
@@ -1109,6 +1119,11 @@ async function loadSubscriptions() {
         subscribedVendorIds.add(
           vendor.id
         );
+
+        vendorNotificationEnabledById.set(
+          vendor.id,
+          snapshot.data().nearbyNotificationEnabled !== false
+        );
       }
     } catch (error) {
       console.error(
@@ -1162,6 +1177,8 @@ async function subscribeToVendor(
 
         active: true,
 
+        nearbyNotificationEnabled: true,
+
         createdAt:
           serverTimestamp(),
 
@@ -1175,6 +1192,11 @@ async function subscribeToVendor(
 
     subscribedVendorIds.add(
       vendor.id
+    );
+
+    vendorNotificationEnabledById.set(
+      vendor.id,
+      true
     );
 
     syncVendorLocationListeners();
@@ -1301,6 +1323,10 @@ console.log(
       vendor.id
     );
 
+    vendorNotificationEnabledById.delete(
+      vendor.id
+    );
+
     syncVendorLocationListeners();
 
     console.log(
@@ -1356,6 +1382,56 @@ console.log(
    SUBSCRIBE BUTTON
 ================================================== */
 
+async function updateVendorNotificationPreference(enabled) {
+  if (!currentUser || !selectedVendor) return;
+
+  const subscriptionId =
+    `${currentUser.uid}_${selectedVendor.id}`;
+
+  const subscriptionRef =
+    doc(db, "subscriptions", subscriptionId);
+
+  try {
+    vendorNotificationEnabledInput.disabled = true;
+
+    await setDoc(
+      subscriptionRef,
+      {
+        customerId: currentUser.uid,
+        vendorId: selectedVendor.id,
+        active: true,
+        nearbyNotificationEnabled: enabled === true,
+        updatedAt: serverTimestamp(),
+      },
+      { merge: true }
+    );
+
+    vendorNotificationEnabledById.set(
+      selectedVendor.id,
+      enabled === true
+    );
+
+    if (!enabled) {
+      vendorProximityState.delete(selectedVendor.id);
+    }
+
+    vendorNotificationHint.textContent =
+      enabled
+        ? "Notifikasi pedagang ini aktif."
+        : "Notifikasi pedagang ini dimatikan.";
+
+  } catch (error) {
+    console.error("[NOTIFY] Gagal menyimpan preferensi pedagang:", error);
+
+    vendorNotificationEnabledInput.checked =
+      !enabled;
+
+    alert("Pengaturan notifikasi pedagang gagal disimpan.");
+  } finally {
+    vendorNotificationEnabledInput.disabled = false;
+  }
+}
+
 function updateSubscribeButton() {
   if (!selectedVendor) {
     return;
@@ -1365,6 +1441,34 @@ function updateSubscribeButton() {
     subscribedVendorIds.has(
       selectedVendor.id
     );
+
+  const notificationsEnabled =
+    vendorNotificationEnabledById.get(
+      selectedVendor.id
+    ) !== false;
+
+  if (vendorNotificationToggleWrap) {
+    vendorNotificationToggleWrap.classList.toggle(
+      "hidden",
+      !subscribed
+    );
+  }
+
+  if (vendorNotificationEnabledInput) {
+    vendorNotificationEnabledInput.checked =
+      notificationsEnabled;
+    vendorNotificationEnabledInput.disabled =
+      !subscribed;
+  }
+
+  if (vendorNotificationHint) {
+    vendorNotificationHint.textContent =
+      subscribed
+        ? (notificationsEnabled
+          ? "Notifikasi pedagang ini aktif."
+          : "Notifikasi pedagang ini dimatikan.")
+        : "Aktifkan langganan untuk menerima notifikasi dari pedagang ini.";
+  }
 
   subscribeButton.disabled =
     false;
@@ -3350,12 +3454,20 @@ async function notifyNearbyVendor(vendor, distanceMeters) {
         await navigator.serviceWorker.getRegistration("./");
     }
 
+    const customTitle =
+      typeof vendor.nearbyNotificationTitle === "string" &&
+      vendor.nearbyNotificationTitle.trim()
+        ? vendor.nearbyNotificationTitle.trim()
+        : `Halo dari ${businessName} 👋`;
+
+    const customMessage =
+      typeof vendor.nearbyNotificationMessage === "string" &&
+      vendor.nearbyNotificationMessage.trim()
+        ? vendor.nearbyNotificationMessage.trim()
+        : `${businessName} sedang berada sekitar ${Math.round(distanceMeters)} meter dari Anda. Klik notifikasi ini untuk menemukan saya.`;
+
     const options = {
-      body:
-        businessName +
-        " sedang berada sekitar " +
-        Math.round(distanceMeters) +
-        " meter dari Anda.",
+      body: customMessage,
       tag: "iderinaja-nearby-" + vendorId,
       renotify: false,
       icon: "/favicon.ico",
@@ -3363,12 +3475,13 @@ async function notifyNearbyVendor(vendor, distanceMeters) {
       data: {
         vendorId,
         distanceMeters: Math.round(distanceMeters),
+        soundUrl: vendor.nearbyNotificationSoundUrl || "",
       },
     };
 
     if (notificationServiceWorkerRegistration) {
       await notificationServiceWorkerRegistration.showNotification(
-        "Mitra IderinAja di sekitar Anda",
+        customTitle,
         options
       );
       return;
@@ -3454,7 +3567,11 @@ function checkAllNearbyVendorNotifications() {
   }
 
   allVendors
-    .filter((vendor) => subscribedVendorIds.has(vendor.id))
+    .filter(
+      (vendor) =>
+        subscribedVendorIds.has(vendor.id) &&
+        vendorNotificationEnabledById.get(vendor.id) !== false
+    )
     .forEach((vendor) => {
       checkNearbyVendorNotification(vendor);
     });
@@ -3608,6 +3725,18 @@ function syncVendorLocationListeners() {
 }
 
 function bindNearbyNotificationButton() {
+  if (
+    vendorNotificationEnabledInput &&
+    vendorNotificationEnabledInput.dataset.bound !== "true"
+  ) {
+    vendorNotificationEnabledInput.dataset.bound = "true";
+    vendorNotificationEnabledInput.addEventListener("change", () =>
+      updateVendorNotificationPreference(
+        vendorNotificationEnabledInput.checked
+      )
+    );
+  }
+
   const button = document.getElementById("enableNearbyNotifications");
 
   if (!button || button.dataset.bound === "true") return;
