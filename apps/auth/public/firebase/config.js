@@ -26,6 +26,6 @@ export const firestoreDb =
 
 // Public Web Push key from Firebase Console.
 // Replace this placeholder after enabling Firebase Cloud Messaging Web Push.
-export const FCM_VAPID_KEY = "";
+export const FCM_VAPID_KEY = "BAjoHoxqGZNno9YPHl7HtEOyeYeDx15p4PyDY0RU4ys31Hg9nxqY1rTPZ5lOtNyAHUDopPSS-AxwqIPW4IisrJQ";
 
 export { firebaseConfig };
