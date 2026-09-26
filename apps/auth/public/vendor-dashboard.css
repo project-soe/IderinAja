@@ -1057,3 +1057,59 @@ button:disabled {
     margin-top:8px;
   }
 }
+
+/* ==================================================
+   HISTORY PERJALANAN / RUTE TERSIMPAN
+================================================== */
+
+.route-history-card .section-heading{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+}
+.route-recording-box{
+  margin-top:16px;
+  padding:14px;
+  border:1px solid var(--color-border);
+  border-radius:16px;
+  background:rgba(255,255,255,.035);
+}
+.route-status{
+  margin-bottom:14px;
+  color:var(--color-primary);
+  font-size:12px;
+  font-weight:800;
+  line-height:1.5;
+}
+.route-list-header{margin:20px 0 10px}
+.route-list-header h3{margin:0;font-size:15px;font-weight:800}
+.route-list{display:grid;gap:10px}
+.route-item{
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  gap:12px;
+  padding:14px;
+  border:1px solid var(--color-border);
+  border-radius:16px;
+  background:rgba(255,255,255,.035);
+}
+.route-item-main h3{margin:0 0 5px;font-size:14px;font-weight:800}
+.route-item-main p{margin:0;color:var(--color-muted);font-size:11px;line-height:1.5}
+.route-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.route-actions button{min-height:40px;padding:9px 10px;font-size:12px}
+.route-actions .secondary-button{
+  display:block;
+  margin:0;
+  border:1px solid rgba(255,92,92,.20);
+  background:rgba(255,92,92,.07);
+  color:var(--color-danger);
+}
+@media(min-width:560px){
+  .route-item{grid-template-columns:minmax(0,1fr) auto;align-items:center}
+  .route-actions{min-width:190px}
+}
+@media(max-width:480px){
+  .route-history-card .section-heading{display:block}
+  .route-history-card .menu-count{margin-top:8px}
+}
