@@ -196,6 +196,14 @@ const nearbyNotificationSoundInput =
 const nearbyNotificationSoundStatus =
   document.getElementById("nearbyNotificationSoundStatus");
 
+const routeNameInput = document.getElementById("routeName");
+const saveRouteButton = document.getElementById("saveRoute");
+const routeMessage = document.getElementById("routeMessage");
+const routeList = document.getElementById("routeList");
+const routeEmpty = document.getElementById("routeEmpty");
+const routeCount = document.getElementById("routeCount");
+const activeRouteStatus = document.getElementById("activeRouteStatus");
+
 
 /* ==================================================
    DOM — MENU
@@ -292,6 +300,14 @@ let nearbyNotificationTitle = "";
 let nearbyNotificationMessageText = "";
 let nearbyNotificationSoundUrl = "";
 let nearbyNotificationSoundName = "";
+
+let currentRoutePoints = [];
+let routeRecordingStartedAt = null;
+let activeReplayRoute = null;
+let activeReplayIndex = 0;
+
+const MAX_ROUTE_POINTS = 500;
+const MIN_ROUTE_POINTS_TO_SAVE = 2;
 
 
 
@@ -785,7 +801,11 @@ async function loadVendorProfile() {
       nearbyNotificationEnabled;
   }
 
-  if (nearbyNotificationRadiusInput) {
+  if (saveRouteButton) {
+  saveRouteButton.addEventListener("click", saveCurrentRoute);
+}
+
+if (nearbyNotificationRadiusInput) {
     nearbyNotificationRadiusInput.value =
       String(nearbyNotificationRadiusMeters);
   }
@@ -1465,6 +1485,9 @@ async function uploadLocation(
       longitude,
     };
 
+    recordRoutePoint(latitude, longitude, accuracy);
+    updateRouteReplayProgress(latitude, longitude);
+
 
     latitudeElement.textContent =
       latitude.toFixed(
@@ -1519,6 +1542,287 @@ async function uploadLocation(
   }
 }
 
+
+/* ==================================================
+   HISTORY PERJALANAN / RUTE TERSIMPAN
+================================================== */
+
+function showRouteMessage(text, type = "") {
+  if (!routeMessage) return;
+  routeMessage.textContent = text;
+  routeMessage.className = `message ${type}`;
+}
+
+function getRouteCollection() {
+  return collection(db, "vendorRoutes", currentUser.uid, "routes");
+}
+
+function updateRouteRecordingUI() {
+  if (saveRouteButton) {
+    const count = currentRoutePoints.length;
+    saveRouteButton.disabled = count < MIN_ROUTE_POINTS_TO_SAVE;
+    saveRouteButton.textContent =
+      count >= MIN_ROUTE_POINTS_TO_SAVE
+        ? `Simpan Perjalanan (${count} titik)`
+        : "Simpan Perjalanan";
+  }
+
+  if (activeRouteStatus) {
+    activeRouteStatus.textContent = activeReplayRoute
+      ? `Mengulangi: ${activeReplayRoute.name} • titik ${Math.min(activeReplayIndex + 1, activeReplayRoute.points.length)}/${activeReplayRoute.points.length}`
+      : currentRoutePoints.length > 0
+        ? `Merekam perjalanan: ${currentRoutePoints.length} titik GPS`
+        : "Belum ada perjalanan yang direkam.";
+  }
+}
+
+function recordRoutePoint(latitude, longitude, accuracy) {
+  if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return;
+
+  const point = {
+    lat: Number(latitude),
+    lng: Number(longitude),
+    accuracy: Number.isFinite(accuracy) ? Number(accuracy) : null,
+    recordedAt: Date.now(),
+  };
+
+  const previous = currentRoutePoints[currentRoutePoints.length - 1];
+  if (previous) {
+    const distance = calculateDistance(
+      previous.lat, previous.lng, point.lat, point.lng
+    );
+    if (distance < MIN_LOCATION_UPDATE_DISTANCE_METERS) return;
+  }
+
+  if (currentRoutePoints.length >= MAX_ROUTE_POINTS) {
+    currentRoutePoints.shift();
+  }
+
+  currentRoutePoints.push(point);
+  routeRecordingStartedAt ??= point.recordedAt;
+  updateRouteRecordingUI();
+}
+
+async function saveCurrentRoute() {
+  if (!currentUser) return;
+
+  if (currentRoutePoints.length < MIN_ROUTE_POINTS_TO_SAVE) {
+    showRouteMessage("Perjalanan belum cukup panjang. Rekam minimal 2 titik GPS.", "error");
+    return;
+  }
+
+  const suggestedName = routeNameInput?.value.trim() ||
+    `Rute ${new Intl.DateTimeFormat("id-ID", {
+      day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit"
+    }).format(new Date())}`;
+
+  const name = window.prompt("Nama perjalanan yang ingin disimpan:", suggestedName);
+  if (name === null) return;
+
+  const normalizedName = name.trim();
+  if (normalizedName.length < 2 || normalizedName.length > 60) {
+    showRouteMessage("Nama rute harus 2–60 karakter.", "error");
+    return;
+  }
+
+  saveRouteButton.disabled = true;
+
+  try {
+    await addDoc(getRouteCollection(), {
+      vendorId: currentUser.uid,
+      name: normalizedName,
+      points: currentRoutePoints.map(({lat, lng}) => ({lat, lng})),
+      pointCount: currentRoutePoints.length,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+      lastUsedAt: null,
+    });
+
+    if (routeNameInput) routeNameInput.value = "";
+    showRouteMessage(`Perjalanan "${normalizedName}" berhasil disimpan.`, "success");
+    await loadSavedRoutes();
+  } catch (error) {
+    console.error("Save route error:", error);
+    showRouteMessage("Perjalanan gagal disimpan.", "error");
+  } finally {
+    updateRouteRecordingUI();
+  }
+}
+
+function formatRouteDate(timestamp) {
+  if (!timestamp || typeof timestamp.toDate !== "function") return "Waktu belum tersedia";
+  return new Intl.DateTimeFormat("id-ID", {
+    dateStyle: "medium", timeStyle: "short"
+  }).format(timestamp.toDate());
+}
+
+function stopRouteReplay() {
+  activeReplayRoute = null;
+  activeReplayIndex = 0;
+  updateRouteRecordingUI();
+}
+
+async function repeatSavedRoute(route) {
+  if (!currentUser || !Array.isArray(route.points) || route.points.length < 2) {
+    showRouteMessage("Rute ini tidak memiliki titik yang cukup.", "error");
+    return;
+  }
+
+  try {
+    await updateDoc(doc(db, "vendorRoutes", currentUser.uid, "routes", route.id), {
+      lastUsedAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
+
+    activeReplayRoute = {
+      id: route.id,
+      name: route.name || "Rute tersimpan",
+      points: route.points,
+    };
+    activeReplayIndex = 0;
+
+    showRouteMessage(
+      `Mode ulangi "${activeReplayRoute.name}" aktif. Aktifkan GPS dan ikuti rute yang ditampilkan.`,
+      "success"
+    );
+    updateRouteRecordingUI();
+
+    if (watchId === null) startLocationSharing();
+  } catch (error) {
+    console.error("Repeat route error:", error);
+    showRouteMessage("Rute gagal diaktifkan.", "error");
+  }
+}
+
+async function deleteSavedRoute(routeId, routeName) {
+  if (!currentUser) return;
+
+  if (!window.confirm(`Hapus perjalanan "${routeName || "ini"}"?`)) return;
+
+  try {
+    await deleteDoc(doc(db, "vendorRoutes", currentUser.uid, "routes", routeId));
+
+    if (activeReplayRoute?.id === routeId) stopRouteReplay();
+
+    showRouteMessage("Perjalanan berhasil dihapus.", "success");
+    await loadSavedRoutes();
+  } catch (error) {
+    console.error("Delete route error:", error);
+    showRouteMessage("Perjalanan gagal dihapus.", "error");
+  }
+}
+
+function renderSavedRoutes(routes) {
+  if (!routeList) return;
+  routeList.innerHTML = "";
+
+  if (routeCount) routeCount.textContent = `${routes.length} rute`;
+
+  if (routes.length === 0) {
+    const empty = document.createElement("div");
+    empty.className = "menu-empty";
+    empty.id = "routeEmpty";
+    empty.textContent = "Belum ada perjalanan tersimpan.";
+    routeList.appendChild(empty);
+    return;
+  }
+
+  routes.forEach((route) => {
+    const card = document.createElement("article");
+    card.className = "route-item";
+
+    const main = document.createElement("div");
+    main.className = "route-item-main";
+
+    const title = document.createElement("h3");
+    title.textContent = route.name || "Tanpa nama";
+
+    const meta = document.createElement("p");
+    meta.textContent =
+      `${Number(route.pointCount) || route.points?.length || 0} titik • dibuat ${formatRouteDate(route.createdAt)}`;
+    if (route.lastUsedAt) {
+      meta.textContent += ` • terakhir diulang ${formatRouteDate(route.lastUsedAt)}`;
+    }
+
+    main.appendChild(title);
+    main.appendChild(meta);
+
+    const actions = document.createElement("div");
+    actions.className = "route-actions";
+
+    const repeatButton = document.createElement("button");
+    repeatButton.type = "button";
+    repeatButton.className = "primary-button";
+    repeatButton.textContent = "🔁 Ulangi";
+    repeatButton.addEventListener("click", () => repeatSavedRoute(route));
+
+    const deleteButton = document.createElement("button");
+    deleteButton.type = "button";
+    deleteButton.className = "secondary-button";
+    deleteButton.textContent = "🗑 Hapus";
+    deleteButton.addEventListener("click", () => deleteSavedRoute(route.id, route.name));
+
+    actions.appendChild(repeatButton);
+    actions.appendChild(deleteButton);
+    card.appendChild(main);
+    card.appendChild(actions);
+    routeList.appendChild(card);
+  });
+}
+
+async function loadSavedRoutes() {
+  if (!currentUser || !routeList) return;
+
+  try {
+    const snapshot = await getDocs(getRouteCollection());
+    const routes = snapshot.docs.map((routeDoc) => ({
+      id: routeDoc.id,
+      ...routeDoc.data(),
+    })).sort(
+      (a, b) =>
+        (b.updatedAt?.toMillis?.() || b.createdAt?.toMillis?.() || 0) -
+        (a.updatedAt?.toMillis?.() || a.createdAt?.toMillis?.() || 0)
+    );
+
+    renderSavedRoutes(routes);
+  } catch (error) {
+    console.error("Load saved routes error:", error);
+    showRouteMessage("Riwayat perjalanan gagal dimuat.", "error");
+  }
+}
+
+function updateRouteReplayProgress(latitude, longitude) {
+  if (!activeReplayRoute || !Array.isArray(activeReplayRoute.points)) return;
+
+  const points = activeReplayRoute.points;
+  let bestIndex = activeReplayIndex;
+  let bestDistance = Number.POSITIVE_INFINITY;
+
+  const searchStart = Math.max(0, activeReplayIndex - 3);
+  const searchEnd = Math.min(points.length - 1, activeReplayIndex + 25);
+
+  for (let index = searchStart; index <= searchEnd; index += 1) {
+    const point = points[index];
+    const distance = calculateDistance(
+      latitude, longitude, Number(point.lat), Number(point.lng)
+    );
+
+    if (distance < bestDistance) {
+      bestDistance = distance;
+      bestIndex = index;
+    }
+  }
+
+  activeReplayIndex = Math.max(activeReplayIndex, bestIndex);
+
+  if (activeReplayIndex >= points.length - 1) {
+    showRouteMessage(`Rute "${activeReplayRoute.name}" selesai.`, "success");
+    stopRouteReplay();
+    return;
+  }
+
+  updateRouteRecordingUI();
+}
 
 /* ==================================================
    LOCATION ERROR
@@ -2985,6 +3289,8 @@ onAuthStateChanged(
       await loadVendorProfile();
 
       await loadMenus();
+
+      await loadSavedRoutes();
 
       await initializeVendorOrderNotifications();
       startOrdersListener();
