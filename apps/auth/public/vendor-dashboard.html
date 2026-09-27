@@ -46,18 +46,96 @@
       </header>
 
       <nav class="app-bottom-nav" aria-label="Navigasi utama">
-  <a href="#businessProfileSection"><span>👤</span>Profil</a>
-  <a href="#locationSection"><span>📍</span>Lokasi</a>
-  <a href="#menuSection"><span>🍽️</span>Menu</a>
-  <a href="#ordersSection"><span>📦</span>Pesanan</a>
-  <a href="#routeHistorySection"><span>🛣️</span>Rute</a>
-  <button type="button" data-quick-action="top"><span>⬆️</span>Atas</button>
+  <button type="button" class="nav-item is-active" data-nav-target="home">
+    <span class="nav-icon">⌂</span><span>Beranda</span>
+  </button>
+  <button type="button" class="nav-item" data-nav-target="location">
+    <span class="nav-icon">📍</span><span>Lokasi</span>
+  </button>
+  <button type="button" class="nav-item" data-nav-target="menu">
+    <span class="nav-icon">🍽️</span><span>Menu</span>
+  </button>
+  <button type="button" class="nav-item" data-nav-target="orders">
+    <span class="nav-icon">📦</span><span>Pesanan</span>
+    <b id="navOrderBadge" class="nav-badge" hidden>0</b>
+  </button>
+  <button type="button" class="nav-item" data-nav-target="routes">
+    <span class="nav-icon">🛣️</span><span>Rute</span>
+  </button>
+  <button type="button" class="nav-item" data-nav-target="more">
+    <span class="nav-icon">•••</span><span>Lainnya</span>
+  </button>
 </nav>
+
+<!-- =========================================
+     BERANDA MITRA
+========================================== -->
+<section id="homeSection" class="home-view" data-nav-view="home">
+  <div class="hero-card">
+    <div class="hero-copy">
+      <span class="eyebrow">MITRA PEDAGANG</span>
+      <h1>Halo, <strong id="homeBusinessName">Mitra</strong> 👋</h1>
+      <p>Kelola dagangan, lokasi, pesanan, dan rute dari satu tempat.</p>
+    </div>
+    <div id="homeOnlineBadge" class="home-status-badge offline">
+      <span class="status-dot"></span>
+      <span>Offline</span>
+    </div>
+  </div>
+
+  <div class="home-stats">
+    <button type="button" class="stat-card" data-nav-target="orders">
+      <span class="stat-icon">📦</span>
+      <span class="stat-label">Pesanan aktif</span>
+      <strong id="homeOrderCount">0</strong>
+    </button>
+    <button type="button" class="stat-card" data-nav-target="menu">
+      <span class="stat-icon">🍽️</span>
+      <span class="stat-label">Menu tersedia</span>
+      <strong id="homeMenuCount">0</strong>
+    </button>
+    <button type="button" class="stat-card" data-nav-target="routes">
+      <span class="stat-icon">🛣️</span>
+      <span class="stat-label">Rute tersimpan</span>
+      <strong id="homeRouteCount">0</strong>
+    </button>
+  </div>
+
+  <div class="home-section-heading">
+    <div>
+      <h2>Aksi Cepat</h2>
+      <p>Fitur yang paling sering digunakan Mitra.</p>
+    </div>
+  </div>
+
+  <div class="quick-action-grid">
+    <button type="button" class="quick-action-card" data-nav-target="location">
+      <span>📍</span><strong>Lokasi</strong><small>GPS & notifikasi</small>
+    </button>
+    <button type="button" class="quick-action-card" data-nav-target="menu">
+      <span>🍽️</span><strong>Menu</strong><small>Produk & stok</small>
+    </button>
+    <button type="button" class="quick-action-card" data-nav-target="orders">
+      <span>📦</span><strong>Pesanan</strong><small>Kelola order masuk</small>
+    </button>
+    <button type="button" class="quick-action-card" data-nav-target="routes">
+      <span>🛣️</span><strong>Rute</strong><small>Rekam & ulangi</small>
+    </button>
+  </div>
+
+  <div class="home-tip-card">
+    <span class="tip-icon">💡</span>
+    <div>
+      <strong>Tips Mitra</strong>
+      <p>Aktifkan lokasi saat mulai berjualan agar konsumen dapat menemukan Anda di sekitar.</p>
+    </div>
+  </div>
+</section>
 
       <!-- =========================================
            PROFIL USAHA
       ========================================== -->
-      <section id="businessProfileSection" class="card">
+      <section id="businessProfileSection" class="card nav-view" data-nav-view="more">
         <div class="section-heading">
           <div>
             <h2>Profil Usaha</h2>
@@ -180,7 +258,7 @@
       <!-- =========================================
            LOKASI MITRA
       ========================================== -->
-      <section id="locationSection" class="card">
+      <section id="locationSection" class="card nav-view" data-nav-view="location">
         <h2>Lokasi Mitra</h2>
 
         <div class="location-status">
@@ -313,7 +391,7 @@
       <!-- =========================================
            HISTORY PERJALANAN
       ========================================== -->
-      <section id="routeHistorySection" class="card route-history-card">
+      <section id="routeHistorySection" class="card route-history-card nav-view" data-nav-view="routes">
         <div class="section-heading">
           <div>
             <h2>History Perjalanan</h2>
@@ -355,7 +433,7 @@
       <!-- =========================================
            INFORMASI GPS
       ========================================== -->
-      <section id="gpsSection" class="card">
+      <section id="gpsSection" class="card nav-view gps-view" data-nav-view="location">
         <h2>Informasi GPS</h2>
 
         <div class="info">
@@ -385,7 +463,7 @@
       <!-- =========================================
      MENU & STOK
 ========================================== -->
-<section id="menuSection" class="card">
+<section id="menuSection" class="card nav-view" data-nav-view="menu">
   <div class="section-heading">
     <div>
       <h2>Menu & Stok</h2>
@@ -553,7 +631,7 @@
 
 </section>
 
-      <!-- =========================================                                                   PESANAN MASUK                                                                          ========================================== -->                                              <section id="ordersSection" class="card orders-card">                                                            <div class="section-heading">                                                                 <div>                                                                                         <h2>Pesanan Masuk</h2>                                                                      <p>                                                                                           Pesanan baru dari konsumen akan muncul otomatis.                                          </p>
+      <!-- =========================================                                                   PESANAN MASUK                                                                          ========================================== -->                                              <section id="ordersSection" class="card orders-card nav-view" data-nav-view="orders">                                                            <div class="section-heading">                                                                 <div>                                                                                         <h2>Pesanan Masuk</h2>                                                                      <p>                                                                                           Pesanan baru dari konsumen akan muncul otomatis.                                          </p>
           </div>
 
           <span
@@ -590,7 +668,7 @@
           </div>
         </div>
       </section>
-<section id="orderHistorySection" class="card order-history-card">
+<section id="orderHistorySection" class="card order-history-card nav-view" data-nav-view="orders">
   <button id="toggleOrderHistory" class="order-history-toggle" type="button" aria-expanded="false">
     <span><strong>🕘 Riwayat Pesanan</strong><small id="orderHistoryCount">0 pesanan</small></span>
     <span id="orderHistoryChevron">⌄</span>
@@ -607,7 +685,7 @@
   </footer>
 
 </main>
-<script type="module" src="vendor-dashboard.js?v=20260926-01"></script>
+<script type="module" src="vendor-dashboard.js?v=20260927-02"></script>
   
 </body>
 </html>
