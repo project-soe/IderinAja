@@ -2155,6 +2155,8 @@ function renderMenus(
   menuCount.textContent =
     `${sortedMenus.length} menu`;
 
+  updateHomeMenuCount(sortedMenus.length);
+
 
   menuList.innerHTML =
     "";
