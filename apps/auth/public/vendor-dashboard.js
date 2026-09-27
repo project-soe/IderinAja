@@ -1508,6 +1508,8 @@ async function uploadLocation(
     onlineState.textContent =
       "Online";
 
+    updateHomeLocationState(true);
+
 
     statusDot.classList.add(
       "online"
@@ -1717,6 +1719,7 @@ function renderSavedRoutes(routes) {
   routeList.innerHTML = "";
 
   if (routeCount) routeCount.textContent = `${routes.length} rute`;
+  updateHomeRouteCount(routes.length);
 
   if (routes.length === 0) {
     const empty = document.createElement("div");
@@ -2036,6 +2039,8 @@ async function stopLocationSharing() {
 
   onlineState.textContent =
     "Offline";
+
+  updateHomeLocationState(false);
 
 
   locationStatus.textContent =
@@ -2829,6 +2834,7 @@ function renderOrders(orders) {
 
   ordersList.innerHTML = "";
   if (orderCount) orderCount.textContent = activeOrders.length + " aktif";
+  updateHomeOrderCount(activeOrders.length);
 
   if (activeOrders.length === 0) {
     const empty = document.createElement("div");
@@ -3288,6 +3294,8 @@ onAuthStateChanged(
 
       await loadVendorProfile();
 
+      updateHomeBusinessName();
+
       await loadMenus();
 
       await loadSavedRoutes();
@@ -3460,3 +3468,107 @@ document.addEventListener("click", (event) => {
     chevron.textContent = willOpen ? "⌃" : "⌄";
   }
 });
+
+
+/* ==================================================
+   APP NAVIGATION — SINGLE VIEW UX
+================================================== */
+
+const appNavItems = Array.from(
+  document.querySelectorAll("[data-nav-target]")
+);
+
+const appNavViews = Array.from(
+  document.querySelectorAll("[data-nav-view]")
+);
+
+function setVendorAppView(viewName, updateHash = true) {
+  const validViews = new Set(
+    ["home", "location", "menu", "orders", "routes", "more"]
+  );
+
+  const view = validViews.has(viewName) ? viewName : "home";
+
+  appNavViews.forEach((section) => {
+    const active = section.dataset.navView === view;
+    section.classList.toggle("is-active", active);
+    section.setAttribute("aria-hidden", String(!active));
+  });
+
+  const home = document.getElementById("homeSection");
+  if (home) {
+    home.classList.toggle("is-hidden", view !== "home");
+    home.setAttribute("aria-hidden", String(view !== "home"));
+  }
+
+  appNavItems.forEach((item) => {
+    const active = item.dataset.navTarget === view;
+    item.classList.toggle("is-active", active);
+    if (active) {
+      item.setAttribute("aria-current", "page");
+    } else {
+      item.removeAttribute("aria-current");
+    }
+  });
+
+  if (updateHash && history.replaceState) {
+    history.replaceState(null, "", "#" + view);
+  }
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+appNavItems.forEach((item) => {
+  item.addEventListener("click", () => {
+    setVendorAppView(item.dataset.navTarget);
+  });
+});
+
+const initialView =
+  window.location.hash
+    ? window.location.hash.replace("#", "")
+    : "home";
+
+setVendorAppView(initialView, false);
+
+/* Keep dashboard home counters synchronized with existing modules. */
+function updateHomeBusinessName() {
+  const target = document.getElementById("homeBusinessName");
+  if (target && businessNameInput) {
+    target.textContent = businessNameInput.value.trim() || "Mitra";
+  }
+}
+
+function updateHomeLocationState(isOnline) {
+  const badge = document.getElementById("homeOnlineBadge");
+  if (!badge) return;
+
+  badge.classList.toggle("online", isOnline === true);
+  badge.classList.toggle("offline", isOnline !== true);
+
+  const dot = badge.querySelector(".status-dot");
+  const label = badge.querySelector("span:last-child");
+
+  if (dot) dot.classList.toggle("online", isOnline === true);
+  if (label) label.textContent = isOnline === true ? "Online" : "Offline";
+}
+
+function updateHomeOrderCount(count) {
+  const home = document.getElementById("homeOrderCount");
+  const badge = document.getElementById("navOrderBadge");
+  if (home) home.textContent = String(count);
+  if (badge) {
+    badge.textContent = String(count);
+    badge.hidden = count <= 0;
+  }
+}
+
+function updateHomeMenuCount(count) {
+  const home = document.getElementById("homeMenuCount");
+  if (home) home.textContent = String(count);
+}
+
+function updateHomeRouteCount(count) {
+  const home = document.getElementById("homeRouteCount");
+  if (home) home.textContent = String(count);
+}
