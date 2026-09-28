@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <!-- =====================================================
+         BASIC DOCUMENT CONFIGURATION
+         ===================================================== -->
+
+    <meta charset="UTF-8">
+
+    <!-- Responsive viewport untuk perangkat mobile -->
+    <meta
+        name="viewport"
+        content="width=device-width,
+                 initial-scale=1.0,
+                 viewport-fit=cover"
+    >
+
+    <!-- Warna browser/mobile UI -->
+    <meta name="theme-color" content="#081A24">
+
+    <!-- SEO dasar -->
+    <meta
+        name="description"
+        content="IderinAja — Temukan, pesan, dan dukung pedagang keliling di sekitarmu."
+    >
+
+    <meta
+        name="application-name"
+        content="IderinAja"
+    >
+
+    <title>IderinAja — Pedagang Keliling</title>
+
+
+    <!-- =====================================================
+         GOOGLE FONTS
+         =====================================================
+
+         Plus Jakarta Sans:
+         Font utama untuk interface.
+
+         Manrope:
+         Font pendamping/fallback.
+    ====================================================== -->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+
+    <!-- =====================================================
+         APPLICATION CSS
+         ====================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+    <link rel="stylesheet" href="lmgj-logo.css"
+    >
+</head>
+
+
+<body>
+
+    <!-- =====================================================
+         SPLASH SCREEN
+         ====================================================== -->
+
+    <main
+        class="splash-screen"
+        id="splashScreen"
+        aria-label="IderinAja Splash Screen"
+    >
+
+
+        <!-- =================================================
+             BACKGROUND IMAGE
+             ================================================== -->
+
+        <div
+            class="splash-background"
+            aria-hidden="true"
+        ></div>
+
+
+        <!-- =================================================
+             DARK OVERLAY
+
+             Digunakan untuk meningkatkan keterbacaan teks
+             di atas foto.
+             ================================================== -->
+
+        <div
+            class="splash-overlay"
+            aria-hidden="true"
+        ></div>
+
+
+        <!-- =================================================
+             AMBIENT LIGHT EFFECT
+
+             Cahaya lembut yang bergerak perlahan.
+             ================================================== -->
+
+        <div
+            class="ambient-light ambient-light--one"
+            aria-hidden="true"
+        ></div>
+
+        <div class="ambient-light ambient-light--two"
+            aria-hidden="true"
+        ></div>
+
+
+        <!-- =================================================
+             MOBILE STATUS BAR
+             ================================================== -->
+
+        <header class="status-bar">
+
+            <!-- Jam -->
+            <time
+                id="currentTime"
+                class="status-time"
+            >
+                09:41
+            </time>
+
+
+            <!-- Status icons -->
+          <div
+                class="status-icons"
+                aria-hidden="true"
+            >
+
+                <span class="signal-icon"></span>
+
+                <span class="wifi-icon"></span>
+
+                <span class="battery-icon">
+                    <span class="battery-level"></span>
+                </span>
+
+            </div>
+
+        </header>
+
+
+        <!-- =================================================
+             SKIP BUTTON
+
+             Pada prototype ini hanya mengirim event navigasi.
+             Nanti dapat dihubungkan ke halaman Auth.
+             ================================================== -->
+
+        <button
+            type="button"
+            class="skip-button"
+            id="skipButton"
+            aria-label="Lewati halaman pembuka"
+        >
+            Lewati
+        </button>
+
+        <!-- =================================================
+             BRAND AREA
+             ================================================== -->
+
+        <section
+            class="brand-section"
+            aria-label="Brand IderinAja"
+        >
+
+            <!-- Logo -->
+            <div class="brand-logo platform-splash-mark" aria-label="Logo IderinAja">
+   <span>Iderin<strong>Aja</strong></span>
+ </div>
+
+
+            <!-- Brand name -->
+            <h1 class="brand-name">
+                Iderin<span>Aja</span>
+            </h1>
+
+
+            <!-- Tagline -->
+            <p class="brand-tagline">
+                Temukan
+                <strong>•</strong>
+                Pesan
+                <strong>•</strong>
+                Dukung
+                <br>
+                Pedagang Keliling di Sekitarmu
+            </p>
+
+        </section>
+        <footer class="splash-company-footer" aria-label="Perusahaan pengelola platform">
+            <img src="assets/lmgj-logo.svg" alt="Logo LMGJ" width="58" height="42">
+            <span>LMGJ</span>
+        </footer>
+
+
+        <!-- =================================================
+             HERO MESSAGE
+             ================================================== -->
+
+        <section
+            class="hero-section"
+            aria-label="Pesan utama"
+        >
+
+            <!-- Eyebrow -->
+            <p class="hero-eyebrow">
+                PLATFORM PEDAGANG KELILING
+            </p>
+
+
+            <!-- Headline -->
+            <h2 class="hero-title">
+
+                Pedagang Keliling
+
+                <span>
+                    Lebih Mudah,
+                    <br>
+                    Lebih Dekat!
+                </span>
+
+            </h2>
+
+        </section>
+
+
+        <!-- =================================================
+             PAGE INDICATOR
+             ================================================== -->
+	     <nav
+            class="page-indicator"
+            aria-label="Navigasi onboarding"
+        >
+
+            <button
+                type="button"
+                class="page-dot page-dot--active"
+                data-page="0"
+                aria-label="Halaman 1"
+            ></button>
+
+            <button
+                type="button"
+                class="page-dot"
+                data-page="1"
+                aria-label="Halaman 2"
+            ></button>
+
+            <button
+                type="button"
+                class="page-dot"
+                data-page="2"
+                aria-label="Halaman 3"
+            ></button>
+
+        </nav>
+
+
+        <!-- =================================================
+             SWIPE HINT
+             ================================================== -->
+
+        <div
+            class="swipe-hint"
+            id="swipeHint"
+            aria-hidden="true"
+        >
+
+            <span>
+                Geser untuk melanjutkan
+            </span>
+
+            <span class="swipe-arrow">
+                →
+            </span>
+
+        </div>
+
+    </main>
+
+
+    <!-- =====================================================
+         APPLICATION JAVASCRIPT
+         ====================================================== -->
+
+    <script
+        src="script.js"
+        defer
+    ></script>
+
+</body>
+
+</html>
