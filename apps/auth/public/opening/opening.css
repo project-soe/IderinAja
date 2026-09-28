@@ -1,0 +1,207 @@
+/* ============================================================
+   IDERINAJA — AUTH OPENING
+   SVG INTRO / BOOT SCREEN
+
+   Architecture:
+   - Dedicated opening module
+   - No CSS framework
+   - No runtime font dependency
+   - Motion respects prefers-reduced-motion
+   ============================================================ */
+
+:root {
+  --opening-bg: #09090b;
+  --opening-text: #f3f4f6;
+  --opening-muted: rgba(253, 230, 138, 0.62);
+  --opening-glow: rgba(194, 142, 88, 0.12);
+  --opening-stroke-start: #3a2211;
+  --opening-stroke-mid: #794824;
+  --opening-stroke-end: #c28e58;
+  --opening-stroke-highlight: #e5be9d;
+  --opening-duration: 3.2s;
+  --opening-ease: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  min-height: 100svh;
+  overflow: hidden;
+  background: var(--opening-bg);
+  color: var(--opening-text);
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+.opening-screen {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  min-height: 100svh;
+  place-items: center;
+  overflow: hidden;
+  padding:
+    max(1.5rem, env(safe-area-inset-top))
+    1.25rem
+    max(1.5rem, env(safe-area-inset-bottom));
+  background: var(--opening-bg);
+}
+
+.opening-glow {
+  position: absolute;
+  z-index: -1;
+  top: 50%;
+  left: 50%;
+  width: min(500px, 90vw);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: var(--opening-glow);
+  filter: blur(120px);
+  pointer-events: none;
+}
+
+.opening-content {
+  width: min(100%, 620px);
+  text-align: center;
+}
+
+.opening-logo {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 264px;
+  overflow: visible;
+  filter: drop-shadow(0 0 30px rgba(194, 142, 88, 0.5));
+}
+
+.opening-logo__path {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation:
+    opening-draw
+    var(--opening-duration)
+    var(--opening-ease)
+    forwards;
+}
+
+.opening-logo__path--01 { animation-delay: 100ms; }
+.opening-logo__path--02 { animation-delay: 700ms; }
+.opening-logo__path--03 { animation-delay: 1200ms; }
+.opening-logo__path--04 { animation-delay: 1700ms; }
+.opening-logo__path--05 { animation-delay: 2300ms; }
+.opening-logo__path--06 { animation-delay: 2800ms; }
+.opening-logo__path--07 { animation-delay: 3000ms; }
+
+.opening-status {
+  margin: 2rem 0 0;
+  color: var(--opening-muted);
+  font-size: clamp(0.7rem, 2.4vw, 0.875rem);
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  animation: opening-status-pulse 1.8s ease-in-out infinite;
+}
+
+.opening-skip {
+  position: fixed;
+  top: max(1rem, env(safe-area-inset-top));
+  right: 1rem;
+  z-index: 10;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  padding: 0.55rem 0.8rem;
+  background: rgba(9, 9, 11, 0.56);
+  color: rgba(255, 255, 255, 0.72);
+  font: inherit;
+  font-size: 0.72rem;
+  cursor: pointer;
+  opacity: 0;
+  transition:
+    opacity 220ms ease,
+    background 220ms ease,
+    border-color 220ms ease;
+}
+
+.opening-screen[data-ready="true"] .opening-skip {
+  opacity: 1;
+}
+
+.opening-skip:hover,
+.opening-skip:focus-visible {
+  background: rgba(194, 142, 88, 0.12);
+  border-color: rgba(194, 142, 88, 0.45);
+  outline: none;
+}
+
+.opening-screen.is-exiting {
+  animation: opening-exit 420ms ease forwards;
+}
+
+@keyframes opening-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes opening-status-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes opening-exit {
+  to {
+    opacity: 0;
+    transform: scale(1.015);
+  }
+}
+
+@media (max-width: 480px) {
+  .opening-logo {
+    max-height: 220px;
+  }
+
+  .opening-status {
+    margin-top: 1.5rem;
+    letter-spacing: 0.22em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .opening-logo__path {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+
+  .opening-status {
+    animation: none;
+  }
+
+  .opening-screen.is-exiting {
+    animation-duration: 120ms;
+  }
+}
