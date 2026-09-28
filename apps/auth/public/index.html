@@ -1,313 +1,141 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
-    <!-- =====================================================
-         BASIC DOCUMENT CONFIGURATION
-         ===================================================== -->
+  <!-- =========================================================
+       IDERINAJA — AUTH OPENING
+       Dedicated SVG intro / boot screen.
+       ========================================================= -->
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  >
+  <meta name="theme-color" content="#09090b">
+  <meta
+    name="description"
+    content="IderinAja — Pedagang Keliling"
+  >
 
-    <meta charset="UTF-8">
+  <title>IderinAja — Memuat</title>
 
-    <!-- Responsive viewport untuk perangkat mobile -->
-    <meta
-        name="viewport"
-        content="width=device-width,
-                 initial-scale=1.0,
-                 viewport-fit=cover"
-    >
-
-    <!-- Warna browser/mobile UI -->
-    <meta name="theme-color" content="#081A24">
-
-    <!-- SEO dasar -->
-    <meta
-        name="description"
-        content="IderinAja — Temukan, pesan, dan dukung pedagang keliling di sekitarmu."
-    >
-
-    <meta
-        name="application-name"
-        content="IderinAja"
-    >
-
-    <title>IderinAja — Pedagang Keliling</title>
-
-
-    <!-- =====================================================
-         GOOGLE FONTS
-         =====================================================
-
-         Plus Jakarta Sans:
-         Font utama untuk interface.
-
-         Manrope:
-         Font pendamping/fallback.
-    ====================================================== -->
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-
-    <link
-        rel="preconnect"
-        href="https://fonts.gstatic.com"
-        crossorigin
-    >
-
-    <link
-        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet"
-    >
-
-
-    <!-- =====================================================
-         APPLICATION CSS
-         ====================================================== -->
-
-    <link
-        rel="stylesheet"
-        href="style.css"
-    >
-
-    <link rel="stylesheet" href="lmgj-logo.css"
-    >
+  <link rel="stylesheet" href="opening/opening.css">
 </head>
 
-
 <body>
+  <main
+    id="openingScreen"
+    class="opening-screen"
+    aria-label="Membuka IderinAja"
+  >
+    <div class="opening-glow" aria-hidden="true"></div>
 
-    <!-- =====================================================
-         SPLASH SCREEN
-         ====================================================== -->
+    <div class="opening-content">
+      <svg
+        class="opening-logo"
+        viewBox="0 0 520 220"
+        role="img"
+        aria-label="Logo IderinAja"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <defs>
+          <linearGradient
+            id="iderinAjaOpeningGradient"
+            x1="0%"
+            y1="0%"
+            x2="100%"
+            y2="100%"
+          >
+            <stop offset="0%" stop-color="#3A2211" />
+            <stop offset="35%" stop-color="#794824" />
+            <stop offset="70%" stop-color="#C28E58" />
+            <stop offset="100%" stop-color="#E5BE9D" />
+          </linearGradient>
 
-    <main
-        class="splash-screen"
-        id="splashScreen"
-        aria-label="IderinAja Splash Screen"
+          <linearGradient
+            id="iderinAjaOpeningHighlight"
+            x1="0%"
+            y1="0%"
+            x2="0%"
+            y2="100%"
+          >
+            <stop offset="0%" stop-color="#FCEADE" stop-opacity="0.9" />
+            <stop offset="100%" stop-color="#B07D4F" stop-opacity="0.3" />
+          </linearGradient>
+        </defs>
+
+        <g
+          fill="none"
+          stroke="url(#iderinAjaOpeningGradient)"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path
+            class="opening-logo__path opening-logo__path--01"
+            d="M 45 40 L 45 155 C 45 170, 55 180, 75 180 L 95 180 C 110 180, 120 170, 120 155 L 120 90"
+            stroke-width="14"
+          />
+          <path
+            class="opening-logo__path opening-logo__path--02"
+            d="M 95 90 L 140 160 L 185 85 L 225 155"
+            stroke-width="14"
+          />
+          <path
+            class="opening-logo__path opening-logo__path--03"
+            d="M 95 90 L 140 160 L 185 85 L 225 155"
+            stroke="url(#iderinAjaOpeningHighlight)"
+            stroke-width="6"
+          />
+          <path
+            class="opening-logo__path opening-logo__path--04"
+            d="M 225 155 C 240 180, 260 185, 280 165 C 300 145, 290 100, 265 85 C 240 70, 215 95, 235 125 C 255 155, 305 160, 345 135"
+            stroke-width="14"
+          />
+          <path
+            class="opening-logo__path opening-logo__path--05"
+            d="M 330 60 C 370 30, 420 50, 420 95 L 420 185 C 420 205, 395 215, 375 195 C 360 180, 365 165, 385 155"
+            stroke-width="14"
+          />
+          <path
+            class="opening-logo__path opening-logo__path--06"
+            d="M 45 40 L 45 155"
+            stroke="url(#iderinAjaOpeningHighlight)"
+            stroke-width="5"
+          />
+          <path
+            class="opening-logo__path opening-logo__path--07"
+            d="M 390 95 L 390 175"
+            stroke="url(#iderinAjaOpeningHighlight)"
+            stroke-width="5"
+          />
+        </g>
+      </svg>
+
+      <p
+        class="opening-status"
+        role="status"
+        aria-live="polite"
+      >
+        Memuat Pengalaman...
+      </p>
+    </div>
+
+    <button
+      id="openingSkip"
+      class="opening-skip"
+      type="button"
+      aria-label="Lewati intro IderinAja"
     >
+      Lewati
+    </button>
 
+    <noscript>
+      <p>
+        JavaScript diperlukan untuk melanjutkan.
+        <a href="account-type.html">Buka IderinAja</a>
+      </p>
+    </noscript>
+  </main>
 
-        <!-- =================================================
-             BACKGROUND IMAGE
-             ================================================== -->
-
-        <div
-            class="splash-background"
-            aria-hidden="true"
-        ></div>
-
-
-        <!-- =================================================
-             DARK OVERLAY
-
-             Digunakan untuk meningkatkan keterbacaan teks
-             di atas foto.
-             ================================================== -->
-
-        <div
-            class="splash-overlay"
-            aria-hidden="true"
-        ></div>
-
-
-        <!-- =================================================
-             AMBIENT LIGHT EFFECT
-
-             Cahaya lembut yang bergerak perlahan.
-             ================================================== -->
-
-        <div
-            class="ambient-light ambient-light--one"
-            aria-hidden="true"
-        ></div>
-
-        <div class="ambient-light ambient-light--two"
-            aria-hidden="true"
-        ></div>
-
-
-        <!-- =================================================
-             MOBILE STATUS BAR
-             ================================================== -->
-
-        <header class="status-bar">
-
-            <!-- Jam -->
-            <time
-                id="currentTime"
-                class="status-time"
-            >
-                09:41
-            </time>
-
-
-            <!-- Status icons -->
-          <div
-                class="status-icons"
-                aria-hidden="true"
-            >
-
-                <span class="signal-icon"></span>
-
-                <span class="wifi-icon"></span>
-
-                <span class="battery-icon">
-                    <span class="battery-level"></span>
-                </span>
-
-            </div>
-
-        </header>
-
-
-        <!-- =================================================
-             SKIP BUTTON
-
-             Pada prototype ini hanya mengirim event navigasi.
-             Nanti dapat dihubungkan ke halaman Auth.
-             ================================================== -->
-
-        <button
-            type="button"
-            class="skip-button"
-            id="skipButton"
-            aria-label="Lewati halaman pembuka"
-        >
-            Lewati
-        </button>
-
-        <!-- =================================================
-             BRAND AREA
-             ================================================== -->
-
-        <section
-            class="brand-section"
-            aria-label="Brand IderinAja"
-        >
-
-            <!-- Logo -->
-            <div class="brand-logo platform-splash-mark" aria-label="Logo IderinAja">
-   <span>Iderin<strong>Aja</strong></span>
- </div>
-
-
-            <!-- Brand name -->
-            <h1 class="brand-name">
-                Iderin<span>Aja</span>
-            </h1>
-
-
-            <!-- Tagline -->
-            <p class="brand-tagline">
-                Temukan
-                <strong>•</strong>
-                Pesan
-                <strong>•</strong>
-                Dukung
-                <br>
-                Pedagang Keliling di Sekitarmu
-            </p>
-
-        </section>
-        <footer class="splash-company-footer" aria-label="Perusahaan pengelola platform">
-            <img src="assets/lmgj-logo.svg" alt="Logo LMGJ" width="58" height="42">
-            <span>LMGJ</span>
-        </footer>
-
-
-        <!-- =================================================
-             HERO MESSAGE
-             ================================================== -->
-
-        <section
-            class="hero-section"
-            aria-label="Pesan utama"
-        >
-
-            <!-- Eyebrow -->
-            <p class="hero-eyebrow">
-                PLATFORM PEDAGANG KELILING
-            </p>
-
-
-            <!-- Headline -->
-            <h2 class="hero-title">
-
-                Pedagang Keliling
-
-                <span>
-                    Lebih Mudah,
-                    <br>
-                    Lebih Dekat!
-                </span>
-
-            </h2>
-
-        </section>
-
-
-        <!-- =================================================
-             PAGE INDICATOR
-             ================================================== -->
-	     <nav
-            class="page-indicator"
-            aria-label="Navigasi onboarding"
-        >
-
-            <button
-                type="button"
-                class="page-dot page-dot--active"
-                data-page="0"
-                aria-label="Halaman 1"
-            ></button>
-
-            <button
-                type="button"
-                class="page-dot"
-                data-page="1"
-                aria-label="Halaman 2"
-            ></button>
-
-            <button
-                type="button"
-                class="page-dot"
-                data-page="2"
-                aria-label="Halaman 3"
-            ></button>
-
-        </nav>
-
-
-        <!-- =================================================
-             SWIPE HINT
-             ================================================== -->
-
-        <div
-            class="swipe-hint"
-            id="swipeHint"
-            aria-hidden="true"
-        >
-
-            <span>
-                Geser untuk melanjutkan
-            </span>
-
-            <span class="swipe-arrow">
-                →
-            </span>
-
-        </div>
-
-    </main>
-
-
-    <!-- =====================================================
-         APPLICATION JAVASCRIPT
-         ====================================================== -->
-
-    <script
-        src="script.js"
-        defer
-    ></script>
-
+  <script src="opening/opening.js" defer></script>
 </body>
-
 </html>
