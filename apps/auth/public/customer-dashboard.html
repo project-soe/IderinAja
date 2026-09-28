@@ -2151,6 +2151,165 @@
  .app-bottom-nav{grid-template-columns:repeat(5,1fr)}
 }
 
+    /* =========================================================
+       CUSTOMER APP SHELL
+       ========================================================= */
+    .customer-home-screen{
+      display:grid;
+      gap:14px;
+      margin-bottom:16px;
+    }
+    .customer-welcome{
+      position:relative;
+      overflow:hidden;
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:18px;
+      min-height:190px;
+      padding:22px;
+      border:1px solid rgba(255,194,26,.16);
+      border-radius:24px;
+      background:
+        radial-gradient(circle at 88% 10%,rgba(255,194,26,.14),transparent 35%),
+        linear-gradient(145deg,rgba(14,43,56,.98),rgba(7,21,29,.98));
+      box-shadow:0 16px 40px rgba(0,0,0,.18);
+    }
+    .customer-welcome::after{
+      content:"";
+      position:absolute;
+      width:170px;height:170px;
+      right:-70px;bottom:-90px;
+      border-radius:50%;
+      border:1px solid rgba(255,194,26,.18);
+      box-shadow:0 0 0 22px rgba(255,194,26,.035),0 0 0 44px rgba(255,194,26,.02);
+      pointer-events:none;
+    }
+    .customer-eyebrow{
+      color:var(--yellow);
+      font-size:10px;
+      font-weight:900;
+      letter-spacing:.14em;
+    }
+    .customer-welcome h1{
+      max-width:520px;
+      margin:8px 0 7px;
+      font-size:clamp(25px,6vw,38px);
+      line-height:1.04;
+      letter-spacing:-.8px;
+    }
+    .customer-welcome p{
+      max-width:560px;
+      margin:0;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.55;
+    }
+    .customer-location-pill{
+      flex:0 0 auto;
+      align-self:flex-start;
+      padding:8px 11px;
+      border:1px solid rgba(40,199,111,.2);
+      border-radius:999px;
+      background:rgba(40,199,111,.07);
+      color:var(--green);
+      font-size:10px;
+      font-weight:800;
+      white-space:nowrap;
+    }
+    .customer-stat-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:10px;
+    }
+    .customer-stat-card{
+      min-width:0;
+      padding:15px;
+      border:1px solid var(--border);
+      border-radius:18px;
+      background:rgba(255,255,255,.035);
+      box-shadow:0 8px 24px rgba(0,0,0,.08);
+    }
+    .customer-stat-icon{
+      display:grid;
+      place-items:center;
+      width:31px;height:31px;
+      margin-bottom:12px;
+      border-radius:10px;
+      background:rgba(255,194,26,.09);
+      color:var(--yellow);
+      font-size:15px;
+    }
+    .customer-stat-card strong{
+      display:block;
+      color:var(--white);
+      font-size:20px;
+      line-height:1;
+    }
+    .customer-stat-card small{
+      display:block;
+      margin-top:5px;
+      color:var(--muted);
+      font-size:10px;
+      font-weight:700;
+    }
+    .customer-home-actions{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:9px;
+    }
+    .customer-home-actions button{
+      min-height:78px;
+      padding:12px 10px;
+      text-align:left;
+      border:1px solid var(--border);
+      border-radius:17px;
+      background:rgba(255,255,255,.035);
+      color:var(--white);
+      transition:transform .15s ease,background .2s ease,border-color .2s ease;
+    }
+    .customer-home-actions button:hover{
+      transform:translateY(-1px);
+      background:rgba(255,194,26,.07);
+      border-color:rgba(255,194,26,.2);
+    }
+    .customer-home-actions button span{
+      display:block;
+      margin-bottom:8px;
+      color:var(--yellow);
+      font-size:18px;
+    }
+    .customer-home-actions button b{
+      display:block;
+      font-size:11px;
+    }
+    .customer-home-actions button small{
+      display:block;
+      margin-top:3px;
+      color:var(--muted);
+      font-size:9px;
+    }
+    .customer-screen-section{scroll-margin-top:82px}
+    .customer-screen-section.is-hidden{display:none!important}
+    .app-bottom-nav button.active{
+      background:rgba(255,194,26,.12);
+      color:var(--yellow);
+    }
+    @media(max-width:600px){
+      .customer-welcome{
+        min-height:175px;
+        padding:18px;
+        display:block;
+      }
+      .customer-location-pill{display:inline-flex;margin-top:15px}
+      .customer-stat-card{padding:13px}
+      .customer-home-actions{grid-template-columns:repeat(2,1fr)}
+    }
+    @media(min-width:801px){
+      .customer-home-screen{gap:16px}
+      .customer-welcome{min-height:205px}
+    }
+
     /* COMPANY FOOTER */
     .company-footer{
       display:flex;
@@ -2220,19 +2379,55 @@
     </header>
 
     <nav class="app-bottom-nav" aria-label="Navigasi utama">
-  <button type="button" data-app-nav="orders"><span>📦</span>Pesanan</button>
-  <button type="button" data-app-nav="search"><span>🔎</span>Cari</button>
-  <button type="button" data-app-nav="vendors"><span>🛍️</span>Mitra</button>
-  <button type="button" data-app-nav="map"><span>📍</span>Peta</button>
+  <button type="button" data-app-nav="home" class="active"><span>⌂</span>Beranda</button>
+  <button type="button" data-app-nav="search"><span>⌕</span>Cari</button>
+  <button type="button" data-app-nav="vendors"><span>▣</span>Mitra</button>
+  <button type="button" data-app-nav="map"><span>⌖</span>Peta</button>
   <button type="button" data-app-nav="cart"><span>🛒</span>Keranjang</button>
 </nav>
+
+<section class="customer-home-screen" data-customer-screen="home" aria-labelledby="customerHomeTitle">
+  <div class="customer-welcome">
+    <div>
+      <span class="customer-eyebrow">IDERINAJA • KONSUMEN</span>
+      <h1 id="customerHomeTitle">Temukan pedagang di dekatmu.</h1>
+      <p>Pesan lebih mudah, lihat mitra terdekat, dan pantau pesananmu dari satu tempat.</p>
+    </div>
+    <div class="customer-location-pill" id="customerHomeLocation">● Menyiapkan lokasi</div>
+  </div>
+
+  <div class="customer-stat-grid" aria-label="Ringkasan">
+    <article class="customer-stat-card">
+      <span class="customer-stat-icon">▣</span>
+      <strong id="customerHomeVendorCount">0</strong>
+      <small>Mitra tersedia</small>
+    </article>
+    <article class="customer-stat-card">
+      <span class="customer-stat-icon">⌖</span>
+      <strong id="customerHomeLocationStatus">—</strong>
+      <small>Status lokasi</small>
+    </article>
+    <article class="customer-stat-card">
+      <span class="customer-stat-icon">🛒</span>
+      <strong id="customerHomeCartCount">0</strong>
+      <small>Item keranjang</small>
+    </article>
+  </div>
+
+  <div class="customer-home-actions">
+    <button type="button" data-app-nav="search"><span>⌕</span><b>Cari pedagang</b><small>Nama atau kategori</small></button>
+    <button type="button" data-app-nav="vendors"><span>▣</span><b>Lihat mitra</b><small>Pedagang terdekat</small></button>
+    <button type="button" data-app-nav="map"><span>⌖</span><b>Buka peta</b><small>Lihat posisi mitra</small></button>
+    <button type="button" data-app-nav="orders"><span>📦</span><b>Pesanan saya</b><small>Lihat status pesanan</small></button>
+  </div>
+</section>
 
     
     <!-- =========================================
          SEARCH PEDAGANG
     ========================================== -->
 
-    <section id="searchVendorSection" class="card">
+    <section id="searchVendorSection" class="card customer-screen-section" data-customer-screen="search">
 
       <h2>
         🔎 Cari Pedagang
@@ -2302,7 +2497,7 @@
          PEDAGANG
     ========================================== -->
 
-    <section id="vendorListSection" class="card">
+    <section id="vendorListSection" class="card customer-screen-section" data-customer-screen="vendors">
 
       <h2>
         Mitra
@@ -2322,7 +2517,7 @@
          MAP
     ========================================== -->
 
-    <section id="nearbyMapSection" class="card">
+    <section id="nearbyMapSection" class="card customer-screen-section" data-customer-screen="map">
 
       <h2>
         📍 Pedagang di Sekitar Anda
@@ -2865,14 +3060,110 @@
 
 
 <script>
-document.addEventListener("click",(event)=>{
- const action=event.target.closest("[data-app-nav]")?.dataset.appNav;
- if(!action)return;
- if(action==="orders"){window.location.href="customer-orders.html";return;}
- if(action==="cart"){document.getElementById("openCartButton")?.click();return;}
- const targets={search:"#searchVendorSection",vendors:"#vendorListSection",map:"#nearbyMapSection"};
- document.querySelector(targets[action])?.scrollIntoView({behavior:"smooth",block:"start"});
-});
+(() => {
+  const navButtons = [...document.querySelectorAll("[data-app-nav]")];
+  const screens = [...document.querySelectorAll("[data-customer-screen]")];
+  const homeLocation = document.getElementById("customerHomeLocation");
+  const homeLocationStatus = document.getElementById("customerHomeLocationStatus");
+  const homeVendorCount = document.getElementById("customerHomeVendorCount");
+  const homeCartCount = document.getElementById("customerHomeCartCount");
+  const vendorList = document.getElementById("vendorList");
+  const cartSummary = document.getElementById("cartBarSummary");
+
+  const screenLabels = {
+    home: "Beranda",
+    search: "Cari",
+    vendors: "Mitra",
+    map: "Peta"
+  };
+
+  function setActiveScreen(screen) {
+    const target = screenLabels[screen] ? screen : "home";
+
+    screens.forEach((element) => {
+      element.classList.toggle(
+        "is-hidden",
+        element.dataset.customerScreen !== target
+      );
+    });
+
+    navButtons.forEach((button) => {
+      button.classList.toggle(
+        "active",
+        button.dataset.appNav === target
+      );
+    });
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+
+    if (target === "map" && window.__iderinajaRefreshMap) {
+      window.setTimeout(window.__iderinajaRefreshMap, 120);
+    }
+  }
+
+  function syncHomeStats() {
+    if (vendorList && homeVendorCount) {
+      const count = [...vendorList.children].filter(
+        (item) => !item.classList.contains("empty")
+      ).length;
+      homeVendorCount.textContent = String(count);
+    }
+
+    if (cartSummary && homeCartCount) {
+      const match = cartSummary.textContent.match(/\d+/);
+      homeCartCount.textContent = match ? match[0] : "0";
+    }
+
+    if (homeLocationStatus && homeLocation) {
+      const online = homeLocation.classList.contains("online");
+      homeLocationStatus.textContent = online ? "Aktif" : "Siap";
+      homeLocation.style.color = online ? "var(--green)" : "var(--muted)";
+      homeLocation.style.borderColor = online
+        ? "rgba(40,199,111,.2)"
+        : "var(--border)";
+      homeLocation.style.background = online
+        ? "rgba(40,199,111,.07)"
+        : "rgba(255,255,255,.04)";
+    }
+  }
+
+  document.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-app-nav]");
+    if (!button) return;
+
+    const action = button.dataset.appNav;
+
+    if (action === "orders") {
+      window.location.href = "customer-orders.html";
+      return;
+    }
+
+    if (action === "cart") {
+      document.getElementById("openCartButton")?.click();
+      return;
+    }
+
+    setActiveScreen(action);
+  });
+
+  if (vendorList) {
+    new MutationObserver(syncHomeStats).observe(vendorList, {
+      childList: true,
+      subtree: true
+    });
+  }
+
+  if (cartSummary) {
+    new MutationObserver(syncHomeStats).observe(cartSummary, {
+      childList: true,
+      characterData: true,
+      subtree: true
+    });
+  }
+
+  setActiveScreen("home");
+  syncHomeStats();
+})();
 </script>
 
 </body>
