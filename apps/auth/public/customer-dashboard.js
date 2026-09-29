@@ -188,6 +188,71 @@ let vendorNotificationEnabledById = new Map();
 let stopCustomerOrdersListener = null;
 
 /* ==================================================
+   CUSTOMER HOME SUMMARY
+================================================== */
+
+function syncCustomerHomeStats() {
+  const vendorCountElement =
+    document.getElementById("customerHomeVendorCount");
+
+  const locationStatusElement =
+    document.getElementById("customerHomeLocationStatus");
+
+  const cartCountElement =
+    document.getElementById("customerHomeCartCount");
+
+  const locationPill =
+    document.getElementById("customerHomeLocation");
+
+  if (vendorCountElement) {
+    vendorCountElement.textContent =
+      String(allVendors.length);
+  }
+
+  if (locationStatusElement) {
+    locationStatusElement.textContent =
+      customerPosition ? "Aktif" : "—";
+  }
+
+  if (cartCountElement) {
+    cartCountElement.textContent =
+      String(getCartItemCount());
+  }
+
+  if (locationPill) {
+    locationPill.textContent =
+      customerPosition
+        ? "● Lokasi aktif"
+        : "● Menyiapkan lokasi";
+  }
+}
+
+window.__iderinAjaGetCustomerHomeState = () => {
+  const onlineVendorCount =
+    allVendors.filter(
+      (vendor) =>
+        vendor.isOnline === true &&
+        typeof vendor.latitude === "number" &&
+        typeof vendor.longitude === "number"
+    ).length;
+
+  return {
+    vendorCount: allVendors.length,
+    onlineVendorCount,
+    location: customerPosition
+      ? {
+          latitude: customerPosition.latitude,
+          longitude: customerPosition.longitude,
+          accuracy: customerPosition.accuracy,
+        }
+      : null,
+    cartCount: getCartItemCount(),
+    cartVendorName: cart.vendorName || "",
+    cartTotal: getCartTotal(),
+  };
+};
+
+/* ==================================================
    MAP ICONS
 ================================================== */
 
@@ -508,6 +573,7 @@ function startCustomerLocation() {
           longitude,
           accuracy,
         };
+        syncCustomerHomeStats();
         updateCheckoutLocationUI();
 
         const location = [
@@ -562,6 +628,8 @@ function startCustomerLocation() {
 
         connectionStatus.textContent =
           "GPS Konsumen belum aktif";
+
+        syncCustomerHomeStats();
       },
 
       {
@@ -1789,6 +1857,8 @@ function getCartTotal() {
   );
 }
 function updateCartUI() {
+
+  syncCustomerHomeStats();
 
   const cartBar =
     document.getElementById("cartBar");
@@ -3727,6 +3797,7 @@ function syncVendorLocationListeners() {
           };
         }
 
+        syncCustomerHomeStats();
         renderVendorResults();
         updateVendorMarkers(allVendors);
         checkNearbyVendorNotification(allVendors[vendorIndex]);
@@ -3825,6 +3896,8 @@ function startVendorListener() {
       allVendors = vendors;
 
       await loadSubscriptions();
+
+      syncCustomerHomeStats();
 
       renderVendorResults();
       updateVendorMarkers(allVendors);
@@ -4591,6 +4664,12 @@ if (
     }
   }
 );
+
+console.log(
+  "[CART] Event delegation aktif"
+);
+
+syncCustomerHomeStats();
 
 console.log(
   "[CART] Event delegation aktif"
