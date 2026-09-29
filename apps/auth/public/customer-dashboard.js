@@ -4665,10 +4665,6 @@ if (
   }
 );
 
-console.log(
-  "[CART] Event delegation aktif"
-);
-
 syncCustomerHomeStats();
 
 console.log(
