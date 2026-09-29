@@ -3366,6 +3366,10 @@
       element.setAttribute("aria-hidden", String(!isTarget));
     });
 
+    const targetScreen = screens.find(
+      (element) => element.dataset.customerScreen === target
+    );
+
     navButtons.forEach((button) => {
       const isActive = button.dataset.appNav === target;
       button.classList.toggle("active", isActive);
@@ -3376,7 +3380,14 @@
       }
     });
 
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (targetScreen) {
+      window.requestAnimationFrame(() => {
+        targetScreen.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      });
+    }
 
     if (target === "map") {
       window.setTimeout(() => {
