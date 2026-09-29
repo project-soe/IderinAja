@@ -456,6 +456,27 @@ function initializeMap() {
   console.log(
     "[MAP] Leaflet berhasil diinisialisasi."
   );
+
+  // Leaflet needs an explicit size recalculation after its
+  // container changes from display:none to visible.
+  window.__iderinAjaRefreshMap = () => {
+    if (!map) return;
+
+    window.setTimeout(() => {
+      map.invalidateSize({ pan: false, animate: false });
+
+      if (customerPosition) {
+        map.setView(
+          [
+            customerPosition.latitude,
+            customerPosition.longitude,
+          ],
+          Math.max(map.getZoom(), 15),
+          { animate: false }
+        );
+      }
+    }, 0);
+  };
 }
 
 /* ==================================================
@@ -2173,6 +2194,8 @@ function closeCartModal() {
   );
 }
 
+window.__iderinAjaCloseCart = closeCartModal;
+
 function renderCheckoutItems() {
 
   const container =
@@ -2376,6 +2399,8 @@ function closeCheckoutModal() {
     "hidden"
   );
 }
+
+window.__iderinAjaCloseCheckout = closeCheckoutModal;
 
 async function handleCartCheckout() {
 
