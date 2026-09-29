@@ -3061,72 +3061,61 @@
 
 <script>
 (() => {
+  "use strict";
+
   const navButtons = [...document.querySelectorAll("[data-app-nav]")];
-  const screens = [...document.querySelectorAll("[data-customer-screen]")];
+  const screens = [...document.querySelectorAll(".customer-screen-section, .customer-home-screen")];
   const homeLocation = document.getElementById("customerHomeLocation");
   const homeLocationStatus = document.getElementById("customerHomeLocationStatus");
   const homeVendorCount = document.getElementById("customerHomeVendorCount");
   const homeCartCount = document.getElementById("customerHomeCartCount");
   const vendorList = document.getElementById("vendorList");
-  const cartSummary = document.getElementById("cartBarSummary");
+  const cartBarSummary = document.getElementById("cartBarSummary");
 
-  const screenLabels = {
-    home: "Beranda",
-    search: "Cari",
-    vendors: "Mitra",
-    map: "Peta"
-  };
+  const validScreens = new Set(["home", "search", "vendors", "map"]);
 
   function setActiveScreen(screen) {
-    const target = screenLabels[screen] ? screen : "home";
+    const target = validScreens.has(screen) ? screen : "home";
 
     screens.forEach((element) => {
-      element.classList.toggle(
-        "is-hidden",
-        element.dataset.customerScreen !== target
-      );
+      const isTarget = element.dataset.customerScreen === target;
+      element.classList.toggle("is-hidden", !isTarget);
+      element.setAttribute("aria-hidden", String(!isTarget));
     });
 
     navButtons.forEach((button) => {
-      button.classList.toggle(
-        "active",
-        button.dataset.appNav === target
-      );
+      const isActive = button.dataset.appNav === target;
+      button.classList.toggle("active", isActive);
+      if (isActive) {
+        button.setAttribute("aria-current", "page");
+      } else {
+        button.removeAttribute("aria-current");
+      }
     });
 
     window.scrollTo({ top: 0, behavior: "smooth" });
 
-    if (target === "map" && window.__iderinajaRefreshMap) {
-      window.setTimeout(window.__iderinajaRefreshMap, 120);
+    if (target === "map") {
+      window.setTimeout(() => {
+        window.__iderinajaRefreshMap?.();
+      }, 150);
     }
   }
 
   function syncHomeStats() {
     if (vendorList && homeVendorCount) {
-      const count = [...vendorList.children].filter(
-        (item) => !item.classList.contains("empty")
-      ).length;
-      homeVendorCount.textContent = String(count);
+      const cards = [...vendorList.querySelectorAll(".vendor[data-vendor-id]")];
+      homeVendorCount.textContent = String(cards.length);
     }
 
-    if (cartSummary && homeCartCount) {
-      const match = cartSummary.textContent.match(/\d+/);
+    if (cartBarSummary && homeCartCount) {
+      const match = cartBarSummary.textContent.match(/\d+/);
       homeCartCount.textContent = match ? match[0] : "0";
-    }
-
-    if (homeLocationStatus && homeLocation) {
-      const online = homeLocation.classList.contains("online");
-      homeLocationStatus.textContent = online ? "Aktif" : "Siap";
-      homeLocation.style.color = online ? "var(--green)" : "var(--muted)";
-      homeLocation.style.borderColor = online
-        ? "rgba(40,199,111,.2)"
-        : "var(--border)";
-      homeLocation.style.background = online
-        ? "rgba(40,199,111,.07)"
-        : "rgba(255,255,255,.04)";
     }
   }
 
+  // Delegated navigation handler: works for bottom-nav and
+  // all quick-action buttons, including dynamically rendered UI.
   document.addEventListener("click", (event) => {
     const button = event.target.closest("[data-app-nav]");
     if (!button) return;
@@ -3134,16 +3123,42 @@
     const action = button.dataset.appNav;
 
     if (action === "orders") {
-      window.location.href = "customer-orders.html";
+      window.location.assign("customer-orders.html");
       return;
     }
 
     if (action === "cart") {
-      document.getElementById("openCartButton")?.click();
+      const cartButton = document.getElementById("openCartButton");
+      if (cartButton) {
+        cartButton.click();
+      } else {
+        console.warn("[NAV] #openCartButton tidak ditemukan.");
+      }
       return;
     }
 
     setActiveScreen(action);
+  });
+
+  // Close modal overlays by tapping their backdrop.
+  document.addEventListener("click", (event) => {
+    if (event.target?.id === "checkoutModal") {
+      window.__iderinAjaCloseCheckout?.();
+    }
+
+    if (event.target?.id === "cartModal") {
+      window.__iderinAjaCloseCart?.();
+    }
+  });
+
+  // Escape should close whichever modal is open.
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") return;
+
+    document.getElementById("vendorModal")?.classList.add("hidden");
+    document.getElementById("cartModal")?.classList.add("hidden");
+    document.getElementById("checkoutModal")?.classList.add("hidden");
+    document.getElementById("customerOrderDetailModal")?.classList.add("hidden");
   });
 
   if (vendorList) {
@@ -3153,13 +3168,17 @@
     });
   }
 
-  if (cartSummary) {
-    new MutationObserver(syncHomeStats).observe(cartSummary, {
+  if (cartBarSummary) {
+    new MutationObserver(syncHomeStats).observe(cartBarSummary, {
       childList: true,
       characterData: true,
       subtree: true
     });
   }
+
+  // Public hooks used by the module script.
+  window.__iderinAjaSetCustomerScreen = setActiveScreen;
+  window.__iderinAjaSyncHomeStats = syncHomeStats;
 
   setActiveScreen("home");
   syncHomeStats();
