@@ -525,10 +525,15 @@ function initializeMap() {
   // Leaflet needs an explicit size recalculation after its
   // container changes from display:none to visible.
   window.__iderinAjaRefreshMap = () => {
-    if (!map) return;
+    if (!map || !mapElement) return;
 
-    window.setTimeout(() => {
-      map.invalidateSize({ pan: false, animate: false });
+    const refresh = () => {
+      // The map section is switched from display:none to visible.
+      // Leaflet must recalculate its dimensions after that layout pass.
+      map.invalidateSize({
+        pan: false,
+        animate: false,
+      });
 
       if (customerPosition) {
         map.setView(
@@ -540,8 +545,32 @@ function initializeMap() {
           { animate: false }
         );
       }
-    }, 0);
+    };
+
+    // Run after the current layout, after the smooth scroll starts,
+    // and once more after mobile browser layout settles.
+    window.requestAnimationFrame(() => {
+      refresh();
+      window.requestAnimationFrame(refresh);
+    });
+
+    window.setTimeout(refresh, 180);
+    window.setTimeout(refresh, 500);
   };
+
+  // Keep Leaflet synchronized if the map container changes size.
+  if ("ResizeObserver" in window) {
+    const mapResizeObserver = new ResizeObserver(() => {
+      if (mapElement.offsetParent !== null) {
+        map.invalidateSize({
+          pan: false,
+          animate: false,
+        });
+      }
+    });
+
+    mapResizeObserver.observe(mapElement);
+  }
 }
 
 /* ==================================================
