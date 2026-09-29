@@ -2310,6 +2310,127 @@
       .customer-welcome{min-height:205px}
     }
 
+    /* CUSTOMER INFO MODAL */
+    .customer-stat-card{
+      appearance:none;
+      width:100%;
+      color:inherit;
+      font:inherit;
+      text-align:left;
+      cursor:pointer;
+      transition:transform .15s ease,background .2s ease,border-color .2s ease,box-shadow .2s ease;
+    }
+    .customer-stat-card:hover{
+      transform:translateY(-1px);
+      background:rgba(255,194,26,.055);
+      border-color:rgba(255,194,26,.22);
+      box-shadow:0 12px 28px rgba(0,0,0,.12);
+    }
+    .customer-stat-card:active{transform:scale(.99)}
+    .customer-stat-card:focus-visible{
+      outline:2px solid rgba(255,194,26,.75);
+      outline-offset:3px;
+    }
+    .customer-info-modal{
+      position:fixed;
+      inset:0;
+      z-index:1400;
+      display:flex;
+      align-items:flex-end;
+      justify-content:center;
+      padding:12px;
+      background:rgba(0,0,0,.72);
+      backdrop-filter:blur(7px);
+    }
+    .customer-info-modal.hidden{display:none}
+    .customer-info-card{
+      width:min(100%,520px);
+      padding:19px;
+      border:1px solid rgba(255,194,26,.18);
+      border-radius:22px 22px 18px 18px;
+      background:linear-gradient(180deg,rgba(12,37,49,.99),rgba(8,26,36,.99));
+      box-shadow:0 24px 70px rgba(0,0,0,.52);
+    }
+    .customer-info-header{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:14px;
+    }
+    .customer-info-eyebrow{
+      color:var(--yellow);
+      font-size:9px;
+      font-weight:900;
+      letter-spacing:.16em;
+    }
+    .customer-info-header h2{
+      margin:5px 0 0;
+      color:var(--white);
+      font-size:20px;
+      line-height:1.15;
+    }
+    .customer-info-close{
+      flex:0 0 auto;
+      width:36px;
+      height:36px;
+      border:1px solid var(--border);
+      border-radius:11px;
+      background:rgba(255,255,255,.05);
+      color:var(--white);
+      font-size:22px;
+    }
+    .customer-info-content{
+      display:grid;
+      gap:10px;
+      margin-top:18px;
+    }
+    .customer-info-row{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:16px;
+      padding:12px 13px;
+      border:1px solid var(--border-soft);
+      border-radius:14px;
+      background:rgba(255,255,255,.035);
+    }
+    .customer-info-row span{
+      color:var(--muted);
+      font-size:11px;
+      line-height:1.45;
+    }
+    .customer-info-row strong{
+      color:var(--white);
+      font-size:12px;
+      text-align:right;
+    }
+    .customer-info-note{
+      padding:12px 13px;
+      border-radius:14px;
+      border:1px solid rgba(255,194,26,.14);
+      background:rgba(255,194,26,.055);
+      color:var(--muted);
+      font-size:11px;
+      line-height:1.55;
+    }
+    .customer-info-actions{margin-top:13px}
+    .customer-info-actions.hidden{display:none}
+    .customer-info-primary{
+      width:100%;
+      padding:13px 14px;
+      border:0;
+      border-radius:13px;
+      background:var(--yellow);
+      color:var(--dark);
+      font-size:12px;
+      font-weight:900;
+    }
+    .customer-info-primary:hover{background:var(--yellow-dark)}
+    @media(min-width:700px){
+      .customer-info-modal{align-items:center}
+      .customer-info-card{border-radius:22px}
+    }
+
     /* COMPANY FOOTER */
     .company-footer{
       display:flex;
@@ -2397,21 +2518,38 @@
   </div>
 
   <div class="customer-stat-grid" aria-label="Ringkasan">
-    <article class="customer-stat-card">
+    <button
+      type="button"
+      class="customer-stat-card"
+      data-customer-info="vendors"
+      aria-label="Lihat informasi mitra tersedia"
+    >
       <span class="customer-stat-icon">▣</span>
       <strong id="customerHomeVendorCount">0</strong>
       <small>Mitra tersedia</small>
-    </article>
-    <article class="customer-stat-card">
+    </button>
+
+    <button
+      type="button"
+      class="customer-stat-card"
+      data-customer-info="location"
+      aria-label="Lihat status lokasi"
+    >
       <span class="customer-stat-icon">⌖</span>
       <strong id="customerHomeLocationStatus">—</strong>
       <small>Status lokasi</small>
-    </article>
-    <article class="customer-stat-card">
+    </button>
+
+    <button
+      type="button"
+      class="customer-stat-card"
+      data-customer-info="cart"
+      aria-label="Lihat informasi keranjang"
+    >
       <span class="customer-stat-icon">🛒</span>
       <strong id="customerHomeCartCount">0</strong>
       <small>Item keranjang</small>
-    </article>
+    </button>
   </div>
 
   <div class="customer-home-actions">
@@ -2610,6 +2748,41 @@
   </div>
 
 </div>
+  <div
+    id="customerInfoModal"
+    class="customer-info-modal hidden"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="customerInfoTitle"
+  >
+    <div class="customer-info-card">
+      <div class="customer-info-header">
+        <div>
+          <div id="customerInfoEyebrow" class="customer-info-eyebrow">IDERINAJA</div>
+          <h2 id="customerInfoTitle">Informasi</h2>
+        </div>
+        <button
+          id="closeCustomerInfo"
+          class="customer-info-close"
+          type="button"
+          aria-label="Tutup informasi"
+        >×</button>
+      </div>
+
+      <div id="customerInfoContent" class="customer-info-content"></div>
+
+      <div id="customerInfoActions" class="customer-info-actions hidden">
+        <button
+          id="customerInfoCartButton"
+          type="button"
+          class="customer-info-primary"
+        >
+          Lihat keranjang
+        </button>
+      </div>
+    </div>
+  </div>
+
   <footer class="company-footer" aria-label="Perusahaan pengelola platform">
     <img class="company-footer-logo" src="assets/lmgj-logo.svg" alt="Logo LMGJ" width="58" height="42" />
     <span class="company-footer-name">LMGJ</span>
@@ -3056,6 +3229,116 @@
 
 <script
   type="module" src="customer-dashboard.js?v=20260929-02"> 
+</script>
+
+
+<script>
+(() => {
+  "use strict";
+
+  const infoModal = document.getElementById("customerInfoModal");
+  const infoTitle = document.getElementById("customerInfoTitle");
+  const infoContent = document.getElementById("customerInfoContent");
+  const infoActions = document.getElementById("customerInfoActions");
+  const infoCartButton = document.getElementById("customerInfoCartButton");
+  const infoClose = document.getElementById("closeCustomerInfo");
+
+  function getHomeState() {
+    return window.__iderinAjaGetCustomerHomeState?.() || {
+      vendorCount: Number(document.getElementById("customerHomeVendorCount")?.textContent) || 0,
+      onlineVendorCount: 0,
+      location: null,
+      cartCount: Number(document.getElementById("customerHomeCartCount")?.textContent) || 0,
+      cartVendorName: "",
+      cartTotal: 0,
+    };
+  }
+
+  function formatHomeRupiah(value) {
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      maximumFractionDigits: 0,
+    }).format(Number(value) || 0);
+  }
+
+  function row(label, value) {
+    return `<div class="customer-info-row"><span>${label}</span><strong>${value}</strong></div>`;
+  }
+
+  function openCustomerInfo(type) {
+    if (!infoModal || !infoTitle || !infoContent) return;
+
+    const state = getHomeState();
+    infoActions?.classList.add("hidden");
+
+    if (type === "vendors") {
+      infoTitle.textContent = "Mitra tersedia";
+      infoContent.innerHTML =
+        row("Total mitra", `${state.vendorCount} mitra`) +
+        row("Sedang online", `${state.onlineVendorCount} mitra`) +
+        `<div class="customer-info-note">Daftar mitra diperbarui secara realtime dari data IderinAja. Pilih “Lihat mitra” untuk melihat profil dan menu pedagang.</div>`;
+    } else if (type === "location") {
+      infoTitle.textContent = "Status lokasi";
+      if (state.location) {
+        const accuracy = Number(state.location.accuracy);
+        infoContent.innerHTML =
+          row("Status", "Aktif") +
+          row("Akurasi", Number.isFinite(accuracy) ? `±${Math.round(accuracy)} m` : "Tidak tersedia") +
+          row("Koordinat", `${state.location.latitude.toFixed(6)}, ${state.location.longitude.toFixed(6)}`) +
+          `<div class="customer-info-note">Lokasi digunakan untuk menghitung jarak ke Mitra dan menampilkan posisi Anda di peta. Posisi hanya diperbarui ketika izin lokasi browser aktif.</div>`;
+      } else {
+        infoContent.innerHTML =
+          row("Status", "Belum aktif") +
+          `<div class="customer-info-note">Izin GPS belum aktif atau lokasi belum berhasil diperoleh. Aktifkan izin lokasi browser lalu coba lagi.</div>`;
+      }
+    } else if (type === "cart") {
+      infoTitle.textContent = "Keranjang";
+      const cartCount = Number(state.cartCount) || 0;
+      infoContent.innerHTML =
+        row("Jumlah item", `${cartCount} item`) +
+        row("Mitra", state.cartVendorName || "Belum ada") +
+        row("Total sementara", formatHomeRupiah(state.cartTotal)) +
+        `<div class="customer-info-note">${cartCount ? "Keranjang siap diperiksa sebelum checkout." : "Keranjang masih kosong. Buka profil Mitra untuk memilih menu."}</div>`;
+      if (cartCount) infoActions?.classList.remove("hidden");
+    } else {
+      return;
+    }
+
+    infoModal.classList.remove("hidden");
+  }
+
+  function closeCustomerInfo() {
+    infoModal?.classList.add("hidden");
+  }
+
+  document.addEventListener("click", (event) => {
+    const infoButton = event.target.closest("[data-customer-info]");
+    if (infoButton) {
+      openCustomerInfo(infoButton.dataset.customerInfo);
+      return;
+    }
+
+    if (event.target.closest("#closeCustomerInfo")) {
+      closeCustomerInfo();
+      return;
+    }
+
+    if (event.target === infoModal) {
+      closeCustomerInfo();
+      return;
+    }
+
+    if (event.target.closest("#customerInfoCartButton")) {
+      closeCustomerInfo();
+      document.getElementById("openCartButton")?.click();
+    }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeCustomerInfo();
+  });
+})();
 </script>
 
 
