@@ -433,6 +433,59 @@
       </section>
 
       <!-- =========================================
+           PREVIEW RUTE
+      ========================================== -->
+      <div
+        id="routePreviewModal"
+        class="route-preview-modal hidden"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="routePreviewTitle"
+      >
+        <div class="route-preview-card">
+          <div class="route-preview-header">
+            <div>
+              <span class="route-preview-eyebrow">RIWAYAT PERJALANAN</span>
+              <h2 id="routePreviewTitle">Rute</h2>
+            </div>
+            <button
+              id="closeRoutePreview"
+              class="route-preview-close"
+              type="button"
+              aria-label="Tutup preview rute"
+            >×</button>
+          </div>
+
+          <div id="routePreviewMap" class="route-preview-map" aria-label="Preview jalur perjalanan"></div>
+
+          <div class="route-preview-stats">
+            <div>
+              <span>Jarak</span>
+              <strong id="routePreviewDistance">—</strong>
+            </div>
+            <div>
+              <span>Titik GPS</span>
+              <strong id="routePreviewPoints">—</strong>
+            </div>
+            <div>
+              <span>Dibuat</span>
+              <strong id="routePreviewCreated">—</strong>
+            </div>
+          </div>
+
+          <div id="routePreviewNote" class="route-preview-note">
+            Garis menunjukkan jalur berdasarkan titik GPS yang tersimpan.
+          </div>
+
+          <div class="route-preview-actions">
+            <button id="routePreviewRepeat" class="primary-button" type="button">
+              🔁 Ulangi Rute
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- =========================================
            INFORMASI GPS
       ========================================== -->
       <section id="gpsSection" class="card nav-view gps-view" data-nav-view="location">
@@ -687,7 +740,7 @@
   </footer>
 
 </main>
-<script type="module" src="vendor-dashboard.js?v=20260927-03"></script>
+<script type="module" src="vendor-dashboard.js?v=20260930-01"></script>
   
 </body>
 </html>
