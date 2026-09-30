@@ -2174,6 +2174,183 @@ textarea:focus {
   color: #71838c;
 }
 
+/* Route history preview */
+.route-preview-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1600;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 12px;
+  background: rgba(0,0,0,.72);
+  backdrop-filter: blur(8px);
+}
+.route-preview-modal.hidden { display: none; }
+
+.route-preview-card {
+  width: min(100%, 620px);
+  max-height: min(90vh, 780px);
+  overflow-y: auto;
+  padding: 17px;
+  border: 1px solid rgba(244,189,43,.18);
+  border-radius: 22px 22px 18px 18px;
+  background:
+    linear-gradient(180deg, rgba(15,38,49,.99), rgba(7,23,31,.99));
+  box-shadow: 0 24px 75px rgba(0,0,0,.55);
+}
+
+.route-preview-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 13px;
+}
+.route-preview-eyebrow {
+  color: var(--ui-gold);
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: .16em;
+}
+.route-preview-header h2 {
+  margin-top: 5px;
+  font-size: 20px;
+}
+.route-preview-close {
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 11px;
+  background: rgba(255,255,255,.04);
+  color: #fff;
+  font-size: 22px;
+}
+
+.route-preview-map {
+  position: relative;
+  height: 285px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 17px;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(244,189,43,.06), transparent 32%),
+    linear-gradient(145deg, #102630, #081a24);
+}
+.route-preview-map svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.route-preview-map .route-line {
+  fill: none;
+  stroke: var(--ui-gold);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 3px 5px rgba(0,0,0,.35));
+}
+.route-preview-map .route-line-glow {
+  fill: none;
+  stroke: rgba(244,189,43,.18);
+  stroke-width: 11;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.route-preview-map .route-point {
+  stroke: #07151d;
+  stroke-width: 2;
+}
+.route-preview-map .route-start { fill: #54d889; }
+.route-preview-map .route-end { fill: #ff6d6d; }
+
+.route-preview-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 7px;
+  margin-top: 10px;
+}
+.route-preview-stats > div {
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid rgba(255,255,255,.055);
+  border-radius: 13px;
+  background: rgba(255,255,255,.025);
+}
+.route-preview-stats span {
+  display: block;
+  color: #74868f;
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+.route-preview-stats strong {
+  display: block;
+  margin-top: 5px;
+  color: #fff;
+  font-size: 11px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.route-preview-note {
+  margin-top: 10px;
+  padding: 11px 12px;
+  border: 1px solid rgba(244,189,43,.10);
+  border-radius: 13px;
+  background: rgba(244,189,43,.04);
+  color: #81939b;
+  font-size: 10px;
+  line-height: 1.5;
+}
+.route-preview-actions {
+  margin-top: 11px;
+}
+.route-preview-actions .primary-button {
+  width: 100%;
+}
+
+.route-replay-progress {
+  margin-top: 11px;
+  padding: 11px 12px;
+  border: 1px solid rgba(244,189,43,.12);
+  border-radius: 14px;
+  background: rgba(244,189,43,.045);
+}
+.route-replay-progress.hidden { display: none; }
+.route-replay-progress-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  color: #87979e;
+  font-size: 9px;
+}
+.route-replay-progress-head strong { color: var(--ui-gold); }
+.route-replay-progress-track {
+  height: 6px;
+  margin-top: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255,255,255,.07);
+}
+.route-replay-progress-bar {
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--ui-gold);
+  transition: width .25s ease;
+}
+
+@media (min-width: 700px) {
+  .route-preview-modal { align-items: center; }
+  .route-preview-card { border-radius: 22px; }
+}
+@media (max-width: 480px) {
+  .route-preview-map { height: 250px; }
+  .route-preview-stats { gap: 5px; }
+  .route-preview-stats > div { padding: 9px 8px; }
+}
+
 /* Footer becomes intentionally quiet */
 .company-footer {
   margin: 24px 0 15px;
