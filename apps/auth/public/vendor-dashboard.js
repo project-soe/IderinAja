@@ -203,6 +203,19 @@ const routeList = document.getElementById("routeList");
 const routeEmpty = document.getElementById("routeEmpty");
 const routeCount = document.getElementById("routeCount");
 const activeRouteStatus = document.getElementById("activeRouteStatus");
+const routeReplayProgress = document.getElementById("routeReplayProgress");
+const routeReplayProgressValue = document.getElementById("routeReplayProgressValue");
+const routeReplayProgressBar = document.getElementById("routeReplayProgressBar");
+
+const routePreviewModal = document.getElementById("routePreviewModal");
+const routePreviewTitle = document.getElementById("routePreviewTitle");
+const routePreviewMap = document.getElementById("routePreviewMap");
+const routePreviewDistance = document.getElementById("routePreviewDistance");
+const routePreviewPoints = document.getElementById("routePreviewPoints");
+const routePreviewCreated = document.getElementById("routePreviewCreated");
+const routePreviewNote = document.getElementById("routePreviewNote");
+const routePreviewRepeat = document.getElementById("routePreviewRepeat");
+const closeRoutePreview = document.getElementById("closeRoutePreview");
 
 
 /* ==================================================
@@ -305,6 +318,7 @@ let currentRoutePoints = [];
 let routeRecordingStartedAt = null;
 let activeReplayRoute = null;
 let activeReplayIndex = 0;
+let routePreviewTarget = null;
 
 const MAX_ROUTE_POINTS = 500;
 const MIN_ROUTE_POINTS_TO_SAVE = 2;
@@ -804,6 +818,28 @@ async function loadVendorProfile() {
   if (saveRouteButton) {
   saveRouteButton.addEventListener("click", saveCurrentRoute);
 }
+
+closeRoutePreview?.addEventListener("click", closeRoutePreviewModal);
+
+routePreviewModal?.addEventListener("click", (event) => {
+  if (event.target === routePreviewModal) {
+    closeRoutePreviewModal();
+  }
+});
+
+routePreviewRepeat?.addEventListener("click", async () => {
+  if (!routePreviewTarget) return;
+
+  const route = routePreviewTarget;
+  closeRoutePreviewModal();
+  await repeatSavedRoute(route);
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    closeRoutePreviewModal();
+  }
+});
 
 if (nearbyNotificationRadiusInput) {
     nearbyNotificationRadiusInput.value =
@@ -1576,6 +1612,23 @@ function updateRouteRecordingUI() {
         ? `Merekam perjalanan: ${currentRoutePoints.length} titik GPS`
         : "Belum ada perjalanan yang direkam.";
   }
+
+  if (routeReplayProgress && routeReplayProgressValue && routeReplayProgressBar) {
+    if (!activeReplayRoute || !activeReplayRoute.points?.length) {
+      routeReplayProgress.classList.add("hidden");
+      routeReplayProgressValue.textContent = "0%";
+      routeReplayProgressBar.style.width = "0%";
+    } else {
+      const total = activeReplayRoute.points.length - 1;
+      const percent = total > 0
+        ? Math.min(100, Math.round((activeReplayIndex / total) * 100))
+        : 0;
+
+      routeReplayProgress.classList.remove("hidden");
+      routeReplayProgressValue.textContent = `${percent}%`;
+      routeReplayProgressBar.style.width = `${percent}%`;
+    }
+  }
 }
 
 function recordRoutePoint(latitude, longitude, accuracy) {
@@ -1630,11 +1683,20 @@ async function saveCurrentRoute() {
   saveRouteButton.disabled = true;
 
   try {
+    const savedPoints = currentRoutePoints.map(({lat, lng}) => ({lat, lng}));
+    const distanceMeters = calculateRouteDistance(savedPoints);
+    const durationSeconds = routeRecordingStartedAt
+      ? Math.max(0, Math.round((Date.now() - routeRecordingStartedAt) / 1000))
+      : 0;
+
     await addDoc(getRouteCollection(), {
       vendorId: currentUser.uid,
       name: normalizedName,
-      points: currentRoutePoints.map(({lat, lng}) => ({lat, lng})),
-      pointCount: currentRoutePoints.length,
+      points: savedPoints,
+      pointCount: savedPoints.length,
+      distanceMeters: Math.round(distanceMeters),
+      durationSeconds,
+      recordingStartedAtMs: routeRecordingStartedAt || null,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
       lastUsedAt: null,
@@ -1649,6 +1711,32 @@ async function saveCurrentRoute() {
   } finally {
     updateRouteRecordingUI();
   }
+}
+
+function calculateRouteDistance(points) {
+  if (!Array.isArray(points) || points.length < 2) return 0;
+
+  let total = 0;
+  for (let index = 1; index < points.length; index += 1) {
+    const previous = points[index - 1];
+    const current = points[index];
+
+    total += calculateDistance(
+      Number(previous.lat),
+      Number(previous.lng),
+      Number(current.lat),
+      Number(current.lng)
+    );
+  }
+
+  return total;
+}
+
+function formatRouteDistance(meters) {
+  const value = Number(meters) || 0;
+  return value >= 1000
+    ? `${(value / 1000).toFixed(1)} km`
+    : `${Math.round(value)} m`;
 }
 
 function formatRouteDate(timestamp) {
@@ -1714,6 +1802,78 @@ async function deleteSavedRoute(routeId, routeName) {
   }
 }
 
+function renderRoutePreview(route) {
+  if (!routePreviewModal || !routePreviewMap) return;
+
+  const points = Array.isArray(route.points)
+    ? route.points
+        .map((point) => ({
+          lat: Number(point.lat),
+          lng: Number(point.lng),
+        }))
+        .filter((point) => Number.isFinite(point.lat) && Number.isFinite(point.lng))
+    : [];
+
+  if (points.length < 2) {
+    showRouteMessage("Rute ini tidak memiliki titik GPS yang cukup.", "error");
+    return;
+  }
+
+  routePreviewTarget = route;
+  if (routePreviewTitle) routePreviewTitle.textContent = route.name || "Rute tersimpan";
+  if (routePreviewPoints) routePreviewPoints.textContent = `${points.length} titik`;
+  if (routePreviewDistance) {
+    routePreviewDistance.textContent =
+      formatRouteDistance(route.distanceMeters ?? calculateRouteDistance(points));
+  }
+  if (routePreviewCreated) {
+    routePreviewCreated.textContent = formatRouteDate(route.createdAt);
+  }
+  if (routePreviewNote) {
+    routePreviewNote.textContent =
+      "Garis menunjukkan jalur berdasarkan titik GPS yang tersimpan. Ini adalah preview rute, bukan navigasi turn-by-turn.";
+  }
+
+  const minLat = Math.min(...points.map((point) => point.lat));
+  const maxLat = Math.max(...points.map((point) => point.lat));
+  const minLng = Math.min(...points.map((point) => point.lng));
+  const maxLng = Math.max(...points.map((point) => point.lng));
+  const latRange = Math.max(maxLat - minLat, 0.00001);
+  const lngRange = Math.max(maxLng - minLng, 0.00001);
+  const padding = 34;
+  const width = 1000;
+  const height = 520;
+
+  const pathPoints = points.map((point) => {
+    const x = padding + ((point.lng - minLng) / lngRange) * (width - padding * 2);
+    const y = height - padding - ((point.lat - minLat) / latRange) * (height - padding * 2);
+    return [x, y];
+  });
+
+  const pathData = pathPoints
+    .map(([x, y], index) => `${index === 0 ? "M" : "L"} ${x.toFixed(2)} ${y.toFixed(2)}`)
+    .join(" ");
+
+  const start = pathPoints[0];
+  const end = pathPoints[pathPoints.length - 1];
+
+  routePreviewMap.innerHTML = `
+    <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Preview jalur ${(route.name || "rute").replace(/"/g, "&quot;")}">
+      <path class="route-line-glow" d="${pathData}"></path>
+      <path class="route-line" d="${pathData}"></path>
+      <circle class="route-point route-start" cx="${start[0]}" cy="${start[1]}" r="9"></circle>
+      <circle class="route-point route-end" cx="${end[0]}" cy="${end[1]}" r="9"></circle>
+    </svg>
+  `;
+
+  routePreviewModal.classList.remove("hidden");
+}
+
+function closeRoutePreviewModal() {
+  routePreviewModal?.classList.add("hidden");
+  routePreviewTarget = null;
+}
+
 function renderSavedRoutes(routes) {
   if (!routeList) return;
   routeList.innerHTML = "";
@@ -1753,6 +1913,12 @@ function renderSavedRoutes(routes) {
     const actions = document.createElement("div");
     actions.className = "route-actions";
 
+    const previewButton = document.createElement("button");
+    previewButton.type = "button";
+    previewButton.className = "secondary-button";
+    previewButton.textContent = "👁 Lihat";
+    previewButton.addEventListener("click", () => renderRoutePreview(route));
+
     const repeatButton = document.createElement("button");
     repeatButton.type = "button";
     repeatButton.className = "primary-button";
@@ -1765,6 +1931,7 @@ function renderSavedRoutes(routes) {
     deleteButton.textContent = "🗑 Hapus";
     deleteButton.addEventListener("click", () => deleteSavedRoute(route.id, route.name));
 
+    actions.appendChild(previewButton);
     actions.appendChild(repeatButton);
     actions.appendChild(deleteButton);
     card.appendChild(main);
