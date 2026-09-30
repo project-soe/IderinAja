@@ -94,6 +94,9 @@ const errorMessage =
 const vendorList =
   document.getElementById("vendorList");
 
+const searchVendorList =
+  document.getElementById("searchVendorList");
+
 const connectionStatus =
   document.getElementById("connectionStatus");
 
@@ -880,181 +883,126 @@ function sortVendorsByDistance(
    RENDER SEARCH RESULTS
 ================================================== */
 
-function renderVendorResults() {
-  const filtered =
-    getFilteredVendors();
+function renderVendorCard(vendor) {
+  const element = document.createElement("div");
 
-  const sorted =
-    sortVendorsByDistance(
-      filtered
+  element.className = "vendor";
+  element.dataset.vendorId = vendor.id;
+  element.dataset.latitude = vendor.latitude;
+  element.dataset.longitude = vendor.longitude;
+
+  let distanceText = "Lokasi belum tersedia";
+
+  if (
+    customerPosition &&
+    typeof vendor.latitude === "number" &&
+    typeof vendor.longitude === "number"
+  ) {
+    const distance = calculateDistance(
+      customerPosition.latitude,
+      customerPosition.longitude,
+      vendor.latitude,
+      vendor.longitude
     );
+
+    distanceText = formatDistance(distance);
+  }
+
+  const businessName =
+    vendor.businessName || "Mitra IderinAja";
+
+  const username = vendor.username
+    ? `@${vendor.username}`
+    : "Username belum tersedia";
+
+  const category = vendor.category || "Lainnya";
+
+  const subscribed =
+    subscribedVendorIds.has(vendor.id);
+
+  element.innerHTML = `
+    <div class="vendor-header">
+      <div>
+        <div class="vendor-name">
+          ${escapeHtml(businessName)}
+        </div>
+        <div class="vendor-username">
+          ${escapeHtml(username)}
+        </div>
+      </div>
+      <div class="distance">
+        ${escapeHtml(distanceText)}
+      </div>
+    </div>
+
+    <div class="vendor-category">
+      ${escapeHtml(category)}
+    </div>
+
+    <div class="vendor-info">
+      <div>
+        ${
+          vendor.isOnline === true
+            ? "🟢 Pedagang sedang online"
+            : "⚪ Pedagang sedang offline"
+        }
+      </div>
+    </div>
+
+    <div class="vendor-actions">
+      <button
+        type="button"
+        class="vendor-button primary"
+        data-action="profile"
+        data-vendor-id="${escapeHtml(vendor.id)}"
+      >
+        Lihat Profil & Menu
+      </button>
+
+      <button
+        type="button"
+        class="vendor-button ${subscribed ? "subscribed" : ""}"
+        data-action="${subscribed ? "unsubscribe" : "subscribe"}"
+        data-vendor-id="${escapeHtml(vendor.id)}"
+      >
+        ${subscribed ? "✓ Berlangganan" : "⭐ Subscribe"}
+      </button>
+    </div>
+  `;
+
+  return element;
+}
+
+function renderVendorList(container, sorted) {
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  if (sorted.length === 0) {
+    container.innerHTML = `
+      <div class="empty">
+        Tidak ada pedagang yang sesuai dengan pencarian.
+      </div>
+    `;
+    return;
+  }
+
+  sorted.forEach((vendor) => {
+    container.appendChild(renderVendorCard(vendor));
+  });
+}
+
+function renderVendorResults() {
+  const filtered = getFilteredVendors();
+  const sorted = sortVendorsByDistance(filtered);
 
   searchResultCount.textContent =
     `${sorted.length} pedagang ditemukan`;
 
-  if (sorted.length === 0) {
-    vendorList.innerHTML = `
-      <div class="empty">
-        Tidak ada pedagang yang sesuai
-        dengan pencarian.
-      </div>
-    `;
-
-    return;
-  }
-
-  vendorList.innerHTML = "";
-
-  sorted.forEach(
-    (vendor) => {
-      const element =
-        document.createElement(
-          "div"
-        );
-
-      element.className =
-        "vendor";
-
-      element.dataset.vendorId =
-        vendor.id;
-
-      element.dataset.latitude =
-        vendor.latitude;
-
-      element.dataset.longitude =
-        vendor.longitude;
-
-      let distanceText =
-        "Lokasi belum tersedia";
-
-      if (
-        customerPosition &&
-        typeof vendor.latitude ===
-          "number" &&
-        typeof vendor.longitude ===
-          "number"
-      ) {
-        const distance =
-          calculateDistance(
-            customerPosition.latitude,
-            customerPosition.longitude,
-            vendor.latitude,
-            vendor.longitude
-          );
-
-        distanceText =
-          formatDistance(
-            distance
-          );
-      }
-
-      const businessName =
-        vendor.businessName ||
-        "Mitra IderinAja";
-
-      const username =
-        vendor.username
-          ? `@${vendor.username}`
-          : "Username belum tersedia";
-
-      const category =
-        vendor.category ||
-        "Lainnya";
-
-      const subscribed =
-        subscribedVendorIds.has(
-          vendor.id
-        );
-
-      element.innerHTML = `
-        <div class="vendor-header">
-
-          <div>
-
-            <div class="vendor-name">
-              ${escapeHtml(
-                businessName
-              )}
-            </div>
-
-            <div class="vendor-username">
-              ${escapeHtml(
-                username
-              )}
-            </div>
-
-          </div>
-
-          <div class="distance">
-            ${escapeHtml(
-              distanceText
-            )}
-          </div>
-
-        </div>
-
-        <div class="vendor-category">
-          ${escapeHtml(
-            category
-          )}
-        </div>
-
-        <div class="vendor-info">
-
-          <div>
-            ${
-              vendor.isOnline === true
-                ? "🟢 Pedagang sedang online"
-                : "⚪ Pedagang sedang offline"
-            }
-          </div>
-
-        </div>
-
-        <div class="vendor-actions">
-
-          <button
-            type="button"
-            class="vendor-button primary"
-            data-action="profile"
-            data-vendor-id="${escapeHtml(
-              vendor.id
-            )}"
-          >
-            Lihat Profil
-          </button>
-
-          <button
-            type="button"
-            class="vendor-button ${
-              subscribed
-                ? "subscribed"
-                : ""
-            }"
-            data-action="${
-              subscribed
-                ? "unsubscribe"
-                : "subscribe"
-            }"
-            data-vendor-id="${escapeHtml(
-              vendor.id
-            )}"
-          >
-            ${
-              subscribed
-                ? "✓ Berlangganan"
-                : "⭐ Subscribe"
-            }
-          </button>
-
-        </div>
-      `;
-
-      vendorList.appendChild(
-        element
-      );
-    }
-  );
+  // Search now contains the actual vendor cards, while the
+  // dedicated Mitra screen keeps the same live result set.
+  renderVendorList(searchVendorList, sorted);
+  renderVendorList(vendorList, sorted);
 
   updateVendorDistances();
 }
@@ -4042,69 +3990,45 @@ categoryFilter
    VENDOR ACTION EVENTS
 ================================================== */
 
-vendorList.addEventListener(
-  "click",
-  async (event) => {
-    const button =
-      event.target.closest(
-        "[data-action]"
-      );
+async function handleVendorListAction(event) {
+  const button =
+    event.target.closest("[data-action]");
 
-    if (!button) {
-      return;
-    }
+  if (!button) return;
 
-    const vendorId =
-      button.dataset.vendorId;
+  const vendorId = button.dataset.vendorId;
 
-    const vendor =
-      allVendors.find(
-        (item) =>
-          item.id ===
-          vendorId
-      );
+  const vendor =
+    allVendors.find((item) => item.id === vendorId);
 
-    if (!vendor) {
-      return;
-    }
+  if (!vendor) return;
 
-    const action =
-      button.dataset.action;
+  const action = button.dataset.action;
 
-    if (
-      action ===
-      "profile"
-    ) {
-      openVendorProfile(
-        vendor
-      );
-
-      return;
-    }
-
-    if (
-      action ===
-      "subscribe"
-    ) {
-      selectedVendor =
-        vendor;
-
-      await subscribeToVendor(
-        vendor
-      );
-
-      return;
-    }
-
-    if (
-      action ===
-      "unsubscribe"
-    ) {
-      await unsubscribeFromVendor(
-        vendor
-      );
-    }
+  if (action === "profile") {
+    openVendorProfile(vendor);
+    return;
   }
+
+  if (action === "subscribe") {
+    selectedVendor = vendor;
+    await subscribeToVendor(vendor);
+    return;
+  }
+
+  if (action === "unsubscribe") {
+    await unsubscribeFromVendor(vendor);
+  }
+}
+
+vendorList?.addEventListener(
+  "click",
+  handleVendorListAction
+);
+
+searchVendorList?.addEventListener(
+  "click",
+  handleVendorListAction
 );
 
 /* ==================================================
