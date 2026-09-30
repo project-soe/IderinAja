@@ -189,6 +189,7 @@ let cart = {
 let subscribedVendorIds = new Set();
 let vendorNotificationEnabledById = new Map();
 let stopCustomerOrdersListener = null;
+let lastCompletedOrderVendor = null;
 
 /* ==================================================
    CUSTOMER HOME SUMMARY
@@ -2449,6 +2450,103 @@ function closeCheckoutModal() {
 
 window.__iderinAjaCloseCheckout = closeCheckoutModal;
 
+/* ==================================================
+   POST-CHECKOUT SUCCESS
+================================================== */
+
+function closeOrderSuccessModal() {
+  const modal = document.getElementById("orderSuccessModal");
+
+  if (!modal) {
+    return;
+  }
+
+  modal.classList.add("hidden");
+}
+
+function openOrderSuccessModal({
+  orderId,
+  vendor,
+}) {
+  const modal =
+    document.getElementById("orderSuccessModal");
+
+  if (!modal) {
+    return;
+  }
+
+  const vendorElement =
+    document.getElementById("orderSuccessVendor");
+
+  const messageElement =
+    document.getElementById("orderSuccessMessage");
+
+  const vendorName =
+    vendor?.businessName ||
+    vendor?.vendorName ||
+    "Mitra IderinAja";
+
+  if (vendorElement) {
+    vendorElement.textContent =
+      vendorName;
+  }
+
+  if (messageElement) {
+    messageElement.textContent =
+      `Pesanan ${orderId} sudah dikirim ke ${vendorName} dan sedang menunggu konfirmasi mitra.`;
+  }
+
+  modal.classList.remove("hidden");
+}
+
+function continueShoppingFromOrderSuccess() {
+  const vendor =
+    lastCompletedOrderVendor;
+
+  closeOrderSuccessModal();
+
+  if (!vendor) {
+    window.__iderinAjaSetCustomerScreen?.("vendors");
+    return;
+  }
+
+  /*
+   * Kembali ke profil & menu pedagang yang barusan
+   * menerima pesanan. Data vendor tetap disimpan
+   * walaupun keranjang sudah dikosongkan.
+   */
+  window.__iderinAjaSetCustomerScreen?.("vendors");
+
+  openVendorProfile(vendor);
+}
+
+document
+  .getElementById("orderSuccessCheckButton")
+  ?.addEventListener("click", () => {
+    closeOrderSuccessModal();
+
+    window.location.href =
+      "customer-orders.html";
+  });
+
+document
+  .getElementById("orderSuccessContinueButton")
+  ?.addEventListener(
+    "click",
+    continueShoppingFromOrderSuccess
+  );
+
+document
+  .getElementById("orderSuccessModal")
+  ?.addEventListener("click", (event) => {
+    if (
+      event.target.id ===
+      "orderSuccessModal"
+    ) {
+      closeOrderSuccessModal();
+    }
+  });
+
 async function handleCartCheckout() {
 
   console.log(
@@ -2772,13 +2870,31 @@ async function handleCartCheckout() {
       orderId
     );
 
+    /*
+     * Simpan vendor terakhir sebelum cart dikosongkan.
+     * Ini memungkinkan pelanggan kembali ke profil/menu
+     * pedagang yang barusan dipesan dari modal sukses.
+     */
+    lastCompletedOrderVendor =
+      allVendors.find(
+        (vendor) =>
+          vendor.id === cart.vendorId
+      ) || {
+        id: cart.vendorId,
+        businessName:
+          cart.vendorName || "Mitra IderinAja",
+        vendorName:
+          cart.vendorName || "Mitra IderinAja",
+      };
+
     clearCart();
 
     closeCheckoutModal();
 
-    alert(
-      `Pesanan berhasil dibuat.\n\nNomor pesanan: ${orderId}\nStatus: Menunggu konfirmasi mitra.`
-    );
+    openOrderSuccessModal({
+      orderId,
+      vendor: lastCompletedOrderVendor,
+    });
 
     console.log(
       "[ORDER] Pesanan berhasil dibuat:",
