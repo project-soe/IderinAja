@@ -2151,6 +2151,144 @@
  .app-bottom-nav{grid-template-columns:repeat(5,1fr)}
 }
 
+
+    /* ==================================================
+       ORDER SUCCESS MODAL
+    ================================================== */
+
+    .order-success-modal{
+      position:fixed;
+      inset:0;
+      z-index:1700;
+      display:flex;
+      align-items:flex-end;
+      justify-content:center;
+      padding:12px;
+      background:rgba(0,0,0,.76);
+      backdrop-filter:blur(8px);
+    }
+
+    .order-success-modal.hidden{
+      display:none;
+    }
+
+    .order-success-card{
+      width:min(100%,520px);
+      padding:22px;
+      border:1px solid rgba(255,194,26,.2);
+      border-radius:24px 24px 18px 18px;
+      background:
+        radial-gradient(circle at 50% 0%,rgba(255,194,26,.12),transparent 38%),
+        linear-gradient(180deg,rgba(12,37,49,.99),rgba(8,26,36,.99));
+      box-shadow:0 28px 80px rgba(0,0,0,.58);
+      text-align:center;
+    }
+
+    .order-success-icon{
+      width:58px;
+      height:58px;
+      margin:0 auto 13px;
+      display:grid;
+      place-items:center;
+      border-radius:50%;
+      background:rgba(40,199,111,.1);
+      border:1px solid rgba(40,199,111,.22);
+      color:var(--green);
+      font-size:27px;
+      font-weight:900;
+    }
+
+    .order-success-eyebrow{
+      color:var(--yellow);
+      font-size:9px;
+      font-weight:900;
+      letter-spacing:.16em;
+    }
+
+    .order-success-title{
+      margin:6px 0 0;
+      color:var(--white);
+      font-size:23px;
+      line-height:1.15;
+      font-weight:900;
+    }
+
+    .order-success-message{
+      margin:9px auto 0;
+      max-width:430px;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.55;
+    }
+
+    .order-success-vendor{
+      margin-top:14px;
+      padding:11px 13px;
+      border:1px solid rgba(255,194,26,.14);
+      border-radius:14px;
+      background:rgba(255,194,26,.055);
+      color:var(--white);
+      font-size:12px;
+      font-weight:800;
+    }
+
+    .order-success-actions{
+      display:grid;
+      gap:9px;
+      margin-top:17px;
+    }
+
+    .order-success-button{
+      width:100%;
+      min-height:46px;
+      padding:12px 14px;
+      border-radius:13px;
+      font-size:12px;
+      font-weight:900;
+      transition:transform .15s ease,background .2s ease,opacity .2s ease;
+    }
+
+    .order-success-button:active{
+      transform:scale(.985);
+    }
+
+    .order-success-button.primary{
+      border:0;
+      background:var(--yellow);
+      color:var(--dark);
+    }
+
+    .order-success-button.primary:hover{
+      background:var(--yellow-dark);
+    }
+
+    .order-success-button.secondary{
+      border:1px solid rgba(255,194,26,.22);
+      background:rgba(255,194,26,.07);
+      color:var(--yellow);
+    }
+
+    .order-success-button.secondary:hover{
+      background:rgba(255,194,26,.12);
+    }
+
+    .order-success-hint{
+      margin-top:10px;
+      color:var(--muted);
+      font-size:10px;
+      line-height:1.45;
+    }
+
+    @media(min-width:700px){
+      .order-success-modal{
+        align-items:center;
+      }
+
+      .order-success-card{
+        border-radius:24px;
+      }
+    }
+
     /* =========================================================
        CUSTOMER APP SHELL
        ========================================================= */
@@ -2843,6 +2981,68 @@
   </div>
 
 
+
+  <!-- =========================================
+       ORDER SUCCESS MODAL
+  ========================================== -->
+
+  <div
+    id="orderSuccessModal"
+    class="order-success-modal hidden"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="orderSuccessTitle"
+  >
+    <div class="order-success-card">
+      <div class="order-success-icon" aria-hidden="true">✓</div>
+
+      <div class="order-success-eyebrow">PESANAN BERHASIL</div>
+
+      <h2
+        id="orderSuccessTitle"
+        class="order-success-title"
+      >
+        Pesanan berhasil dibuat
+      </h2>
+
+      <p
+        id="orderSuccessMessage"
+        class="order-success-message"
+      >
+        Pesananmu sudah dikirim ke Mitra dan sedang menunggu konfirmasi.
+      </p>
+
+      <div
+        id="orderSuccessVendor"
+        class="order-success-vendor"
+      >
+        Mitra
+      </div>
+
+      <div class="order-success-actions">
+        <button
+          id="orderSuccessCheckButton"
+          class="order-success-button primary"
+          type="button"
+        >
+          📦 Cek Pesanan
+        </button>
+
+        <button
+          id="orderSuccessContinueButton"
+          class="order-success-button secondary"
+          type="button"
+        >
+          🛒 Lanjut Belanja
+        </button>
+      </div>
+
+      <div class="order-success-hint">
+        Pilih “Lanjut Belanja” untuk kembali ke profil & menu pedagang yang barusan kamu pesan.
+      </div>
+    </div>
+  </div>
+
   <!-- =========================================
        CART BAR
   ========================================== -->
@@ -3237,7 +3437,7 @@
   ========================================== -->
 
 <script
-  type="module" src="customer-dashboard.js?v=20260930-03"> 
+  type="module" src="customer-dashboard.js?v=20260930-04"> 
 </script>
 
 
