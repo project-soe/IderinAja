@@ -1739,6 +1739,19 @@ function formatRouteDistance(meters) {
     : `${Math.round(value)} m`;
 }
 
+function formatRouteDuration(seconds) {
+  const value = Math.max(0, Number(seconds) || 0);
+  if (value < 60) return `${Math.round(value)} dtk`;
+
+  const minutes = Math.floor(value / 60);
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+
+  return hours > 0
+    ? `${hours} jam ${remainingMinutes} mnt`
+    : `${minutes} mnt`;
+}
+
 function formatRouteDate(timestamp) {
   if (!timestamp || typeof timestamp.toDate !== "function") return "Waktu belum tersedia";
   return new Intl.DateTimeFormat("id-ID", {
@@ -1901,8 +1914,20 @@ function renderSavedRoutes(routes) {
     title.textContent = route.name || "Tanpa nama";
 
     const meta = document.createElement("p");
-    meta.textContent =
-      `${Number(route.pointCount) || route.points?.length || 0} titik • dibuat ${formatRouteDate(route.createdAt)}`;
+    const routePointCount = Number(route.pointCount) || route.points?.length || 0;
+    const routeDistance = route.distanceMeters ?? calculateRouteDistance(route.points);
+    const routeSummary = [
+      `${routePointCount} titik`,
+      formatRouteDistance(routeDistance),
+    ];
+
+    if (Number(route.durationSeconds) > 0) {
+      routeSummary.push(formatRouteDuration(route.durationSeconds));
+    }
+
+    routeSummary.push(`dibuat ${formatRouteDate(route.createdAt)}`);
+    meta.textContent = routeSummary.join(" • ");
+
     if (route.lastUsedAt) {
       meta.textContent += ` • terakhir diulang ${formatRouteDate(route.lastUsedAt)}`;
     }
