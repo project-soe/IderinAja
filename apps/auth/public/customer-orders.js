@@ -152,7 +152,7 @@ function showOrderDetail(order){
       ? `<div class="rejected">↩️ Pesanan dibatalkan oleh Anda sebelum diterima mitra.</div>`
       : "");
 
-  detailAddress.textContent = order.address || "Belum ada alamat";
+  detailAddress.textContent = order.deliveryAddress || order.address || "Belum ada alamat";
   detailNotes.textContent = order.notes || "Tidak ada catatan";
   detailPayment.textContent =
     order.paymentMethod === "cod"
