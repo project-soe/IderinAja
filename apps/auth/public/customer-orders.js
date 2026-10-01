@@ -1,6 +1,6 @@
 import { firebaseApp, firestoreDb } from "./firebase/config.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
-import { doc, getDoc, collection, onSnapshot, query, where } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+import { doc, getDoc, collection, onSnapshot, query, where, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
 
 const auth = getAuth(firebaseApp);
 const db = firestoreDb;
@@ -23,6 +23,8 @@ const detailAddress = document.getElementById("detailAddress");
 const detailNotes = document.getElementById("detailNotes");
 const detailPayment = document.getElementById("detailPayment");
 const detailTotal = document.getElementById("detailTotal");
+const cancelOrderButton = document.getElementById("cancelOrderButton");
+const cancelOrderNote = document.getElementById("cancelOrderNote");
 
 let currentUser = null;
 let allOrders = [];
@@ -34,6 +36,7 @@ const statusMeta = {
   accepted: { label:"Pesanan diterima", icon:"✅", className:"accepted" },
   rejected: { label:"Pesanan ditolak", icon:"❌", className:"rejected" },
   completed: { label:"Pesanan selesai", icon:"🏁", className:"completed" },
+  cancelled: { label:"Pesanan dibatalkan", icon:"↩️", className:"cancelled" },
 };
 
 const activeStatuses = new Set(["pending","accepted"]);
@@ -160,6 +163,10 @@ function showOrderDetail(order){
       : String(order.paymentMethod || "Belum ditentukan").toUpperCase();
 
   detailTotal.textContent = formatRupiah(order.total);
+  const canCancel = order.status === "pending";
+  cancelOrderButton?.classList.toggle("hidden", !canCancel);
+  cancelOrderNote?.classList.toggle("hidden", !canCancel);
+  if (cancelOrderButton) cancelOrderButton.dataset.orderId = canCancel ? order.id : "";
   detailModal.classList.remove("hidden");
 }
 
@@ -202,6 +209,26 @@ ordersList.addEventListener("click", event => {
   if (!card) return;
   const order = allOrders.find(item => item.id === card.dataset.orderId);
   showOrderDetail(order);
+});
+
+cancelOrderButton?.addEventListener("click", async () => {
+  const orderId = cancelOrderButton.dataset.orderId;
+  if (!orderId || !currentUser) return;
+  const order = allOrders.find(item => item.id === orderId);
+  if (!order || order.status !== "pending") return;
+  if (!window.confirm("Batalkan pesanan ini? Pesanan tidak akan diproses oleh mitra.")) return;
+  cancelOrderButton.disabled = true;
+  cancelOrderButton.textContent = "Membatalkan...";
+  try {
+    await updateDoc(doc(db, "orders", orderId), { status: "cancelled", updatedAt: serverTimestamp() });
+    detailModal.classList.add("hidden");
+  } catch (error) {
+    console.error("[CUSTOMER ORDERS] Pembatalan gagal:", error);
+    alert("Pesanan gagal dibatalkan. Silakan coba lagi.");
+  } finally {
+    cancelOrderButton.disabled = false;
+    cancelOrderButton.textContent = "✕ Batalkan Pesanan";
+  }
 });
 
 document.getElementById("closeDetail")?.addEventListener("click", () => {
