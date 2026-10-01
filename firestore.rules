@@ -318,6 +318,29 @@ service cloud.firestore {
           )
         );
 
+      // CUSTOMER:
+      // Konsumen hanya dapat membatalkan pesanan
+      // yang masih pending. Field lain tidak boleh diubah.
+      allow update: if
+        request.auth != null
+        && request.auth.uid ==
+          resource.data.customerId
+        && request.resource.data.customerId ==
+          resource.data.customerId
+        && request.resource.data.vendorId ==
+          resource.data.vendorId
+        && resource.data.status ==
+          'pending'
+        && request.resource.data.status ==
+          'cancelled'
+        && request.resource.data.diff(resource.data)
+          .affectedKeys()
+          .hasOnly([
+            'status',
+            'updatedAt'
+          ])
+        && request.resource.data.updatedAt is timestamp;
+
       allow delete: if false;
     }
 
