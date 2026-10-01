@@ -2997,6 +2997,8 @@ function getOrderStatusLabel(
       "Ditolak",
     completed:
       "Selesai",
+    cancelled:
+      "Dibatalkan oleh konsumen",
   };
 
   return (
@@ -3023,7 +3025,7 @@ function renderOrders(orders) {
     (order) => order.status === "pending" || order.status === "accepted"
   );
   const historyOrders = orders.filter(
-    (order) => order.status === "rejected" || order.status === "completed"
+    (order) => order.status === "rejected" || order.status === "completed" || order.status === "cancelled"
   );
 
   ordersList.innerHTML = "";
