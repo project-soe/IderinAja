@@ -70,6 +70,8 @@
         <button id="closeDetail" class="close" type="button" aria-label="Tutup">×</button>
       </div>
       <div id="detailStatus" class="detail-status badge pending">⏳ Menunggu konfirmasi</div>
+      <button id="cancelOrderButton" class="cancel-order-button hidden" type="button">✕ Batalkan Pesanan</button>
+      <div id="cancelOrderNote" class="cancel-order-note hidden">Anda masih dapat membatalkan pesanan sebelum diterima oleh mitra.</div>
       <div class="detail-section"><h3>Progress Pesanan</h3><div id="detailTimeline" class="timeline"></div></div>
       <div class="detail-section"><h3>Item Pesanan</h3><div id="detailItems" class="detail-items"></div></div>
       <div class="detail-section">
@@ -80,7 +82,7 @@
           <div><span>Pembayaran</span><strong id="detailPayment">COD</strong></div>
         </div>
       </div>
-      <div class="total"><span>Total</span><strong id="detailTotal">Rp0</strong></div><button id="cancelOrderButton" class="cancel-order-button hidden" type="button">✕ Batalkan Pesanan</button><div id="cancelOrderNote" class="cancel-order-note hidden">Pembatalan hanya tersedia sebelum pesanan diterima mitra.</div>
+      <div class="total"><span>Total</span><strong id="detailTotal">Rp0</strong></div>
     </div>
   </div>
 
@@ -90,6 +92,6 @@
     <button type="button" id="logoutButton"><span>↪</span>Keluar</button>
   </nav>
 
-  <script type="module" src="customer-orders.js?v=20261001-01"></script>
+  <script type="module" src="customer-orders.js?v=20261001-02"></script>
 </body>
 </html>
