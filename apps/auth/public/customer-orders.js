@@ -141,14 +141,16 @@ function showOrderDetail(order){
     {key:"accepted",icon:"✅",label:"Pesanan diterima mitra"},
     {key:"completed",icon:"🏁",label:"Pesanan selesai"}
   ];
-  const currentIndex = order.status === "rejected" ? -1 : timeline.findIndex(item => item.key === order.status);
+  const currentIndex = (order.status === "rejected" || order.status === "cancelled") ? -1 : timeline.findIndex(item => item.key === order.status);
   detailTimeline.innerHTML = timeline.map((item,index) => `
-    <div class="timeline-item ${order.status !== "rejected" && currentIndex >= index ? "done" : ""}">
+    <div class="timeline-item ${order.status !== "rejected" && order.status !== "cancelled" && currentIndex >= index ? "done" : ""}">
       <span class="timeline-icon">${item.icon}</span><span>${item.label}</span>
     </div>
   `).join("") + (order.status === "rejected"
     ? `<div class="rejected">❌ Pesanan ditolak oleh mitra.</div>`
-    : "");
+    : order.status === "cancelled"
+      ? `<div class="rejected">↩️ Pesanan dibatalkan oleh Anda sebelum diterima mitra.</div>`
+      : "");
 
   detailAddress.textContent = order.address || "Belum ada alamat";
   detailNotes.textContent = order.notes || "Tidak ada catatan";
